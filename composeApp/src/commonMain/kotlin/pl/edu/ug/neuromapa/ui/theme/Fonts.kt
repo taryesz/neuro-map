@@ -42,10 +42,15 @@ fun getAppTypography(): Typography {
             lineHeight = 20.sp
         ),
         bodySmall = TextStyle(fontFamily = inter,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Bold,
             fontSize = 15.sp,
             lineHeight = 30.sp
         ),
+        labelSmall = TextStyle(fontFamily = inter,
+            fontWeight = FontWeight.Bold,
+            fontSize = 10.sp,
+            lineHeight = 10.sp,
+        )
     )
 
 }

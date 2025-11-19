@@ -9,7 +9,6 @@ data class TeamMember(
     val affiliationIds: List<Int>
 )
 
-// Lista powiązana z zasobami (Zdefiniuj to poza funkcją Composable lub w remember)
 val teamMembersData = listOf(
     TeamMember(Res.string.team_member_1, listOf(1, 4)),
     TeamMember(Res.string.team_member_2, listOf(2, 3)),
@@ -18,7 +17,6 @@ val teamMembersData = listOf(
     TeamMember(Res.string.team_member_5, listOf(7))
 )
 
-// Mapa afiliacji (Numer ID -> Zasób)
 val affiliationsData = mapOf(
     1 to Res.string.affiliation_1,
     2 to Res.string.affiliation_2,

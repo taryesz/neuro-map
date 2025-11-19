@@ -55,9 +55,6 @@ import pl.edu.ug.neuromapa.ui.theme.getAppTypography
 @Composable
 fun HomeScreen() {
     Scaffold(
-        bottomBar = {
-            // ...
-        },
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
     ) {
