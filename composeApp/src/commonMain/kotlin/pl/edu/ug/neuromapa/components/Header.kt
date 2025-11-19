@@ -11,23 +11,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import pl.edu.ug.neuromapa.ui.theme.CornersRadius
 import pl.edu.ug.neuromapa.ui.theme.MainPadding
 import pl.edu.ug.neuromapa.ui.theme.getAppTypography
 import pl.edu.ug.neuromapa.ui.theme.ProfileIcon
+import pl.edu.ug.neuromapa.ui.theme.userProfileIconSize
 
 @Composable
 fun Header(
     title: String,
     showProfile: Boolean = true,
     onProfileClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    additionalContent: @Composable () -> Unit = {}
 ) {
 
-    // Header itself
-    Box(
+    // Header panel
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .background(
@@ -39,47 +39,49 @@ fun Header(
             .padding(horizontal = MainPadding, vertical = MainPadding)
     ) {
 
-        // Header's content
+        // Greeting & profile picture panels' wrapper
         Row(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,   // Space the two panels evenly
+            verticalAlignment = Alignment.Top                   // Keep the content of the two panels at the top
+                                                                // in case the text is longer and doesn't fit
+                                                                // in the row
         ) {
 
-            // Title box
+            // Greeting panel : contains the "Witaj, User!" text
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)     // Fill full width, but leave space for the second box (Profile picture)
+                // Make the Greeting panel not push the Profile picture panel out and keep it in the Wrapper
+                modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
 
-                // Title content
+                // Greeting text wrapper
                 Row(
                     modifier = Modifier
-                        .align(Alignment.TopStart)
+                        .align(Alignment.TopStart)  // Stick the text to the top of its wrapper
                         .fillMaxWidth()
                 ) {
                     Text(
                         text = title,
                         color = MaterialTheme.colorScheme.onPrimary,
-                        lineHeight = 40.sp,
                         style = getAppTypography().titleLarge
                     )
                 }
             }
 
-            // Profile picture box
+            // Profile picture panel : contains user photo. Showed optionally
             if (showProfile) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(userProfileIconSize)
                         .clip(CircleShape)
-                        .background(ProfileIcon)
-                        .clickable { onProfileClick() }
+                        .background(ProfileIcon)     // TODO: replace with user's photo
+                        .clickable { onProfileClick() }     // TODO: transfer user to their profile
                 )
             }
         }
+
+        // Add more content depending on what Screen the user is on
+        additionalContent()
+
     }
 }

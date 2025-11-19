@@ -3,7 +3,6 @@ package pl.edu.ug.neuromapa.ui.theme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -19,7 +18,6 @@ fun getInterFontFamily(): FontFamily {
         Font(resource = Res.font.inter_18pt_bold, weight = FontWeight.Bold),
         Font(resource = Res.font.inter_18pt_semibold, weight = FontWeight.SemiBold),
         Font(resource = Res.font.inter_18pt_regular, weight = FontWeight.Normal),
-
     )
 }
 
@@ -28,8 +26,26 @@ fun getAppTypography(): Typography {
     val inter = getInterFontFamily()
 
     return Typography(
-        titleLarge = TextStyle(fontFamily = inter, fontWeight = FontWeight.Bold, fontSize = 36.sp),
-        titleMedium = TextStyle(fontFamily = inter, fontWeight = FontWeight.SemiBold),
-        bodySmall = TextStyle(fontFamily = inter, fontWeight = FontWeight.Normal),
+        titleLarge = TextStyle(fontFamily = inter,
+            fontWeight = FontWeight.Bold,
+            fontSize = 36.sp,
+            lineHeight = 40.sp
+        ),
+        titleMedium = TextStyle(fontFamily = inter,
+            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp,
+            lineHeight = 32.sp
+        ),
+        titleSmall = TextStyle(fontFamily = inter,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            lineHeight = 20.sp
+        ),
+        bodySmall = TextStyle(fontFamily = inter,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp,
+            lineHeight = 30.sp
+        ),
     )
+
 }
