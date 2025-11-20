@@ -7,6 +7,7 @@ val CornersRadius = 15.dp
 val MainPadding = 30.dp
 val SecondaryPadding = 15.dp
 val TertiaryPadding = 7.5.dp
+val MenuItemLabelSpacing = 4.dp
 val MainSpacing = 30.dp
 val BulletPointHorizontalSpacing = 12.dp
 val userProfileIconSize = 40.dp

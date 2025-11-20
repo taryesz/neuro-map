@@ -1,7 +1,9 @@
 package pl.edu.ug.neuromapa.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -24,6 +26,7 @@ import pl.edu.ug.neuromapa.ui.theme.Surface
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.neuromap_logo_vertical_dark_no_text
 import neuromapa.composeapp.generated.resources.*
+import pl.edu.ug.neuromapa.ui.theme.MenuItemLabelSpacing
 
 @Composable
 fun NavigationBar(
@@ -55,40 +58,46 @@ fun NavigationBar(
                     val containerSize = if (isMapScreen) 70.dp else 50.dp
                     val iconSize = if (isMapScreen) 50.dp else 40.dp
 
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(containerSize)
-                            .requiredSize(containerSize)    // Make sure the size is the one we want
-                            .aspectRatio(1f)         // Lock the ratio to be a square
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
                     ) {
 
-                        // If a button is clicked, add background, round corners
-                        if (isSelected) {
-                            Box(
-                                modifier = Modifier
-                                    .size(containerSize)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(Surface)
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(containerSize)
+                                .requiredSize(containerSize)    // Make sure the size is the one we want
+                                .aspectRatio(1f)         // Lock the ratio to be a square
+                        ) {
+
+                            // If a button is clicked, add background, round corners
+                            if (isSelected) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(containerSize)
+                                        .clip(RoundedCornerShape(15.dp))
+                                        .background(Surface)
+                                )
+                            }
+
+                            Icon(
+                                painter = iconPainter,
+                                contentDescription = screen.label,
+                                modifier = Modifier.size(iconSize)
                             )
+
                         }
 
-                        Icon(
-                            painter = iconPainter,
-                            contentDescription = screen.label,
-                            modifier = Modifier.size(iconSize)
-                        )
-
+                        // Show the button label for all buttons except for the Map one
+                        if (!isMapScreen) {
+                            Text(
+                                text = screen.label,
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(top = MenuItemLabelSpacing)
+                            )
+                        }
                     }
-                },
 
-                // Show the button label for all buttons except for the Map one
-                label = {
-                    if (!isMapScreen) {
-                        Text(
-                            text = screen.label,
-                            style = MaterialTheme.typography.labelSmall,
-                        )
-                    }
                 },
 
                 colors = NavigationBarItemDefaults.colors(
@@ -114,9 +123,3 @@ fun getIconPainter(screen: Screen): Painter {
         Screen.Survey -> painterResource(Res.drawable.comment)
     }
 }
-
-
-
-
-
-
