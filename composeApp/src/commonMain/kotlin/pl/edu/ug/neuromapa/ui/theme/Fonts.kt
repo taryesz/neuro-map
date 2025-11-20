@@ -42,7 +42,7 @@ fun getAppTypography(): Typography {
             lineHeight = 20.sp
         ),
         bodySmall = TextStyle(fontFamily = inter,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
             fontSize = 15.sp,
             lineHeight = 30.sp
         ),
