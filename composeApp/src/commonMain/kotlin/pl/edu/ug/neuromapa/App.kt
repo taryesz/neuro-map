@@ -13,6 +13,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import pl.edu.ug.neuromapa.components.NavigationBar
 
 import pl.edu.ug.neuromapa.screens.home.HomeScreen
+import pl.edu.ug.neuromapa.screens.home.MapScreen
 import pl.edu.ug.neuromapa.ui.theme.NeuroMapaTheme
 
 @Composable
@@ -37,8 +38,8 @@ fun App() {
             Box(modifier = Modifier.padding(paddingValues)) {
                 when (currentScreen) {
                     Screen.Home -> HomeScreen()
-                    Screen.Add -> Text("Ekran Dodawania")       // TODO
-                    Screen.Map -> Text("Ekran Mapy")            // TODO
+                    Screen.Add -> Text("Ekran Dodaj")           // TODO
+                    Screen.Map -> MapScreen()
                     Screen.Favorites -> Text("Ekran Ulubione")  // TODO
                     Screen.Survey -> Text("Ekran Ankiety")      // TODO
                 }

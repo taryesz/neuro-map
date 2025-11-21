@@ -32,6 +32,7 @@ fun HomeHeader(
     Header(
         title = title,
         showProfile = showProfile,
+        roundBottomCorners = true,
         onProfileClick = onProfileClick,
         modifier = Modifier,
         additionalContent = {

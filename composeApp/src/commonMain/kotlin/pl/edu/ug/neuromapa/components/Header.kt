@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import pl.edu.ug.neuromapa.ui.theme.CornersRadius
 import pl.edu.ug.neuromapa.ui.theme.MainPadding
 import pl.edu.ug.neuromapa.ui.theme.getAppTypography
@@ -21,6 +22,7 @@ import pl.edu.ug.neuromapa.ui.theme.userProfileIconSize
 fun Header(
     title: String,
     showProfile: Boolean = true,
+    roundBottomCorners: Boolean = true,
     onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     additionalContent: @Composable () -> Unit = {}
@@ -32,7 +34,9 @@ fun Header(
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(bottomStart = CornersRadius, bottomEnd = CornersRadius)
+                shape = if (roundBottomCorners)
+                    RoundedCornerShape(bottomStart = CornersRadius, bottomEnd = CornersRadius)
+                else RoundedCornerShape(0.dp)
             )
             .windowInsetsPadding(WindowInsets.statusBars)
             .wrapContentHeight()
