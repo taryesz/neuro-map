@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.screens.home.components
+package pl.edu.ug.neuromapa.screens.map.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,14 +10,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import pl.edu.ug.neuromapa.ui.theme.getAppTypography
+import pl.edu.ug.neuromapa.ui.getAppTypography
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.filter
 import org.jetbrains.compose.resources.painterResource
-import pl.edu.ug.neuromapa.ui.theme.Background
-import pl.edu.ug.neuromapa.ui.theme.MainPadding
-import pl.edu.ug.neuromapa.ui.theme.SecondaryPadding
-import pl.edu.ug.neuromapa.ui.theme.userProfileIconSize
+import pl.edu.ug.neuromapa.ui.Background
+import pl.edu.ug.neuromapa.ui.MainPadding
+import pl.edu.ug.neuromapa.ui.SecondaryPadding
+import pl.edu.ug.neuromapa.ui.userProfileIconSize
 
 @Composable
 fun MapHeader(

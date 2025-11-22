@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.screens.home
+package pl.edu.ug.neuromapa.screens.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,9 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import pl.edu.ug.neuromapa.components.Header
-import pl.edu.ug.neuromapa.screens.home.components.MapHeader
-import pl.edu.ug.neuromapa.ui.theme.MainPadding
-import pl.edu.ug.neuromapa.ui.theme.MainSpacing
+import pl.edu.ug.neuromapa.screens.map.components.MapHeader
+import pl.edu.ug.neuromapa.ui.MainPadding
+import pl.edu.ug.neuromapa.ui.MainSpacing
 
 @Composable
 fun MapScreen() {

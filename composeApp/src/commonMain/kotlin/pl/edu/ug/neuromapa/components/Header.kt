@@ -12,11 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import pl.edu.ug.neuromapa.ui.theme.CornersRadius
-import pl.edu.ug.neuromapa.ui.theme.MainPadding
-import pl.edu.ug.neuromapa.ui.theme.getAppTypography
-import pl.edu.ug.neuromapa.ui.theme.ProfileIcon
-import pl.edu.ug.neuromapa.ui.theme.userProfileIconSize
+import pl.edu.ug.neuromapa.ui.CornersRadius
+import pl.edu.ug.neuromapa.ui.MainPadding
+import pl.edu.ug.neuromapa.ui.getAppTypography
+import pl.edu.ug.neuromapa.ui.ProfileIcon
+import pl.edu.ug.neuromapa.ui.userProfileIconSize
 
 @Composable
 fun Header(

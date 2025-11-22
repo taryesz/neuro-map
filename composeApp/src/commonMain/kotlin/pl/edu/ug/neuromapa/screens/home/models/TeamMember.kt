@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.screens.home.data.models
+package pl.edu.ug.neuromapa.screens.home.models
 
 import org.jetbrains.compose.resources.StringResource
 import neuromapa.composeapp.generated.resources.Res

@@ -1,7 +1,6 @@
 package pl.edu.ug.neuromapa.screens.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -41,18 +39,18 @@ import neuromapa.composeapp.generated.resources.team_members_title
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.screens.home.components.HomeHeader
-import pl.edu.ug.neuromapa.screens.home.data.models.affiliationsData
-import pl.edu.ug.neuromapa.screens.home.data.models.teamMembersData
-import pl.edu.ug.neuromapa.ui.theme.BulletPointHorizontalSpacing
-import pl.edu.ug.neuromapa.ui.theme.MainPadding
-import pl.edu.ug.neuromapa.ui.theme.MainSpacing
-import pl.edu.ug.neuromapa.ui.theme.SecondaryPadding
-import pl.edu.ug.neuromapa.ui.theme.SuperTextFontSize
-import pl.edu.ug.neuromapa.ui.theme.SuperTextLineHeight
-import pl.edu.ug.neuromapa.ui.theme.SuperTextNumberWidth
-import pl.edu.ug.neuromapa.ui.theme.SuperTextOpacity
-import pl.edu.ug.neuromapa.ui.theme.TertiaryPadding
-import pl.edu.ug.neuromapa.ui.theme.getAppTypography
+import pl.edu.ug.neuromapa.screens.home.models.affiliationsData
+import pl.edu.ug.neuromapa.screens.home.models.teamMembersData
+import pl.edu.ug.neuromapa.ui.BulletPointHorizontalSpacing
+import pl.edu.ug.neuromapa.ui.MainPadding
+import pl.edu.ug.neuromapa.ui.MainSpacing
+import pl.edu.ug.neuromapa.ui.SecondaryPadding
+import pl.edu.ug.neuromapa.ui.SuperTextFontSize
+import pl.edu.ug.neuromapa.ui.SuperTextLineHeight
+import pl.edu.ug.neuromapa.ui.SuperTextNumberWidth
+import pl.edu.ug.neuromapa.ui.SuperTextOpacity
+import pl.edu.ug.neuromapa.ui.TertiaryPadding
+import pl.edu.ug.neuromapa.ui.getAppTypography
 
 @Composable
 fun HomeScreen() {

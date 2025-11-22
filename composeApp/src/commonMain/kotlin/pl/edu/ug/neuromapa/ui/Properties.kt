@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.ui.theme
+package pl.edu.ug.neuromapa.ui
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp

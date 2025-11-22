@@ -13,11 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import pl.edu.ug.neuromapa.components.Header
-import pl.edu.ug.neuromapa.ui.theme.CornersRadius
-import pl.edu.ug.neuromapa.ui.theme.MainPadding
-import pl.edu.ug.neuromapa.ui.theme.SecondaryPadding
-import pl.edu.ug.neuromapa.ui.theme.SurfaceVariant
-import pl.edu.ug.neuromapa.ui.theme.getAppTypography
+import pl.edu.ug.neuromapa.ui.CornersRadius
+import pl.edu.ug.neuromapa.ui.MainPadding
+import pl.edu.ug.neuromapa.ui.SecondaryPadding
+import pl.edu.ug.neuromapa.ui.SurfaceVariant
+import pl.edu.ug.neuromapa.ui.getAppTypography
 
 @Composable
 fun HomeHeader(

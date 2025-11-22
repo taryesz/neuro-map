@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.components
+package pl.edu.ug.neuromapa.enums
 
 enum class Screen(val label: String) {
     Home("Główna"),

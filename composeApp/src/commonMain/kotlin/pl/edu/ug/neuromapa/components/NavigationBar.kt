@@ -18,15 +18,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import pl.edu.ug.neuromapa.ui.theme.Background
-import pl.edu.ug.neuromapa.ui.theme.MainPadding
-import pl.edu.ug.neuromapa.ui.theme.Primary
-import pl.edu.ug.neuromapa.ui.theme.SecondaryPadding
-import pl.edu.ug.neuromapa.ui.theme.Surface
+import pl.edu.ug.neuromapa.ui.Background
+import pl.edu.ug.neuromapa.ui.MainPadding
+import pl.edu.ug.neuromapa.ui.Primary
+import pl.edu.ug.neuromapa.ui.SecondaryPadding
+import pl.edu.ug.neuromapa.ui.Surface
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.neuromap_logo_vertical_dark_no_text
 import neuromapa.composeapp.generated.resources.*
-import pl.edu.ug.neuromapa.ui.theme.MenuItemLabelSpacing
+import pl.edu.ug.neuromapa.enums.Screen
+import pl.edu.ug.neuromapa.ui.MenuItemLabelSpacing
 
 @Composable
 fun NavigationBar(
