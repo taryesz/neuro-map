@@ -1,4 +1,7 @@
 <resources>
+
+    <!-- HOME SCREEN -->
+
     <!-- O projekcie-->
     <string name="about_project_title">O projekcie</string>
     <string name="about_project_description">We współczesnym świecie tworzenie przestrzeni dostępnych i przyjaznych dla osób o różnorodnych potrzebach staje się coraz ważniejsze. Kluczowym elementem tej inkluzywności jest wspieranie osób neuroatypowych — w tym osób w spektrum autyzmu czy z ADHD. Neuromapa powstała z potrzeby identyfikowania, opisywania i promowania miejsc przyjaznych neuroróżnorodności, ze szczególnym uwzględnieniem dzieci i młodzieży. Projekt opiera się na empatii, danych i zaangażowaniu społeczności, aby codzienne funkcjonowanie stawało się bardziej dostępne i wspierające.</string>
@@ -27,4 +30,10 @@
     <string name="affiliation_5">Instytut Pedagogiki, Uniwersytet Gdański</string>
     <string name="affiliation_6">Szkoła Doktorska przy Wydziale Nauk Społecznych, Uniwersytet Gdański</string>
     <string name="affiliation_7">Dejewska Clinic, Gdańsk</string>
+
+    <!-- SELECTED PLACE -->
+    <string name="about_place_title">Opis</string>
+    <string name="localization_title">Lokalizacja</string>
+    <string name="navigate_button">Nawiguj</string>
+    <string name="useful_link_title">Przydatne linki</string>
 </resources>

@@ -14,6 +14,7 @@ import pl.edu.ug.neuromapa.components.NavigationBar
 
 import pl.edu.ug.neuromapa.screens.home.HomeScreen
 import pl.edu.ug.neuromapa.screens.map.MapScreen
+import pl.edu.ug.neuromapa.screens.place.PlaceScreen
 import pl.edu.ug.neuromapa.ui.NeuroMapaTheme
 
 @Composable
