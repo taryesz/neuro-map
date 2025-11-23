@@ -1,6 +1,7 @@
 package pl.edu.ug.neuromapa.screens.home.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,10 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.DrawableResource
 import pl.edu.ug.neuromapa.components.Header
-import pl.edu.ug.neuromapa.ui.CornersRadius
-import pl.edu.ug.neuromapa.ui.MainPadding
-import pl.edu.ug.neuromapa.ui.SecondaryPadding
+import pl.edu.ug.neuromapa.screens.home.settings.buttonCornerRadius
+import pl.edu.ug.neuromapa.screens.home.settings.buttonTextFontSize
+import pl.edu.ug.neuromapa.screens.home.settings.buttonWidePadding
+import pl.edu.ug.neuromapa.screens.map.settings.bodyMediumPadding
 import pl.edu.ug.neuromapa.ui.SurfaceVariant
 import pl.edu.ug.neuromapa.ui.getAppTypography
 
@@ -24,6 +27,7 @@ fun HomeHeader(
     title: String,
     motto: String,
     buttonText: String,
+    userProfileImage: DrawableResource,
     showProfile: Boolean,
     onProfileClick: () -> Unit
 ) {
@@ -31,6 +35,7 @@ fun HomeHeader(
     // Build Home Screen's Header basing on the original Header, adding own content to it
     Header(
         title = title,
+        userProfileImage = userProfileImage,
         showProfile = showProfile,
         roundBottomCorners = true,
         onProfileClick = onProfileClick,
@@ -41,7 +46,7 @@ fun HomeHeader(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = SecondaryPadding, bottom = SecondaryPadding),
+                    .padding(vertical = bodyMediumPadding),
                 verticalAlignment = Alignment.Top,
             ) {
                 Text(
@@ -55,25 +60,26 @@ fun HomeHeader(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = SecondaryPadding),
+                    .padding(top = bodyMediumPadding),
                 verticalAlignment = Alignment.Top,
             ) {
 
                 // Button panel
                 Box(
                     modifier = Modifier
+                        .clickable { println("Kliknięto przycisk Potrzebuję spokoju") } // TODO
                         .fillMaxWidth()
                         .background(
                             color = SurfaceVariant,     // Light green color
-                            shape = RoundedCornerShape(CornersRadius)
+                            shape = RoundedCornerShape(buttonCornerRadius)
                         )
-                        .padding(MainPadding),
+                        .padding(buttonWidePadding),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = buttonText,
                         color = MaterialTheme.colorScheme.onPrimary,
-                        fontSize = 24.sp,   // Custom font size
+                        fontSize = buttonTextFontSize,
                         style = getAppTypography().titleLarge,
                     )
                 }

@@ -15,13 +15,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.DrawableResource
 import pl.edu.ug.neuromapa.components.Header
 import pl.edu.ug.neuromapa.screens.map.components.MapHeader
-import pl.edu.ug.neuromapa.ui.MainPadding
-import pl.edu.ug.neuromapa.ui.MainSpacing
+import pl.edu.ug.neuromapa.screens.map.settings.bodyWidePadding
+import pl.edu.ug.neuromapa.screens.map.settings.bodyWideSpacing
 
 @Composable
-fun MapScreen() {
+fun MapScreen(
+    userProfileImage: DrawableResource,
+) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
@@ -36,6 +39,7 @@ fun MapScreen() {
             // Base Header
             Header(
                 title = "NeuroMapa",
+                userProfileImage = userProfileImage,
                 showProfile = true,
                 roundBottomCorners = false,
                 onProfileClick = { println("Profile clicked") },
@@ -53,8 +57,8 @@ fun MapScreen() {
                     .fillMaxHeight()        // TODO: Remove this line when the map is being implemented
                     .weight(1f)     // TODO: Remove this line when the map is being implemented
                     .background(Color.Gray) // TODO: Remove this line when the map is being implemented
-                    .padding(MainPadding),  // TODO: Remove this line when the map is being implemented
-                verticalArrangement = Arrangement.spacedBy(MainSpacing)
+                    .padding(bodyWidePadding),  // TODO: Remove this line when the map is being implemented
+                verticalArrangement = Arrangement.spacedBy(bodyWideSpacing)
             ) {
                 // TODO: The map goes here | BARTEK
             }

@@ -19,15 +19,15 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.ui.Background
-import pl.edu.ug.neuromapa.ui.MainPadding
+import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 import pl.edu.ug.neuromapa.ui.Primary
-import pl.edu.ug.neuromapa.ui.SecondaryPadding
+import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
 import pl.edu.ug.neuromapa.ui.Surface
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.neuromap_logo_vertical_dark_no_text
 import neuromapa.composeapp.generated.resources.*
 import pl.edu.ug.neuromapa.enums.Screen
-import pl.edu.ug.neuromapa.ui.MenuItemLabelSpacing
+import pl.edu.ug.neuromapa.ui.settings.navigationBarLabelSpacing
 
 @Composable
 fun NavigationBar(
@@ -36,7 +36,7 @@ fun NavigationBar(
 ) {
     NavigationBar(
         containerColor = Background,
-        modifier = Modifier.padding(top = SecondaryPadding, start = MainPadding, end = MainPadding),
+        modifier = Modifier.padding(top = globalComponentMediumPadding, start = globalComponentWidePadding, end = globalComponentWidePadding),
         tonalElevation = 0.dp
     ) {
 
@@ -94,7 +94,7 @@ fun NavigationBar(
                             Text(
                                 text = screen.label,
                                 style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.padding(top = MenuItemLabelSpacing)
+                                modifier = Modifier.padding(top = navigationBarLabelSpacing)
                             )
                         }
                     }

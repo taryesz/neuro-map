@@ -1,5 +1,6 @@
 package pl.edu.ug.neuromapa.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,16 +12,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import pl.edu.ug.neuromapa.ui.CornersRadius
-import pl.edu.ug.neuromapa.ui.MainPadding
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
+import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
+import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.ui.ProfileIcon
-import pl.edu.ug.neuromapa.ui.userProfileIconSize
 
 @Composable
 fun Header(
     title: String,
+    userProfileImage: DrawableResource,
     showProfile: Boolean = true,
     roundBottomCorners: Boolean = true,
     onProfileClick: () -> Unit = {},
@@ -35,12 +40,12 @@ fun Header(
             .background(
                 color = MaterialTheme.colorScheme.primary,
                 shape = if (roundBottomCorners)
-                    RoundedCornerShape(bottomStart = CornersRadius, bottomEnd = CornersRadius)
+                    RoundedCornerShape(bottomStart = globalComponentCornerRadius, bottomEnd = globalComponentCornerRadius)
                 else RoundedCornerShape(0.dp)
             )
             .windowInsetsPadding(WindowInsets.statusBars)
             .wrapContentHeight()
-            .padding(horizontal = MainPadding, vertical = MainPadding)
+            .padding(horizontal = globalComponentWidePadding, vertical = globalComponentWidePadding)
     ) {
 
         // Greeting & profile picture panels' wrapper
@@ -74,12 +79,15 @@ fun Header(
 
             // Profile picture panel : contains user photo. Showed optionally
             if (showProfile) {
-                Box(
+                Image(
+                    painter = painterResource(userProfileImage),
+                    contentDescription = "Zdjęcie profilowe użytkownika",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(userProfileIconSize)
                         .clip(CircleShape)
-                        .background(ProfileIcon)     // TODO: replace with user's photo
-                        .clickable { onProfileClick() }     // TODO: transfer user to their profile
+                        .background(ProfileIcon) // In case the image doesn't load
+                        .clickable { onProfileClick() }
                 )
             }
         }

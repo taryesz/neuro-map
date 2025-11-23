@@ -36,24 +36,28 @@ import neuromapa.composeapp.generated.resources.neuromap_logo_dark
 import neuromapa.composeapp.generated.resources.project_goals_description
 import neuromapa.composeapp.generated.resources.project_goals_title
 import neuromapa.composeapp.generated.resources.team_members_title
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.screens.home.components.HomeHeader
 import pl.edu.ug.neuromapa.screens.home.models.affiliationsData
 import pl.edu.ug.neuromapa.screens.home.models.teamMembersData
-import pl.edu.ug.neuromapa.ui.BulletPointHorizontalSpacing
-import pl.edu.ug.neuromapa.ui.MainPadding
-import pl.edu.ug.neuromapa.ui.MainSpacing
-import pl.edu.ug.neuromapa.ui.SecondaryPadding
-import pl.edu.ug.neuromapa.ui.SuperTextFontSize
-import pl.edu.ug.neuromapa.ui.SuperTextLineHeight
-import pl.edu.ug.neuromapa.ui.SuperTextNumberWidth
-import pl.edu.ug.neuromapa.ui.SuperTextOpacity
-import pl.edu.ug.neuromapa.ui.TertiaryPadding
+import pl.edu.ug.neuromapa.screens.home.settings.bodyMediumPadding
+import pl.edu.ug.neuromapa.screens.home.settings.bodyNarrowPadding
+import pl.edu.ug.neuromapa.screens.home.settings.bodyWidePadding
+import pl.edu.ug.neuromapa.screens.home.settings.bodyWideSpacing
+import pl.edu.ug.neuromapa.screens.home.settings.bulletPointHorizontalSpacing
+import pl.edu.ug.neuromapa.screens.home.settings.superTextFontSize
+import pl.edu.ug.neuromapa.screens.home.settings.superTextLineHeight
+import pl.edu.ug.neuromapa.screens.home.settings.superTextNumberWidth
+import pl.edu.ug.neuromapa.screens.home.settings.superTextOpacity
 import pl.edu.ug.neuromapa.ui.getAppTypography
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    userFirstName: String,
+    userProfileImage: DrawableResource,
+) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
@@ -67,17 +71,18 @@ fun HomeScreen() {
 
             // Header
             HomeHeader(
-                title = "Witaj, Ryszard!",
+                title = "Witaj, $userFirstName!",
                 motto = "Znajdź miejsca przyjazne Twoim potrzebom.",
                 buttonText = "Potrzebuję spokoju",
+                userProfileImage = userProfileImage,
                 showProfile = true,
                 onProfileClick = { println("Profile clicked") }
             )
 
             // Body (Content)
             Column(
-                modifier = Modifier.fillMaxSize().padding(MainPadding),
-                verticalArrangement = Arrangement.spacedBy(MainSpacing)
+                modifier = Modifier.fillMaxSize().padding(bodyWidePadding),
+                verticalArrangement = Arrangement.spacedBy(bodyWideSpacing)
             ) {
 
                 // TODO: Think of a way to avoid repetition?
@@ -97,7 +102,7 @@ fun HomeScreen() {
 
                     // Description
                     Text(
-                        modifier = Modifier.padding(top = SecondaryPadding),
+                        modifier = Modifier.padding(top = bodyMediumPadding),
                         text = stringResource(Res.string.about_project_description),
                         color = MaterialTheme.colorScheme.onBackground,
                         style = getAppTypography().bodySmall,
@@ -125,12 +130,12 @@ fun HomeScreen() {
                     }
 
                     // Description
-                    Column() {
+                    Column {
                         goalsList.forEach { goalText ->
 
                             // Individual fact
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(top = SecondaryPadding),
+                                modifier = Modifier.fillMaxWidth().padding(top = bodyMediumPadding),
                                 verticalAlignment = Alignment.Top
                             ) {
 
@@ -140,7 +145,7 @@ fun HomeScreen() {
                                     style = getAppTypography().bodySmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onBackground,
-                                    modifier = Modifier.padding(end = BulletPointHorizontalSpacing)
+                                    modifier = Modifier.padding(end = bulletPointHorizontalSpacing)
                                 )
 
                                 // Fact
@@ -158,7 +163,7 @@ fun HomeScreen() {
 
                 }
 
-                // "Kluczowe dzialania" section
+                // "Kluczowe działania" section
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -178,12 +183,12 @@ fun HomeScreen() {
                     }
 
                     // Description
-                    Column() {
+                    Column {
                         goalsList.forEach { goalText ->
 
                             // Individual fact
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(top = SecondaryPadding),
+                                modifier = Modifier.fillMaxWidth().padding(top = bodyMediumPadding),
                                 verticalAlignment = Alignment.Top
                             ) {
 
@@ -193,7 +198,7 @@ fun HomeScreen() {
                                     style = getAppTypography().bodySmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onBackground,
-                                    modifier = Modifier.padding(end = BulletPointHorizontalSpacing)
+                                    modifier = Modifier.padding(end = bulletPointHorizontalSpacing)
                                 )
 
                                 // Fact
@@ -231,12 +236,12 @@ fun HomeScreen() {
 
                         val nameText = stringResource(member.nameRes)
 
-                        // Append supertext to a name
+                        // Append super text to a name
                         val styledText = buildAnnotatedString {
                             append("$nameText ")
                             withStyle(
                                 style = SpanStyle(
-                                    fontSize = SuperTextFontSize
+                                    fontSize = superTextFontSize
                                 )
                             ) {
                                 val refsString = member.affiliationIds.joinToString(",")
@@ -247,7 +252,7 @@ fun HomeScreen() {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = SecondaryPadding),
+                                .padding(top = bodyMediumPadding),
                             verticalAlignment = Alignment.Top,
                         ) {
 
@@ -257,7 +262,7 @@ fun HomeScreen() {
                                 style = getAppTypography().bodySmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.padding(end = BulletPointHorizontalSpacing)
+                                modifier = Modifier.padding(end = bulletPointHorizontalSpacing)
                             )
 
                             // Name
@@ -271,12 +276,12 @@ fun HomeScreen() {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(MainSpacing))
+                    Spacer(modifier = Modifier.height(bodyWideSpacing))
 
                     // Institutions
                     affiliationsData.forEach { (id, textRes) ->
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = TertiaryPadding),
+                            modifier = Modifier.fillMaxWidth().padding(bottom = bodyNarrowPadding),
                             verticalAlignment = Alignment.Top
                         ) {
 
@@ -285,22 +290,22 @@ fun HomeScreen() {
                                 text = buildAnnotatedString {
                                     withStyle(SpanStyle(
                                         baselineShift = BaselineShift.Superscript,
-                                        fontSize = SuperTextFontSize
+                                        fontSize = superTextFontSize
                                     )) {
                                         append("$id ")
                                     }
                                 },
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = SuperTextOpacity),
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = superTextOpacity),
                                 style = getAppTypography().bodySmall,
-                                modifier = Modifier.width(SuperTextNumberWidth)
+                                modifier = Modifier.width(superTextNumberWidth)
                             )
 
                             // Institution name
                             Text(
                                 text = stringResource(textRes),
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = SuperTextOpacity),
-                                fontSize = SuperTextFontSize,
-                                lineHeight = SuperTextLineHeight,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = superTextOpacity),
+                                fontSize = superTextFontSize,
+                                lineHeight = superTextLineHeight,
                                 style = getAppTypography().bodySmall,
                                 modifier = Modifier.weight(1f)
                             )
@@ -318,7 +323,7 @@ fun HomeScreen() {
 
                     val logos = listOf(
                         Res.drawable.neuromap_logo_dark to "Logotyp NeuroMapy.",
-                        Res.drawable.faru_gummed_pg_ug_logo_blue to "Logotyp FarU, GumMedu, PG oraz UG.",
+                        Res.drawable.faru_gummed_pg_ug_logo_blue to "Logotyp FarU, GumMed, PG oraz UG.",
                     )
 
                     logos.forEach { (logo, contentDescription) ->
