@@ -18,6 +18,9 @@ val onSurface = Color(0xFF123F44)
 // Light green button
 val SurfaceVariant = Color(0xFF34C759)
 
+// Secondary button
+val SurfaceDim = Color(0xFFb3b3b3)
+
 val LightColors = lightColorScheme(
     background = Background,
     onBackground = onBackground,
@@ -26,6 +29,7 @@ val LightColors = lightColorScheme(
     surface = Surface,
     onSurface = onSurface,
     surfaceVariant = SurfaceVariant,
+    surfaceDim = SurfaceDim,
 )
 
 val ProfileIcon = Color(0xFF595959)

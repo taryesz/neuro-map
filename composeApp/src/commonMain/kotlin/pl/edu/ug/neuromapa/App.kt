@@ -14,6 +14,7 @@ import pl.edu.ug.neuromapa.enums.Screen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import pl.edu.ug.neuromapa.components.NavigationBar
 import pl.edu.ug.neuromapa.screens.home.HomeScreen
+import pl.edu.ug.neuromapa.screens.add.AddScreen
 import pl.edu.ug.neuromapa.screens.map.MapScreen
 import pl.edu.ug.neuromapa.ui.NeuroMapaTheme
 
@@ -42,7 +43,9 @@ fun App() {
                         userFirstName = "Ryszard",
                         userProfileImage = Res.drawable.user_icon_example,
                     )
-                    Screen.Add -> Text("Ekran Dodaj")           // TODO
+                    Screen.Add -> AddScreen(
+                        userProfileImage = Res.drawable.user_icon_example,
+                    )
                     Screen.Map -> MapScreen(
                         userProfileImage = Res.drawable.user_icon_example,
                     )

@@ -36,4 +36,8 @@
     <string name="localization_title">Lokalizacja</string>
     <string name="navigate_button">Nawiguj</string>
     <string name="useful_link_title">Przydatne linki</string>
+
+    <!-- ADD -->
+    <string name="excellence_description">Serduszko oznacza wysoki poziom zaangażowania w dostosowanie przestrzeni i edukację. Miejsce szczególnie przyjazne neuroróżnorodności. Przyznawane za aktywne działania wspierające osoby neuroróżnorodne.\n\nMedal wskazuje miejsca, które wykraczają poza standardowe praktyki i wyróżniają się realnym, strukturalnym wsparciem. Przyznawany miejscom, które wdrażają szczególne, długofalowe działania.</string>
+
 </resources>
