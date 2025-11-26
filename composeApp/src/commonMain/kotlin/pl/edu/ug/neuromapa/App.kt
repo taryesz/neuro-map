@@ -15,7 +15,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import pl.edu.ug.neuromapa.components.NavigationBar
 import pl.edu.ug.neuromapa.screens.home.HomeScreen
 import pl.edu.ug.neuromapa.screens.add.AddScreen
+import pl.edu.ug.neuromapa.screens.favorites.FavoritesScreen
 import pl.edu.ug.neuromapa.screens.map.MapScreen
+import pl.edu.ug.neuromapa.screens.survey.SurveyScreen
 import pl.edu.ug.neuromapa.ui.NeuroMapaTheme
 
 @Composable
@@ -49,8 +51,12 @@ fun App() {
                     Screen.Map -> MapScreen(
                         userProfileImage = Res.drawable.user_icon_example,
                     )
-                    Screen.Favorites -> Text("Ekran Ulubione")  // TODO
-                    Screen.Survey -> Text("Ekran Ankiety")      // TODO
+                    Screen.Favorites -> FavoritesScreen(
+                        userProfileImage = Res.drawable.user_icon_example,
+                    )
+                    Screen.Survey -> SurveyScreen(
+                        userProfileImage = Res.drawable.user_icon_example,
+                    )
                 }
             }
 
