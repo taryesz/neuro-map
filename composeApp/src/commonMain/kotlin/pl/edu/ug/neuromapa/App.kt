@@ -17,6 +17,7 @@ import pl.edu.ug.neuromapa.screens.home.HomeScreen
 import pl.edu.ug.neuromapa.screens.add.AddScreen
 import pl.edu.ug.neuromapa.screens.favorites.FavoritesScreen
 import pl.edu.ug.neuromapa.screens.map.MapScreen
+import pl.edu.ug.neuromapa.screens.place.PlaceScreen
 import pl.edu.ug.neuromapa.screens.survey.SurveyScreen
 import pl.edu.ug.neuromapa.ui.NeuroMapaTheme
 
@@ -53,10 +54,14 @@ fun App() {
                     )
                     Screen.Favorites -> FavoritesScreen(
                         userProfileImage = Res.drawable.user_icon_example,
+                        onNavigateToScreen = { newScreen ->
+                            currentScreen = newScreen
+                        }
                     )
                     Screen.Survey -> SurveyScreen(
                         userProfileImage = Res.drawable.user_icon_example,
                     )
+                    Screen.Place -> PlaceScreen()
                 }
             }
 

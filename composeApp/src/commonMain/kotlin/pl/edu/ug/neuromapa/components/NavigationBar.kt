@@ -40,7 +40,9 @@ fun NavigationBar(
         tonalElevation = 0.dp
     ) {
 
-        Screen.entries.forEach { screen ->
+        Screen.entries
+            .filter { it.label != "Lokalizacja" }
+            .forEach { screen ->
 
             // Check if the the screen is selected
             val isSelected = currentScreen == screen
@@ -122,5 +124,6 @@ fun getIconPainter(screen: Screen): Painter {
         Screen.Map -> painterResource(Res.drawable.neuromap_logo_vertical_dark_no_text)
         Screen.Favorites -> painterResource(Res.drawable.favorite)
         Screen.Survey -> painterResource(Res.drawable.comment)
+        else -> painterResource(Res.drawable.home)
     }
 }

@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.screens.place.data
+package pl.edu.ug.neuromapa.screens.favorites.data
 
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.access
@@ -9,8 +9,8 @@ import neuromapa.composeapp.generated.resources.relax
 import neuromapa.composeapp.generated.resources.staff
 import pl.edu.ug.neuromapa.screens.place.models.*
 
-val CafePlace = Place(
-    name = "Bardzo Długa i Ciekawa Nazwa Lokalizacji Znajdującej Się w Gdańsku",
+val CafePlace1 = Place(
+    name = "Jeszcze Bardziej Długa i Ciekawa Nazwa Lokalizacji Znajdującej Się w Gdańsku",
     photo = Res.drawable.cafe,
     photoDescription = "Zdjęcie cafe z bardzo dluga nazwa.",
     categoryIcon = Res.drawable.food,

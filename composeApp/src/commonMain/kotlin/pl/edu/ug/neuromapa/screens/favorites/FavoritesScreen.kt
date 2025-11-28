@@ -1,5 +1,9 @@
 package pl.edu.ug.neuromapa.screens.favorites
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -21,27 +25,30 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.components.Header
 import pl.edu.ug.neuromapa.screens.favorites.components.FavoriteCard
-import pl.edu.ug.neuromapa.screens.favorites.settings.bodyMediumPadding
 import pl.edu.ug.neuromapa.screens.favorites.settings.bodyMediumSpacing
 import pl.edu.ug.neuromapa.screens.favorites.settings.bodyWidePadding
-import pl.edu.ug.neuromapa.screens.favorites.settings.bodyWideSpacing
-import pl.edu.ug.neuromapa.screens.place.data.CafePlace
-import pl.edu.ug.neuromapa.screens.place.data.mockPlaceKotkaCafe
+import pl.edu.ug.neuromapa.screens.favorites.data.CafePlace
+import pl.edu.ug.neuromapa.screens.favorites.data.CafePlace1
+import pl.edu.ug.neuromapa.screens.favorites.data.CafePlace2
+import pl.edu.ug.neuromapa.screens.favorites.data.mockPlaceKotkaCafe
 import pl.edu.ug.neuromapa.screens.place.models.Place
 import pl.edu.ug.neuromapa.ui.getAppTypography
+import androidx.compose.runtime.key
+import pl.edu.ug.neuromapa.enums.Screen
 
-val favoritePlaces = mutableStateListOf<Place>()
 @Composable
 fun FavoritesScreen(
     userProfileImage: DrawableResource,
+    onNavigateToScreen: (Screen) -> Unit,
     place: Place = mockPlaceKotkaCafe,
     place1: Place = CafePlace,
+    place2: Place = CafePlace1,
+    place3: Place = CafePlace2,
 
 ) {
-    favoritePlaces.add(place)
-    favoritePlaces.add(place1)
-    favoritePlaces.add(place1)
-    favoritePlaces.add(place1)
+    val favoritePlaces = remember {
+        mutableStateListOf(place, place1,place2, place3)
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -83,11 +90,31 @@ fun FavoritesScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(bodyMediumSpacing) // Простір між картками
+                verticalArrangement = Arrangement.spacedBy(bodyMediumSpacing)
             )
             {
-                favoritePlaces.forEach { place ->
-                    FavoriteCard(place = place)
+                favoritePlaces.forEach { currentPlace ->
+                    key(currentPlace.name) {
+                        AnimatedVisibility(
+                            visible = favoritePlaces.contains(currentPlace),
+                            exit = shrinkHorizontally(tween(500)) + fadeOut(tween(500))
+                        ) {
+                            FavoriteCard(
+                                place = currentPlace,
+                                onRemove = { placeToRemove ->
+                                    favoritePlaces.remove(placeToRemove)
+                                    println("Removed: ${placeToRemove.name}")
+                                },
+                                onNavigate = { placeToNavigate ->
+                                    println("Navigate to: ${placeToNavigate.name}")
+                                },
+                                onClick = { placeClicked ->
+                                    println("Card clicked: ${placeClicked.name}")
+                                    onNavigateToScreen(Screen.Place)
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
