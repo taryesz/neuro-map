@@ -1,148 +1,147 @@
 package pl.edu.ug.neuromapa.screens.favorites.components
 
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import pl.edu.ug.neuromapa.screens.favorites.settings.bodyWidePadding
-import pl.edu.ug.neuromapa.screens.favorites.settings.buttonCornerRadius
-import pl.edu.ug.neuromapa.screens.favorites.settings.scrimColor
-import pl.edu.ug.neuromapa.screens.place.models.Place
-import kotlin.math.abs
+import pl.edu.ug.neuromapa.screens.favorites.settings.cornerRadius
+import pl.edu.ug.neuromapa.screens.favorites.settings.mediumPadding
+import pl.edu.ug.neuromapa.screens.favorites.settings.widePadding
+import pl.edu.ug.neuromapa.ui.getAppTypography
+import pl.edu.ug.neuromapa.ui.onPrimary
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteCard(
-    place: Place,
-    onRemove: (Place) -> Unit,
-    onNavigate: (Place) -> Unit,
-    modifier: Modifier = Modifier,
-    onClick: (Place) -> Unit
+    title: String,
+    background: DrawableResource,
+    onClick: () -> Unit = {},
+    onDelete: () -> Unit,
+    onNavigate: () -> Unit
 ) {
-    val offsetX = remember { Animatable(0f) }
-    val scope = rememberCoroutineScope()
 
-    val maxOffset = 220f
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { dismissValue ->
+            when (dismissValue) {
 
-    val actionsOpened = remember { mutableStateOf(false) }
-
-    LaunchedEffect(actionsOpened.value) {
-        if (actionsOpened.value) {
-            delay(4000)
-            scope.launch { offsetX.animateTo(0f) }
-            actionsOpened.value = false
-        }
-    }
-
-
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(160.dp)
-            .padding(horizontal = bodyWidePadding)
-    ) {
-
-        if (offsetX.value != 0f) {
-            DismissBackground(
-                offset = offsetX.value,
-                onConfirmDelete = {
-                    actionsOpened.value = false
-                    onRemove(place)
-                    scope.launch { offsetX.animateTo(0f) }
-                },
-                onConfirmNavigate = {
-                    actionsOpened.value = false
-                    onNavigate(place)
-                    scope.launch { offsetX.animateTo(0f) }
+                // Swipe left -> delete
+                SwipeToDismissBoxValue.EndToStart -> {
+                    onDelete()
+                    true    // Delete and remove the item
                 }
-            )
-        }
 
-        Box(
-            modifier = Modifier
-                .offset { IntOffset(offsetX.value.toInt(), 0) }
-                .draggable(
-                    orientation = Orientation.Horizontal,
-                    state = rememberDraggableState { delta ->
-                        val newOffset = offsetX.value + delta
-                        if (newOffset in -maxOffset..maxOffset) {
-                            scope.launch { offsetX.snapTo(newOffset) }
-                        }
-                        actionsOpened.value = false
-                    },
-                    onDragStopped = {
-                        if (abs(offsetX.value) < maxOffset * 0.25f) {
-                            scope.launch { offsetX.animateTo(0f) }
-                        }else{
-                                actionsOpened.value = true
-                            }
-                    }
-                )
-                .clip(RoundedCornerShape(buttonCornerRadius))
-                .clickable {
-                    if (offsetX.value != 0f) {
-                        actionsOpened.value = false
-                        scope.launch { offsetX.animateTo(0f) }
-                    } else {
-                        onClick(place)
-                    }
+                // Swipe right -> navigation
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    onNavigate()
+                    false   // Perform an action, leave the item as is
                 }
-        ) {
-            Image(
-                painter = painterResource(place.photo),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
 
+                else -> false
+
+            }
+        }
+    )
+
+    // Swipe Box
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            DismissBackground(dismissState)     // Lower layer (what can be seen under the card)
+        },
+        content = {
+
+            // Card
             Box(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(0.67f)
-                    .background(scrimColor)
-                    .align(Alignment.CenterEnd)
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .fillMaxWidth(0.67f)
-                    .align(Alignment.CenterEnd)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+                    .clip(RoundedCornerShape(cornerRadius))
+                    .clickable { onClick() }
             ) {
-                Text(
-                    text = place.name,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    lineHeight = 22.sp,
-                    modifier = Modifier.fillMaxWidth()
+
+                // Background Image
+                Image(
+                    painter = painterResource(background),
+                    contentDescription = title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
                 )
+
+                // Text panel
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .fillMaxWidth(0.66f)
+                        .fillMaxHeight()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                        .padding(vertical = mediumPadding, horizontal = widePadding),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(
+                        text = title,
+                        style = getAppTypography().titleMedium,
+                        color = onPrimary
+                    )
+                }
             }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DismissBackground(dismissState: SwipeToDismissBoxState) {
+
+    val direction = dismissState.dismissDirection
+
+    // Colors depending on the direction of swipe
+    val color = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> Color(0xFF4CAF50) // Green (Right - Map)
+        SwipeToDismissBoxValue.EndToStart -> Color(0xFFE53935) // Red (Left - Delete)
+        else -> Color.Transparent
+    }
+
+    val alignment = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+        SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+        else -> Alignment.Center
+    }
+
+    val icon = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Place    // TODO: replace the icon
+        SwipeToDismissBoxValue.EndToStart -> Icons.Default.Delete   // TODO: replace the icon
+        else -> Icons.Default.Delete
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(cornerRadius))
+            .background(color)
+            .padding(horizontal = mediumPadding),
+        contentAlignment = alignment
+    ) {
+        if (direction != SwipeToDismissBoxValue.Settled) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(28.dp)
+            )
         }
     }
 }

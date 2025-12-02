@@ -42,10 +42,10 @@ import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.screens.home.components.HomeHeader
 import pl.edu.ug.neuromapa.screens.home.models.affiliationsData
 import pl.edu.ug.neuromapa.screens.home.models.teamMembersData
-import pl.edu.ug.neuromapa.screens.home.settings.bodyMediumPadding
-import pl.edu.ug.neuromapa.screens.home.settings.bodyNarrowPadding
-import pl.edu.ug.neuromapa.screens.home.settings.bodyWidePadding
-import pl.edu.ug.neuromapa.screens.home.settings.bodyWideSpacing
+import pl.edu.ug.neuromapa.screens.home.settings.mediumPadding
+import pl.edu.ug.neuromapa.screens.home.settings.narrowPadding
+import pl.edu.ug.neuromapa.screens.home.settings.widePadding
+import pl.edu.ug.neuromapa.screens.home.settings.wideSpacing
 import pl.edu.ug.neuromapa.screens.home.settings.bulletPointHorizontalSpacing
 import pl.edu.ug.neuromapa.screens.home.settings.superTextFontSize
 import pl.edu.ug.neuromapa.screens.home.settings.superTextLineHeight
@@ -81,8 +81,8 @@ fun HomeScreen(
 
             // Body (Content)
             Column(
-                modifier = Modifier.fillMaxSize().padding(bodyWidePadding),
-                verticalArrangement = Arrangement.spacedBy(bodyWideSpacing)
+                modifier = Modifier.fillMaxSize().padding(widePadding),
+                verticalArrangement = Arrangement.spacedBy(wideSpacing)
             ) {
 
                 // TODO: Think of a way to avoid repetition?
@@ -102,7 +102,7 @@ fun HomeScreen(
 
                     // Description
                     Text(
-                        modifier = Modifier.padding(top = bodyMediumPadding),
+                        modifier = Modifier.padding(top = mediumPadding),
                         text = stringResource(Res.string.about_project_description),
                         color = MaterialTheme.colorScheme.onBackground,
                         style = getAppTypography().bodySmall,
@@ -135,7 +135,7 @@ fun HomeScreen(
 
                             // Individual fact
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(top = bodyMediumPadding),
+                                modifier = Modifier.fillMaxWidth().padding(top = mediumPadding),
                                 verticalAlignment = Alignment.Top
                             ) {
 
@@ -188,7 +188,7 @@ fun HomeScreen(
 
                             // Individual fact
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(top = bodyMediumPadding),
+                                modifier = Modifier.fillMaxWidth().padding(top = mediumPadding),
                                 verticalAlignment = Alignment.Top
                             ) {
 
@@ -252,7 +252,7 @@ fun HomeScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = bodyMediumPadding),
+                                .padding(top = mediumPadding),
                             verticalAlignment = Alignment.Top,
                         ) {
 
@@ -276,12 +276,12 @@ fun HomeScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(bodyWideSpacing))
+                    Spacer(modifier = Modifier.height(wideSpacing))
 
                     // Institutions
                     affiliationsData.forEach { (id, textRes) ->
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = bodyNarrowPadding),
+                            modifier = Modifier.fillMaxWidth().padding(bottom = narrowPadding),
                             verticalAlignment = Alignment.Top
                         ) {
 

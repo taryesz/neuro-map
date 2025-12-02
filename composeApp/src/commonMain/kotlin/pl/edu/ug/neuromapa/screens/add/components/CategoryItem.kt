@@ -20,9 +20,12 @@ import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import pl.edu.ug.neuromapa.screens.add.settings.categoryItemIconSize
+import pl.edu.ug.neuromapa.screens.add.settings.categoryItemVerticalPadding
+import pl.edu.ug.neuromapa.screens.add.settings.mediumPadding
+import pl.edu.ug.neuromapa.screens.add.settings.cornerRadius
 
 @Composable
 fun CategoryItem(
@@ -34,10 +37,10 @@ fun CategoryItem(
 
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(15.dp))
+            .clip(RoundedCornerShape(cornerRadius))
             .clickable { onClick() }
-            .padding(horizontal = 15.dp),
-        verticalArrangement = Arrangement.spacedBy(5.dp),
+            .padding(horizontal = mediumPadding),
+        verticalArrangement = Arrangement.spacedBy(categoryItemVerticalPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
@@ -47,7 +50,7 @@ fun CategoryItem(
             contentDescription = iconDescription,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(70.dp)
+                .size(categoryItemIconSize)
                 .clip(CircleShape)
         )
 

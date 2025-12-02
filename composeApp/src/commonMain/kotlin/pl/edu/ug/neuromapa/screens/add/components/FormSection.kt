@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import pl.edu.ug.neuromapa.screens.add.settings.cornerRadius
+import pl.edu.ug.neuromapa.screens.add.settings.narrowPadding
 import pl.edu.ug.neuromapa.ui.getAppTypography
 
 @Composable
@@ -39,7 +41,7 @@ fun FormSection(
 
         Row(
             modifier = Modifier
-                .padding(vertical = 7.5.dp)
+                .padding(vertical = narrowPadding)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -49,8 +51,8 @@ fun FormSection(
             // Place name Text field
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(15.dp))
-                    .padding(vertical = 7.5.dp)
+                    .clip(RoundedCornerShape(cornerRadius))
+                    .padding(vertical = narrowPadding)
                     .weight(1f),
                 contentAlignment = Alignment.CenterStart
             )

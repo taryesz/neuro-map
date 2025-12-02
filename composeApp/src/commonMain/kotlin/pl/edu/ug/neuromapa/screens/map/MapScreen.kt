@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import pl.edu.ug.neuromapa.components.Header
 import pl.edu.ug.neuromapa.screens.map.components.MapHeader
-import pl.edu.ug.neuromapa.screens.map.settings.bodyWidePadding
-import pl.edu.ug.neuromapa.screens.map.settings.bodyWideSpacing
+import pl.edu.ug.neuromapa.screens.map.settings.widePadding
+import pl.edu.ug.neuromapa.screens.map.settings.wideSpacing
 
 @Composable
 fun MapScreen(
@@ -57,8 +57,8 @@ fun MapScreen(
                     .fillMaxHeight()        // TODO: Remove this line when the map is being implemented
                     .weight(1f)     // TODO: Remove this line when the map is being implemented
                     .background(Color.Gray) // TODO: Remove this line when the map is being implemented
-                    .padding(bodyWidePadding),  // TODO: Remove this line when the map is being implemented
-                verticalArrangement = Arrangement.spacedBy(bodyWideSpacing)
+                    .padding(widePadding),  // TODO: Remove this line when the map is being implemented
+                verticalArrangement = Arrangement.spacedBy(wideSpacing)
             ) {
                 // TODO: The map goes here | BARTEK
             }

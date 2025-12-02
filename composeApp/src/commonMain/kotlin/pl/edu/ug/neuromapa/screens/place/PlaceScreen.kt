@@ -34,19 +34,17 @@ import neuromapa.composeapp.generated.resources.navigate_button
 import neuromapa.composeapp.generated.resources.useful_link_title
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import pl.edu.ug.neuromapa.screens.home.settings.cornerRadius
 import pl.edu.ug.neuromapa.screens.place.components.PlaceHeader
 import pl.edu.ug.neuromapa.screens.place.components.SensoryProperty
 import pl.edu.ug.neuromapa.screens.place.data.mockPlaceKotkaCafe
 import pl.edu.ug.neuromapa.screens.place.models.Place
-import pl.edu.ug.neuromapa.screens.place.settings.bodyMediumPadding
-import pl.edu.ug.neuromapa.screens.place.settings.bodyNarrowPadding
-import pl.edu.ug.neuromapa.screens.place.settings.bodyNarrowSpacing
-import pl.edu.ug.neuromapa.screens.place.settings.bodyWidePadding
-import pl.edu.ug.neuromapa.screens.place.settings.bodyWideSpacing
+import pl.edu.ug.neuromapa.screens.place.settings.mediumPadding
+import pl.edu.ug.neuromapa.screens.place.settings.narrowPadding
+import pl.edu.ug.neuromapa.screens.place.settings.mediumSpacing
+import pl.edu.ug.neuromapa.screens.place.settings.widePadding
+import pl.edu.ug.neuromapa.screens.place.settings.wideSpacing
 import pl.edu.ug.neuromapa.screens.place.settings.linkIconSize
-import pl.edu.ug.neuromapa.screens.place.settings.navigationButtonCornerRadius
-import pl.edu.ug.neuromapa.screens.place.settings.navigationButtonHorizontalPadding
-import pl.edu.ug.neuromapa.screens.place.settings.navigationButtonVerticalPadding
 import pl.edu.ug.neuromapa.ui.SurfaceVariant
 import pl.edu.ug.neuromapa.ui.getAppTypography
 
@@ -74,18 +72,20 @@ fun PlaceScreen(
                 imageDescription = mockPlaceKotkaCafe.photoDescription,
                 categoryIcon = mockPlaceKotkaCafe.categoryIcon,
                 categoryIconDescription = mockPlaceKotkaCafe.categoryIconDescription,
+                isFavorite = false,
+                onFavoriteButtonClick = { println("Favorite clicked") },    // TODO: add/remove the object from the user's data
             )
 
             // Body (Content)
             Column(
-                modifier = Modifier.fillMaxSize().padding(bodyWidePadding),
-                verticalArrangement = Arrangement.spacedBy(bodyWideSpacing)
+                modifier = Modifier.fillMaxSize().padding(widePadding),
+                verticalArrangement = Arrangement.spacedBy(wideSpacing)
             ) {
 
                 // Sensory Properties horizontal "Carousel"
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(bodyNarrowSpacing)
+                    horizontalArrangement = Arrangement.spacedBy(mediumSpacing)
                 ) {
                     items(place.properties) { property ->
                         SensoryProperty(
@@ -111,7 +111,7 @@ fun PlaceScreen(
 
                     // Description
                     Text(
-                        modifier = Modifier.padding(top = bodyMediumPadding),
+                        modifier = Modifier.padding(top = mediumPadding),
                         text = place.description,
                         color = MaterialTheme.colorScheme.onBackground,
                         style = getAppTypography().bodySmall,
@@ -134,7 +134,7 @@ fun PlaceScreen(
 
                     // Description
                     Text(
-                        modifier = Modifier.padding(top = bodyMediumPadding),
+                        modifier = Modifier.padding(top = mediumPadding),
                         text = place.address,
                         color = MaterialTheme.colorScheme.onBackground,
                         style = getAppTypography().bodySmall,
@@ -143,14 +143,14 @@ fun PlaceScreen(
                     // Navigation button
                     Column(
                         modifier = Modifier
-                            .padding(top = bodyMediumPadding)
+                            .padding(top = mediumPadding)
                             .clickable { println("Kliknięto przycisk Nawiguj") }   // TODO: open Google Maps and route the user to this place from the user's actual position
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(navigationButtonCornerRadius))
+                            .clip(RoundedCornerShape(cornerRadius))
                             .background(SurfaceVariant)
                             .padding(
-                                horizontal = navigationButtonHorizontalPadding,
-                                vertical = navigationButtonVerticalPadding
+                                horizontal = widePadding,
+                                vertical = mediumPadding
                             ),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -171,7 +171,7 @@ fun PlaceScreen(
                         text = stringResource(Res.string.useful_link_title),
                         color = MaterialTheme.colorScheme.onBackground,
                         style = getAppTypography().titleMedium,
-                        modifier = Modifier.padding(bottom = bodyMediumPadding)
+                        modifier = Modifier.padding(bottom = mediumPadding)
                     )
 
                     // Show each relevant link
@@ -180,7 +180,7 @@ fun PlaceScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = bodyNarrowPadding),
+                                .padding(bottom = narrowPadding),
                             verticalAlignment = Alignment.CenterVertically
                         )
                         {
@@ -193,7 +193,7 @@ fun PlaceScreen(
                                 tint = MaterialTheme.colorScheme.onBackground
                             )
 
-                            Spacer(modifier = Modifier.width(bodyNarrowSpacing))
+                            Spacer(modifier = Modifier.width(mediumSpacing))
 
                             // Needed to open link in default browser of the system
                             val uriHandler = LocalUriHandler.current

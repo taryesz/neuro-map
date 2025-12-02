@@ -12,13 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.DrawableResource
 import pl.edu.ug.neuromapa.components.Header
-import pl.edu.ug.neuromapa.screens.home.settings.buttonCornerRadius
 import pl.edu.ug.neuromapa.screens.home.settings.buttonTextFontSize
-import pl.edu.ug.neuromapa.screens.home.settings.buttonWidePadding
-import pl.edu.ug.neuromapa.screens.map.settings.bodyMediumPadding
+import pl.edu.ug.neuromapa.screens.home.settings.cornerRadius
+import pl.edu.ug.neuromapa.screens.home.settings.widePadding
+import pl.edu.ug.neuromapa.screens.map.settings.mediumPadding
 import pl.edu.ug.neuromapa.ui.SurfaceVariant
 import pl.edu.ug.neuromapa.ui.getAppTypography
 
@@ -46,7 +45,7 @@ fun HomeHeader(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = bodyMediumPadding),
+                    .padding(vertical = mediumPadding),
                 verticalAlignment = Alignment.Top,
             ) {
                 Text(
@@ -60,7 +59,7 @@ fun HomeHeader(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = bodyMediumPadding),
+                    .padding(top = mediumPadding),
                 verticalAlignment = Alignment.Top,
             ) {
 
@@ -71,16 +70,16 @@ fun HomeHeader(
                         .fillMaxWidth()
                         .background(
                             color = SurfaceVariant,     // Light green color
-                            shape = RoundedCornerShape(buttonCornerRadius)
+                            shape = RoundedCornerShape(cornerRadius)
                         )
-                        .padding(buttonWidePadding),
+                        .padding(widePadding),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = buttonText,
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = buttonTextFontSize,
-                        style = getAppTypography().titleLarge,
+                        style = getAppTypography().titleMedium,
                     )
                 }
             }

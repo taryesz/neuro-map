@@ -15,9 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import pl.edu.ug.neuromapa.screens.place.settings.sensoryPropertyPadding
-import pl.edu.ug.neuromapa.screens.place.settings.sensoryPropertyCornerRadius
-import pl.edu.ug.neuromapa.screens.place.settings.sensoryPropertySpacing
+import pl.edu.ug.neuromapa.screens.place.settings.cornerRadius
+import pl.edu.ug.neuromapa.screens.place.settings.mediumPadding
+import pl.edu.ug.neuromapa.screens.place.settings.mediumSpacing
 import pl.edu.ug.neuromapa.screens.place.settings.sensoryPropertyIconSize
 
 @Composable
@@ -30,10 +30,10 @@ fun SensoryProperty(
     // Wrapper
     Row(
         modifier = Modifier
-            .clip(RoundedCornerShape(sensoryPropertyCornerRadius))
+            .clip(RoundedCornerShape(cornerRadius))
             .background(MaterialTheme.colorScheme.surface)
-            .padding(sensoryPropertyPadding),
-        horizontalArrangement = Arrangement.spacedBy(sensoryPropertySpacing),
+            .padding(mediumPadding),
+        horizontalArrangement = Arrangement.spacedBy(mediumSpacing),
         verticalAlignment = Alignment.CenterVertically
     )
     {

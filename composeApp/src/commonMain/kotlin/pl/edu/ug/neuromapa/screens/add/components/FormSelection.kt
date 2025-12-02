@@ -8,6 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import pl.edu.ug.neuromapa.screens.add.settings.mediumPadding
+import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
 import pl.edu.ug.neuromapa.ui.getAppTypography
 
 @Composable
@@ -25,7 +27,7 @@ fun FormSelection(
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(15.dp),
+        verticalArrangement = Arrangement.spacedBy(mediumSpacing),
     )
     {
 
@@ -40,8 +42,8 @@ fun FormSelection(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 15.dp),   // Padding between rows
-                horizontalArrangement = Arrangement.spacedBy(15.dp)
+                    .padding(bottom = mediumPadding),   // Padding between rows
+                horizontalArrangement = Arrangement.spacedBy(mediumSpacing)
             ) {
 
                 for (item in rowItems) {

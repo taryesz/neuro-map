@@ -28,8 +28,8 @@ import pl.edu.ug.neuromapa.components.Header
 import pl.edu.ug.neuromapa.screens.add.components.FormButton
 import pl.edu.ug.neuromapa.screens.add.components.FormSection
 import pl.edu.ug.neuromapa.screens.add.components.FormSelection
-import pl.edu.ug.neuromapa.screens.map.settings.bodyWidePadding
-import pl.edu.ug.neuromapa.screens.place.settings.bodyNarrowSpacing
+import pl.edu.ug.neuromapa.screens.add.settings.widePadding
+import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
 import pl.edu.ug.neuromapa.ui.Background
 import pl.edu.ug.neuromapa.ui.icons.CategoriesDark
 import pl.edu.ug.neuromapa.ui.icons.CategoriesLight
@@ -79,8 +79,8 @@ fun AddScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Background)
-                    .padding(bodyWidePadding),
-                verticalArrangement = Arrangement.spacedBy(bodyNarrowSpacing)
+                    .padding(widePadding),
+                verticalArrangement = Arrangement.spacedBy(mediumSpacing)
             )
             {
 

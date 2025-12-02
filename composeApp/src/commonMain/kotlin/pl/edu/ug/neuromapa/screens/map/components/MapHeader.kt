@@ -14,8 +14,8 @@ import pl.edu.ug.neuromapa.ui.getAppTypography
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.filter
 import org.jetbrains.compose.resources.painterResource
-import pl.edu.ug.neuromapa.screens.map.settings.bodyMediumPadding
-import pl.edu.ug.neuromapa.screens.map.settings.bodyWidePadding
+import pl.edu.ug.neuromapa.screens.map.settings.mediumPadding
+import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
 import pl.edu.ug.neuromapa.ui.Background
 
@@ -32,8 +32,8 @@ fun MapHeader(
             .fillMaxWidth()
             .background(Background)
             .padding(
-                vertical = bodyMediumPadding,
-                horizontal = bodyWidePadding
+                vertical = mediumPadding,
+                horizontal = widePadding
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
