@@ -1,5 +1,6 @@
 package pl.edu.ug.neuromapa.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,75 +12,88 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import pl.edu.ug.neuromapa.ui.theme.CornersRadius
-import pl.edu.ug.neuromapa.ui.theme.MainPadding
-import pl.edu.ug.neuromapa.ui.theme.getAppTypography
-import pl.edu.ug.neuromapa.ui.theme.ProfileIcon
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
+import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
+import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
+import pl.edu.ug.neuromapa.ui.getAppTypography
+import pl.edu.ug.neuromapa.ui.ProfileIcon
 
 @Composable
 fun Header(
     title: String,
+    userProfileImage: DrawableResource,
     showProfile: Boolean = true,
+    roundBottomCorners: Boolean = true,
     onProfileClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    additionalContent: @Composable () -> Unit = {}
 ) {
 
-    // Header itself
-    Box(
+    // Header panel
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(bottomStart = CornersRadius, bottomEnd = CornersRadius)
+                shape = if (roundBottomCorners)
+                    RoundedCornerShape(bottomStart = globalComponentCornerRadius, bottomEnd = globalComponentCornerRadius)
+                else RoundedCornerShape(0.dp)
             )
             .windowInsetsPadding(WindowInsets.statusBars)
             .wrapContentHeight()
-            .padding(horizontal = MainPadding, vertical = MainPadding)
+            .padding(horizontal = globalComponentWidePadding, vertical = globalComponentWidePadding)
     ) {
 
-        // Header's content
+        // Greeting & profile picture panels' wrapper
         Row(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,   // Space the two panels evenly
+            verticalAlignment = Alignment.Top                   // Keep the content of the two panels at the top
+                                                                // in case the text is longer and doesn't fit
+                                                                // in the row
         ) {
 
-            // Title box
+            // Greeting panel : contains the "Witaj, User!" text
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)     // Fill full width, but leave space for the second box (Profile picture)
+                // Make the Greeting panel not push the Profile picture panel out and keep it in the Wrapper
+                modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
 
-                // Title content
+                // Greeting text wrapper
                 Row(
                     modifier = Modifier
-                        .align(Alignment.TopStart)
+                        .align(Alignment.TopStart)  // Stick the text to the top of its wrapper
                         .fillMaxWidth()
                 ) {
                     Text(
                         text = title,
                         color = MaterialTheme.colorScheme.onPrimary,
-                        lineHeight = 40.sp,
                         style = getAppTypography().titleLarge
                     )
                 }
             }
 
-            // Profile picture box
+            // Profile picture panel : contains user photo. Showed optionally
             if (showProfile) {
-                Box(
+                Image(
+                    painter = painterResource(userProfileImage),
+                    contentDescription = "Zdjęcie profilowe użytkownika",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(userProfileIconSize)
                         .clip(CircleShape)
-                        .background(ProfileIcon)
+                        .background(ProfileIcon) // In case the image doesn't load
                         .clickable { onProfileClick() }
                 )
             }
         }
+
+        // Add more content depending on what Screen the user is on
+        additionalContent()
+
     }
 }

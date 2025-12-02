@@ -1,0 +1,46 @@
+<resources>
+
+    <!-- HOME SCREEN -->
+
+    <!-- O projekcie-->
+    <string name="about_project_title">O projekcie</string>
+    <string name="about_project_description">We współczesnym świecie tworzenie przestrzeni dostępnych i przyjaznych dla osób o różnorodnych potrzebach staje się coraz ważniejsze. Kluczowym elementem tej inkluzywności jest wspieranie osób neuroatypowych — w tym osób w spektrum autyzmu czy z ADHD. Neuromapa powstała z potrzeby identyfikowania, opisywania i promowania miejsc przyjaznych neuroróżnorodności, ze szczególnym uwzględnieniem dzieci i młodzieży. Projekt opiera się na empatii, danych i zaangażowaniu społeczności, aby codzienne funkcjonowanie stawało się bardziej dostępne i wspierające.</string>
+
+    <!-- Cele projektu -->
+    <string name="project_goals_title">Cele projektu</string>
+    <string name="project_goals_description">Identyfikacja i promocja miejsc przyjaznych neuroróżnorodności — zbieranie danych o przestrzeniach publicznych i prywatnych w Gdańsku oferujących.\nUdogodnienia i wsparcie dobrostanu.\nPodnoszenie świadomości społecznej — edukowanie społeczności na temat neuroróżnorodności oraz zachęcanie instytucji do wdrażania praktyk inkluzywnych.\nWsparcie osób neuroatypowych i ich rodzin — dostarczanie praktycznych informacji o bezpiecznych i wspierających miejscach w regionie.</string>
+
+    <!-- Kluczowe dzialania -->
+    <string name="key_operations_title">Kluczowe działania</string>
+    <string name="key_operations_description">Badanie i analiza istniejących miejsc (kino, muzea, restauracje, parki) pod kątem rozwiązań przyjaznych sensorycznie i inkluzywnych.\nOpracowanie interaktywnej mapy.\nWspółpraca z lokalnymi przedsiębiorcami — promowanie dobrych praktyk (np. ciche godziny, odpowiednie oznakowanie, szkolenia).\nProwadzenie warsztatów i spotkań dla instytucji oraz właścicieli firm.\nZapewnianie usług wsparcia psychologicznego.\nOrganizacja kampanii edukacyjnych i informacyjnych.</string>
+
+    <!-- Uczestnicy projektu & instytucje -->
+    <string name="team_members_title">Uczestnicy projektu</string>
+
+    <string name="team_member_1">Agata Rudnik</string>
+    <string name="team_member_2">Anna Supernat</string>
+    <string name="team_member_3">Małgorzata Treppner</string>
+    <string name="team_member_4">Alicja Pomian</string>
+    <string name="team_member_5">Anna Skupińska</string>
+
+    <string name="affiliation_1">Akademickie Centrum Wsparcia Psychologicznego, Uniwersytet Gdański</string>
+    <string name="affiliation_2">Laboratorium Onkologii Translacyjnej, Międzyuczelniany Wydział Biotechnologii UG i GUMed</string>
+    <string name="affiliation_3">Centrum Analiz Biostatystycznych i Bioinformatycznych, Gdański Uniwersytet Medyczny</string>
+    <string name="affiliation_4">Instytut Psychologii, Uniwersytet Gdański</string>
+    <string name="affiliation_5">Instytut Pedagogiki, Uniwersytet Gdański</string>
+    <string name="affiliation_6">Szkoła Doktorska przy Wydziale Nauk Społecznych, Uniwersytet Gdański</string>
+    <string name="affiliation_7">Dejewska Clinic, Gdańsk</string>
+
+    <!-- SELECTED PLACE -->
+    <string name="about_place_title">Opis</string>
+    <string name="localization_title">Lokalizacja</string>
+    <string name="navigate_button">Nawiguj</string>
+    <string name="useful_link_title">Przydatne linki</string>
+
+    <!-- ADD -->
+    <string name="excellence_description">Serduszko oznacza wysoki poziom zaangażowania w dostosowanie przestrzeni i edukację. Miejsce szczególnie przyjazne neuroróżnorodności. Przyznawane za aktywne działania wspierające osoby neuroróżnorodne.\n\nMedal wskazuje miejsca, które wykraczają poza standardowe praktyki i wyróżniają się realnym, strukturalnym wsparciem. Przyznawany miejscom, które wdrażają szczególne, długofalowe działania.</string>
+
+    <!-- FAVORITES description -->
+    <string name="project_favorites_description">Stuknij kafelek, żeby zobaczyć szczegóły miejsca. Przesuń kafelek w lewo, żeby usunąć miejsce z listy ulubionych. Przesuń kafelek w prawo, żeby uruchomić tryb nawigacji.</string>
+
+</resources>
