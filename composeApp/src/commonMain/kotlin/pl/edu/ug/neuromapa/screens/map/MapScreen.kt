@@ -21,12 +21,26 @@ import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.screens.map.components.MapHeader
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.wideSpacing
+import androidx.compose.runtime.LaunchedEffect
+
 
 @Composable
 fun MapScreen(
     userProfileImage: DrawableResource,
     mapPoints: List<MapPoint>
 ) {
+
+    LaunchedEffect(mapPoints) {
+        println("=== TEST MAPY: START ===")
+        println("Liczba pobranych punktów: ${mapPoints.size}")
+
+        mapPoints.forEach { point ->
+            println("Punkt: $point")
+        }
+
+        println("=== TEST MAPY: KONIEC ===")
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
