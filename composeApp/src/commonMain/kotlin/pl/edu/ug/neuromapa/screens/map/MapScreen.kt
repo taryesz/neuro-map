@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import pl.edu.ug.neuromapa.components.Header
+import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.screens.map.components.MapHeader
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.wideSpacing
@@ -24,6 +25,7 @@ import pl.edu.ug.neuromapa.screens.map.settings.wideSpacing
 @Composable
 fun MapScreen(
     userProfileImage: DrawableResource,
+    mapPoints: List<MapPoint>
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
