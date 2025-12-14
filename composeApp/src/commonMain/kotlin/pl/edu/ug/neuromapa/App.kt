@@ -13,8 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import demo.composeapp.generated.resources.Res
-import demo.composeapp.generated.resources.user_icon_example
+import neuromapa.composeapp.generated.resources.Res
+import neuromapa.composeapp.generated.resources.user_icon_example
 import pl.edu.ug.neuromapa.enums.Screen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import pl.edu.ug.neuromapa.components.NavigationBar
