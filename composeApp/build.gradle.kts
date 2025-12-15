@@ -46,6 +46,8 @@ kotlin {
             implementation("io.ktor:ktor-client-core:$ktorVersion")
             implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+
+            implementation(libs.maplibre.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

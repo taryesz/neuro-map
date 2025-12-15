@@ -3,6 +3,7 @@ package pl.edu.ug.neuromapa.screens.map
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,14 @@ import pl.edu.ug.neuromapa.screens.map.components.MapHeader
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.wideSpacing
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import neuromapa.composeapp.generated.resources.Res
+import org.maplibre.compose.map.GestureOptions
+import org.maplibre.compose.map.MapOptions
+import org.maplibre.compose.map.MaplibreMap
+import org.maplibre.compose.map.OrnamentOptions
+import org.maplibre.compose.style.BaseStyle
+import pl.edu.ug.neuromapa.screens.map.settings.cameraSettings
 
 
 @Composable
@@ -47,9 +56,6 @@ fun MapScreen(
     ) {
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
         ) {
 
             // Base Header
@@ -69,14 +75,27 @@ fun MapScreen(
             // Body (Content)
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .fillMaxHeight()        // TODO: Remove this line when the map is being implemented
-                    .weight(1f)     // TODO: Remove this line when the map is being implemented
-                    .background(Color.Gray) // TODO: Remove this line when the map is being implemented
-                    .padding(widePadding),  // TODO: Remove this line when the map is being implemented
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(wideSpacing)
             ) {
-                // TODO: The map goes here | BARTEK
+                MaplibreMap(
+                    baseStyle = BaseStyle.Uri(Res.getUri("files/map_1_0_color.json")),
+                    cameraState = cameraSettings(),
+                    options = MapOptions(
+                        ornamentOptions = OrnamentOptions(
+                            padding = PaddingValues(0.dp),
+                            isLogoEnabled = true,
+                            logoAlignment = Alignment.BottomStart,
+                            isAttributionEnabled = true,
+                            attributionAlignment = Alignment.BottomEnd,
+                            isCompassEnabled = true,
+                            compassAlignment = Alignment.TopEnd,
+                            isScaleBarEnabled = true,
+                            scaleBarAlignment = Alignment.TopStart,
+                        ),
+                        gestureOptions = GestureOptions.Standard
+                    )
+                )
             }
 
         }
