@@ -23,21 +23,64 @@ import pl.edu.ug.neuromapa.screens.map.components.MapHeader
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.wideSpacing
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import neuromapa.composeapp.generated.resources.Res
+import org.maplibre.compose.expressions.ast.Expression
+import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.expressions.dsl.image
+import org.maplibre.compose.layers.CircleLayer
+import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.map.GestureOptions
 import org.maplibre.compose.map.MapOptions
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.OrnamentOptions
+import org.maplibre.compose.sources.GeoJsonData
+import org.maplibre.compose.sources.GeoJsonOptions
+import org.maplibre.compose.sources.GeoJsonSource
+import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
 import pl.edu.ug.neuromapa.screens.map.settings.cameraSettings
 
+
+
+fun mapPointsToGeoJson(mapPoints: List<MapPoint>): String {
+    val features = mapPoints.joinToString(separator = ",") { point ->
+        """
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [${point.longitude}, ${point.latitude}]
+            },
+            "properties": {
+                "id": ${point.id},
+                "name": "${point.name}",
+                "category": "${point.category}"
+            }
+        }
+        """
+    }
+
+    return """
+        {
+            "type": "FeatureCollection",
+            "features": [
+                $features
+            ]
+        }
+    """
+}
 
 @Composable
 fun MapScreen(
     userProfileImage: DrawableResource,
     mapPoints: List<MapPoint>
 ) {
+
+    val geoJsonString = remember(mapPoints) {
+        mapPointsToGeoJson(mapPoints)
+    }
 
     LaunchedEffect(mapPoints) {
         println("=== TEST MAPY: START ===")
@@ -46,7 +89,7 @@ fun MapScreen(
         mapPoints.forEach { point ->
             println("Punkt: $point")
         }
-
+//        println("GeoJSON: $geoJsonString")
         println("=== TEST MAPY: KONIEC ===")
     }
 
@@ -95,7 +138,23 @@ fun MapScreen(
                         ),
                         gestureOptions = GestureOptions.Standard
                     )
-                )
+                ) {
+                    val pointsSource = rememberGeoJsonSource(
+                        data = GeoJsonData.JsonString(geoJsonString),
+                        options = GeoJsonOptions(
+                            cluster = true,
+                            clusterMaxZoom = 14,
+                            clusterRadius = 50
+                        )
+                    )
+                    CircleLayer(
+                        id = "Points-places",
+                        source = pointsSource,
+                        color = const(Color.Black),
+                        radius = const(4.dp)
+                    )
+
+                }
             }
 
         }
