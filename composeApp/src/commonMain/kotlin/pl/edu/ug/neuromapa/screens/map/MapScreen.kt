@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -22,14 +23,24 @@ import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.screens.map.components.MapHeader
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.wideSpacing
+import pl.edu.ug.neuromapa.ui.icons.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.em
+import kotlinx.coroutines.coroutineScope
 import neuromapa.composeapp.generated.resources.Res
+import neuromapa.composeapp.generated.resources.category_dark_children
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.maplibre.compose.expressions.ast.Expression
+import org.maplibre.compose.expressions.dsl.asNumber
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.image
 import org.maplibre.compose.layers.CircleLayer
+import org.maplibre.compose.layers.RasterLayer
 import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.map.GestureOptions
 import org.maplibre.compose.map.MapOptions
@@ -41,6 +52,16 @@ import org.maplibre.compose.sources.GeoJsonSource
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
 import pl.edu.ug.neuromapa.screens.map.settings.cameraSettings
+import org.maplibre.compose.expressions.dsl.feature
+import org.maplibre.compose.expressions.dsl.step
+import org.maplibre.compose.util.ClickResult
+import org.maplibre.compose.camera.CameraState
+import org.maplibre.compose.camera.CameraPosition
+import org.maplibre.compose.expressions.dsl.asString
+import org.maplibre.compose.expressions.dsl.not
+import org.maplibre.compose.expressions.value.SymbolZOrder
+import org.maplibre.compose.sources.rememberRasterSource
+import org.maplibre.spatialk.geojson.Point
 
 
 
@@ -78,9 +99,11 @@ fun MapScreen(
     mapPoints: List<MapPoint>
 ) {
 
+
     val geoJsonString = remember(mapPoints) {
         mapPointsToGeoJson(mapPoints)
     }
+
 
     LaunchedEffect(mapPoints) {
         println("=== TEST MAPY: START ===")
@@ -91,6 +114,7 @@ fun MapScreen(
         }
 //        println("GeoJSON: $geoJsonString")
         println("=== TEST MAPY: KONIEC ===")
+
     }
 
     Scaffold(
@@ -145,15 +169,88 @@ fun MapScreen(
                             cluster = true,
                             clusterMaxZoom = 14,
                             clusterRadius = 50
+
                         )
                     )
+                    // WARSTWA 1: KLASTRY (Kółka)
                     CircleLayer(
-                        id = "Points-places",
+                        id = "clusters-circles",
                         source = pointsSource,
-                        color = const(Color.Black),
-                        radius = const(4.dp)
+                        filter = feature.has("point_count"),
+                        color = step(
+                            input = feature["point_count"].asNumber(),
+                            fallback = const(Color.hsv(186f, 0.74f, 0.60f)),
+                            10 to const(Color.hsv(186f, 0.78f, 0.50f)),
+                            30 to const(Color.hsv(186f, 0.84f, 0.40f)),
+
+                        ),
+                        blur = const(0.15f),
+                        opacity = const(0.6f),
+                        radius = step(
+                            input = feature["point_count"].asNumber(),
+                            fallback = const(20.dp), // Domyślny rozmiar
+                            10 to const(30.dp),
+                            30 to const(40.dp),
+                            50 to const(50.dp)
+                        ),
                     )
 
+                    // WARSTWA 2: LICZNIK W KLASTRZE (Tekst)
+                    SymbolLayer(
+                        id = "clusters-count",
+                        source = pointsSource,
+                        filter = feature.has("point_count"),
+                        textField = feature["point_count_abbreviated"].asString(),
+                        textColor = const(Color.Black),
+                        textSize = const(1.em),
+                        textFont = const(listOf("Noto Sans Regular")),
+                        textHaloWidth = const(1.dp),
+                        textHaloColor = const(Color.White),
+                        textHaloBlur = const(1.dp),
+                        textAllowOverlap = const(true),
+                        textIgnorePlacement = const(true),
+                        iconAllowOverlap = const(true),
+                        iconIgnorePlacement = const(true)
+                    )
+
+                    // WARSTWA 3: POJEDYNCZE PUNKTY (Nie-klastry)
+//                    CircleLayer(
+//                        id = "unclustered-points",
+//                        source = pointsSource,
+//                        filter = !feature.has("point_count"),
+//                        color = const(Color.Cyan),
+//                        radius = const(5.dp),
+//                        strokeWidth = const(2.dp),
+//                        strokeColor = const(Color.White),
+//                        onClick = { features ->
+//                            // Tu możesz dodać logikę, np. otwarcie BottomSheet
+//                            println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+//                            ClickResult.Consume
+//                        }
+//                    )
+
+                    SymbolLayer(
+                        id = "unclustered-points",
+                        source = pointsSource,
+                        filter = !feature.has("point_count"),
+                        iconImage = image(
+                            value = painterResource(Res.drawable.category_dark_children),
+                            size = DpSize(30.dp, 30.dp)
+                        ),
+                        iconHaloWidth = const(10.dp),
+                        iconHaloColor = const(Color.White),
+                        iconHaloBlur = const(1.dp),
+
+                        iconAllowOverlap = const(true),
+                        iconIgnorePlacement = const(true),
+                        onClick = { features ->
+                            // Tu możesz dodać logikę, np. otwarcie BottomSheet
+                            println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                            ClickResult.Consume
+                        }
+
+
+                    )
                 }
             }
 
