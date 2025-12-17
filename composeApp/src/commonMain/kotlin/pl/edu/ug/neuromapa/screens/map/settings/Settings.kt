@@ -1,10 +1,12 @@
 package pl.edu.ug.neuromapa.screens.map.settings
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.camera.rememberCameraState
+import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.spatialk.geojson.Position
 
 val widePadding = 30.dp
@@ -25,3 +27,4 @@ fun cameraSettings(): CameraState {
     )
     return camera
 }
+

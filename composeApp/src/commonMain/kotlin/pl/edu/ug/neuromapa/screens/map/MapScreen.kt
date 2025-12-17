@@ -27,12 +27,13 @@ import pl.edu.ug.neuromapa.ui.icons.*
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import org.maplibre.compose.expressions.dsl.Case
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.em
 import kotlinx.coroutines.coroutineScope
 import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.category_dark_children
+import neuromapa.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.maplibre.compose.expressions.ast.Expression
@@ -57,7 +58,10 @@ import org.maplibre.compose.expressions.dsl.step
 import org.maplibre.compose.util.ClickResult
 import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.camera.CameraPosition
+import org.maplibre.compose.expressions.dsl.and
 import org.maplibre.compose.expressions.dsl.asString
+import org.maplibre.compose.expressions.dsl.case
+import org.maplibre.compose.expressions.dsl.eq
 import org.maplibre.compose.expressions.dsl.not
 import org.maplibre.compose.expressions.value.SymbolZOrder
 import org.maplibre.compose.sources.rememberRasterSource
@@ -98,11 +102,19 @@ fun MapScreen(
     userProfileImage: DrawableResource,
     mapPoints: List<MapPoint>
 ) {
-
-
+    // wynik filtracji tutaj poniżej jako mapPoints
     val geoJsonString = remember(mapPoints) {
         mapPointsToGeoJson(mapPoints)
     }
+
+    val iconSize = DpSize(30.dp, 30.dp)
+    val iconHaloWidthValue =  const(10.dp)
+    val iconHaloColorValue = const(Color.White)
+    val iconHaloBlurValue = const(1.dp)
+
+
+
+
 
 
     LaunchedEffect(mapPoints) {
@@ -163,6 +175,9 @@ fun MapScreen(
                         gestureOptions = GestureOptions.Standard
                     )
                 ) {
+
+
+
                     val pointsSource = rememberGeoJsonSource(
                         data = GeoJsonData.JsonString(geoJsonString),
                         options = GeoJsonOptions(
@@ -213,7 +228,7 @@ fun MapScreen(
                         iconIgnorePlacement = const(true)
                     )
 
-                    // WARSTWA 3: POJEDYNCZE PUNKTY (Nie-klastry)
+                    // WARSTWA 3: POJEDYNCZE PUNKTY (Nie-klastry) - wszysztkie punkty poza klastrami
 //                    CircleLayer(
 //                        id = "unclustered-points",
 //                        source = pointsSource,
@@ -230,17 +245,20 @@ fun MapScreen(
 //                    )
 
                     SymbolLayer(
-                        id = "unclustered-points",
+                        id = "unclustered-points-relaks",
                         source = pointsSource,
-                        filter = !feature.has("point_count"),
-                        iconImage = image(
-                            value = painterResource(Res.drawable.category_dark_children),
-                            size = DpSize(30.dp, 30.dp)
+                        filter =
+                            feature.has("point_count").not().and(      // Nie jest klastrem
+                            feature.has("category").and(              // Posiada klucz category
+                            feature["category"].asString().eq(const("relaks"))) // Jest relaksem
                         ),
-                        iconHaloWidth = const(10.dp),
-                        iconHaloColor = const(Color.White),
-                        iconHaloBlur = const(1.dp),
-
+                        iconImage = image(
+                            value = painterResource(Res.drawable.category_dark_relax),
+                            size = iconSize
+                        ),
+                        iconHaloWidth = iconHaloWidthValue,
+                        iconHaloColor = iconHaloColorValue,
+                        iconHaloBlur = iconHaloBlurValue,
                         iconAllowOverlap = const(true),
                         iconIgnorePlacement = const(true),
                         onClick = { features ->
@@ -248,9 +266,156 @@ fun MapScreen(
                             println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
                             ClickResult.Consume
                         }
-
-
                     )
+
+                    SymbolLayer(
+                        id = "unclustered-points-children",
+                        source = pointsSource,
+                        filter =
+                            feature.has("point_count").not().and(      // Nie jest klastrem
+                                feature.has("category").and(              // Posiada klucz category
+                                    feature["category"].asString().eq(const("dzieci"))) // TODO SPRAWDŹ POPRAWNOŚĆ NAZWY KATEGORII
+                            ),
+                        iconImage = image(
+                            value = painterResource(Res.drawable.category_dark_children),
+                            size = iconSize
+                        ),
+                        iconHaloWidth = iconHaloWidthValue,
+                        iconHaloColor = iconHaloColorValue,
+                        iconHaloBlur = iconHaloBlurValue,
+                        iconAllowOverlap = const(true),
+                        iconIgnorePlacement = const(true),
+                        onClick = { features ->
+                            // Tu możesz dodać logikę, np. otwarcie BottomSheet
+                            println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                            ClickResult.Consume
+                        }
+                    )
+
+                    SymbolLayer(
+                        id = "unclustered-points-food",
+                        source = pointsSource,
+                        filter =
+                            feature.has("point_count").not().and(      // Nie jest klastrem
+                                feature.has("category").and(              // Posiada klucz category
+                                    feature["category"].asString().eq(const("jedzenie"))) // Jest relaksem
+                            ),
+                        iconImage = image(
+                            value = painterResource(Res.drawable.category_dark_food),
+                            size = iconSize
+                        ),
+                        iconHaloWidth = iconHaloWidthValue,
+                        iconHaloColor = iconHaloColorValue,
+                        iconHaloBlur = iconHaloBlurValue,
+                        iconAllowOverlap = const(true),
+                        iconIgnorePlacement = const(true),
+                        onClick = { features ->
+                            // Tu możesz dodać logikę, np. otwarcie BottomSheet
+                            println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                            ClickResult.Consume
+                        }
+                    )
+
+                    SymbolLayer(
+                        id = "unclustered-points-culture",
+                        source = pointsSource,
+                        filter =
+                            feature.has("point_count").not().and(      // Nie jest klastrem
+                                feature.has("category").and(              // Posiada klucz category
+                                    feature["category"].asString().eq(const("kultura"))) // Jest relaksem
+                            ),
+                        iconImage = image(
+                            value = painterResource(Res.drawable.category_dark_culture),
+                            size = iconSize
+                        ),
+                        iconHaloWidth = iconHaloWidthValue,
+                        iconHaloColor = iconHaloColorValue,
+                        iconHaloBlur = iconHaloBlurValue,
+                        iconAllowOverlap = const(true),
+                        iconIgnorePlacement = const(true),
+                        onClick = { features ->
+                            // Tu możesz dodać logikę, np. otwarcie BottomSheet
+                            println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                            ClickResult.Consume
+                        }
+                    )
+
+                    SymbolLayer(
+                        id = "unclustered-points-services",
+                        source = pointsSource,
+                        filter =
+                            feature.has("point_count").not().and(      // Nie jest klastrem
+                                feature.has("category").and(              // Posiada klucz category
+                                    feature["category"].asString().eq(const("uslugi"))) // TODO SPRAWDŹ POPRAWNOŚĆ NAZWY KATEGORII
+                            ),
+                        iconImage = image(
+                            value = painterResource(Res.drawable.category_dark_services),
+                            size = iconSize
+                        ),
+                        iconHaloWidth = iconHaloWidthValue,
+                        iconHaloColor = iconHaloColorValue,
+                        iconHaloBlur = iconHaloBlurValue,
+                        iconAllowOverlap = const(true),
+                        iconIgnorePlacement = const(true),
+                        onClick = { features ->
+                            // Tu możesz dodać logikę, np. otwarcie BottomSheet
+                            println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                            ClickResult.Consume
+                        }
+                    )
+
+                    SymbolLayer(
+                        id = "unclustered-points-support",
+                        source = pointsSource,
+                        filter =
+                            feature.has("point_count").not().and(      // Nie jest klastrem
+                                feature.has("category").and(              // Posiada klucz category
+                                    feature["category"].asString().eq(const("wsparcie")))
+                            ),
+                        iconImage = image(
+                            value = painterResource(Res.drawable.category_dark_support),
+                            size = iconSize
+                        ),
+                        iconHaloWidth = iconHaloWidthValue,
+                        iconHaloColor = iconHaloColorValue,
+                        iconHaloBlur = iconHaloBlurValue,
+                        iconAllowOverlap = const(true),
+                        iconIgnorePlacement = const(true),
+                        onClick = { features ->
+                            // Tu możesz dodać logikę, np. otwarcie BottomSheet
+                            println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                            ClickResult.Consume
+                        }
+                    )
+
+                    SymbolLayer(
+                        id = "unclustered-points-work",
+                        source = pointsSource,
+                        filter =
+                            feature.has("point_count").not().and(      // Nie jest klastrem
+                                feature.has("category").and(              // Posiada klucz category
+                                    feature["category"].asString().eq(const("praca"))) // Jest relaksem
+                            ),
+                        iconImage = image(
+                            value = painterResource(Res.drawable.category_dark_work),
+                            size = iconSize
+                        ),
+                        iconHaloWidth = iconHaloWidthValue,
+                        iconHaloColor = iconHaloColorValue,
+                        iconHaloBlur = iconHaloBlurValue,
+                        iconAllowOverlap = const(true),
+                        iconIgnorePlacement = const(true),
+                        onClick = { features ->
+                            // Tu możesz dodać logikę, np. otwarcie BottomSheet
+                            println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                            ClickResult.Consume
+                        }
+                    )
+
+
+
+
+
                 }
             }
 
