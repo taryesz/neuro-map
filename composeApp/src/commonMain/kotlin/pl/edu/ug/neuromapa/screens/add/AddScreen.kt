@@ -1,6 +1,5 @@
 package pl.edu.ug.neuromapa.screens.add
 
-import pl.edu.ug.neuromapa.screens.add.models.SelectionItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,18 +24,15 @@ import neuromapa.composeapp.generated.resources.excellence_description
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.components.Header
+import pl.edu.ug.neuromapa.data.getCategories
+import pl.edu.ug.neuromapa.data.getExcellenceMarks
+import pl.edu.ug.neuromapa.data.getSensoryProperties
 import pl.edu.ug.neuromapa.screens.add.components.FormButton
 import pl.edu.ug.neuromapa.screens.add.components.FormSection
 import pl.edu.ug.neuromapa.screens.add.components.FormSelection
 import pl.edu.ug.neuromapa.screens.add.settings.widePadding
 import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
 import pl.edu.ug.neuromapa.ui.Background
-import pl.edu.ug.neuromapa.ui.icons.CategoriesDark
-import pl.edu.ug.neuromapa.ui.icons.CategoriesLight
-import pl.edu.ug.neuromapa.ui.icons.ExcellencesDark
-import pl.edu.ug.neuromapa.ui.icons.ExcellencesLight
-import pl.edu.ug.neuromapa.ui.icons.SensoryPropertiesDark
-import pl.edu.ug.neuromapa.ui.icons.SensoryPropertiesLight
 
 @Composable
 fun AddScreen(
@@ -91,56 +87,9 @@ fun AddScreen(
                     onValueChange = { name = it }
                 )
 
-                val categories = remember {
-                    listOf(
-                        SelectionItem(
-                            name = CategoriesLight.categoryLightChildren.iconName,
-                            description = CategoriesLight.categoryLightChildren.iconDescription,
-                            iconLight = CategoriesLight.categoryLightChildren.icon,
-                            iconDark = CategoriesDark.categoryDarkChildren.icon
-                        ),
-                        SelectionItem(
-                            name = CategoriesLight.categoryLightCulture.iconName,
-                            description = CategoriesLight.categoryLightCulture.iconDescription,
-                            iconLight = CategoriesLight.categoryLightCulture.icon,
-                            iconDark = CategoriesDark.categoryDarkCulture.icon
-                        ),
-                        SelectionItem(
-                            name = CategoriesLight.categoryLightFood.iconName,
-                            description = CategoriesLight.categoryLightFood.iconDescription,
-                            iconLight = CategoriesLight.categoryLightFood.icon,
-                            iconDark = CategoriesDark.categoryDarkFood.icon
-                        ),
-                        SelectionItem(
-                            name = CategoriesLight.categoryLightRelax.iconName,
-                            description = CategoriesLight.categoryLightRelax.iconDescription,
-                            iconLight = CategoriesLight.categoryLightRelax.icon,
-                            iconDark = CategoriesDark.categoryDarkRelax.icon
-                        ),
-                        SelectionItem(
-                            name = CategoriesLight.categoryLightServices.iconName,
-                            description = CategoriesLight.categoryLightServices.iconDescription,
-                            iconLight = CategoriesLight.categoryLightServices.icon,
-                            iconDark = CategoriesDark.categoryDarkServices.icon
-                        ),
-                        SelectionItem(
-                            name = CategoriesLight.categoryLightSupport.iconName,
-                            description = CategoriesLight.categoryLightSupport.iconDescription,
-                            iconLight = CategoriesLight.categoryLightSupport.icon,
-                            iconDark = CategoriesDark.categoryDarkSupport.icon
-                        ),
-                        SelectionItem(
-                            name = CategoriesLight.categoryLightWork.iconName,
-                            description = CategoriesLight.categoryLightWork.iconDescription,
-                            iconLight = CategoriesLight.categoryLightWork.icon,
-                            iconDark = CategoriesDark.categoryDarkWork.icon
-                        )
-                    )
-                }
-
                 FormSelection(
                     title = "Kategoria",
-                    items = categories,
+                    items = getCategories(),
                     selectedItems = selectedCategories,
                     onSelectionChange = { selectedCategories = it }
                 )
@@ -159,85 +108,16 @@ fun AddScreen(
                     onValueChange = { address = it }
                 )
 
-                val sensoryProperties = remember {
-                    listOf(
-                        SelectionItem(
-                            name = SensoryPropertiesLight.sensoryPropertyLightAccess.iconName,
-                            description = SensoryPropertiesLight.sensoryPropertyLightAccess.iconDescription,
-                            iconLight = SensoryPropertiesLight.sensoryPropertyLightAccess.icon,
-                            iconDark = SensoryPropertiesDark.sensoryPropertyDarkAccess.icon
-                        ),
-                        SelectionItem(
-                            name = SensoryPropertiesLight.sensoryPropertyLightDimmed.iconName,
-                            description = SensoryPropertiesLight.sensoryPropertyLightDimmed.iconDescription,
-                            iconLight = SensoryPropertiesLight.sensoryPropertyLightDimmed.icon,
-                            iconDark = SensoryPropertiesDark.sensoryPropertyDarkDimmed.icon
-                        ),
-                        SelectionItem(
-                            name = SensoryPropertiesLight.sensoryPropertyLightScents.iconName,
-                            description = SensoryPropertiesLight.sensoryPropertyLightScents.iconDescription,
-                            iconLight = SensoryPropertiesLight.sensoryPropertyLightScents.icon,
-                            iconDark = SensoryPropertiesDark.sensoryPropertyDarkScents.icon
-                        ),
-                        SelectionItem(
-                            name = SensoryPropertiesLight.sensoryPropertyLightQuiet.iconName,
-                            description = SensoryPropertiesLight.sensoryPropertyLightQuiet.iconDescription,
-                            iconLight = SensoryPropertiesLight.sensoryPropertyLightQuiet.icon,
-                            iconDark = SensoryPropertiesDark.sensoryPropertyDarkQuiet.icon
-                        ),
-                        SelectionItem(
-                            name = SensoryPropertiesLight.sensoryPropertyLightRelax.iconName,
-                            description = SensoryPropertiesLight.sensoryPropertyLightRelax.iconDescription,
-                            iconLight = SensoryPropertiesLight.sensoryPropertyLightRelax.icon,
-                            iconDark = SensoryPropertiesDark.sensoryPropertyDarkRelax.icon
-                        ),
-                        SelectionItem(
-                            name = SensoryPropertiesLight.sensoryPropertyLightInformation.iconName,
-                            description = SensoryPropertiesLight.sensoryPropertyLightInformation.iconDescription,
-                            iconLight = SensoryPropertiesLight.sensoryPropertyLightInformation.icon,
-                            iconDark = SensoryPropertiesDark.sensoryPropertyDarkInformation.icon
-                        ),
-                        SelectionItem(
-                            name = SensoryPropertiesLight.sensoryPropertyLightOrganized.iconName,
-                            description = SensoryPropertiesLight.sensoryPropertyLightOrganized.iconDescription,
-                            iconLight = SensoryPropertiesLight.sensoryPropertyLightOrganized.icon,
-                            iconDark = SensoryPropertiesDark.sensoryPropertyDarkOrganized.icon
-                        ),
-                        SelectionItem(
-                            name = SensoryPropertiesLight.sensoryPropertyLightStaff.iconName,
-                            description = SensoryPropertiesLight.sensoryPropertyLightStaff.iconDescription,
-                            iconLight = SensoryPropertiesLight.sensoryPropertyLightStaff.icon,
-                            iconDark = SensoryPropertiesDark.sensoryPropertyDarkStaff.icon
-                        ),
-                    )
-                }
-
                 FormSelection(
                     title = "Cechy sensoryczne",
-                    items = sensoryProperties,
+                    items = getSensoryProperties(),
                     selectedItems = selectedProperties,
                     onSelectionChange = { selectedProperties = it }
                 )
 
-                val excellenceMarks = remember {
-                    listOf(
-                        SelectionItem(
-                            name = ExcellencesLight.excellenceLightHeart.iconName,
-                            description = ExcellencesLight.excellenceLightHeart.iconDescription,
-                            iconLight = ExcellencesLight.excellenceLightHeart.icon,
-                            iconDark = ExcellencesDark.excellenceDarkHeart.icon
-                        ),
-                        SelectionItem(
-                            name = ExcellencesLight.excellenceLightMedal.iconName,
-                            description = ExcellencesLight.excellenceLightMedal.iconDescription,
-                            iconLight = ExcellencesLight.excellenceLightMedal.icon,
-                            iconDark = ExcellencesDark.excellenceDarkMedal.icon
-                        )
-                ) }
-
                 FormSelection(
                     title = "Wyróżnienia",
-                    items = excellenceMarks,
+                    items = getExcellenceMarks(),
                     selectedItems = selectedExcellences,
                     onSelectionChange = { selectedExcellences = it },
                     showDescription = true,

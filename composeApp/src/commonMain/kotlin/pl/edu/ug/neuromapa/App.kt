@@ -57,7 +57,7 @@ fun App() {
             contentWindowInsets = WindowInsets(0.dp)
         ) { paddingValues ->
 
-            Box(modifier = Modifier.padding(paddingValues)) {
+            Box(modifier = Modifier.fillMaxSize()) {
 
                 when (dataState) {
 
@@ -70,43 +70,59 @@ fun App() {
                     is PlaceDataState.Error -> {
                         val message = (dataState as PlaceDataState.Error).message
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(text = "Помилка даних: $message. Перевірте підключення до мережі!",
-                                color = MaterialTheme.colorScheme.error)
+                            Text(
+                                text = "Помилка даних: $message. Перевірте підключення до мережі!",
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
                     }
 
                     is PlaceDataState.Success -> {
-                        when (currentScreen) {
 
-                            Screen.Home -> HomeScreen(
-                                userFirstName = "Ryszard",
-                                userProfileImage = Res.drawable.user_icon_example,
-                            )
+                        when (currentScreen) {
 
                             Screen.Map -> MapScreen(
                                 userProfileImage = Res.drawable.user_icon_example,
-                                mapPoints = mapPoints
+                                mapPoints = mapPoints,
+                                bottomPadding = paddingValues.calculateBottomPadding(),
                             )
 
-                            Screen.Add -> AddScreen(
-                                userProfileImage = Res.drawable.user_icon_example,
-                            )
+                            else -> {
 
-                            Screen.Favorites -> FavoritesScreen(
-                                userProfileImage = Res.drawable.user_icon_example,
-                                onPlaceClick = { place ->
-                                    selectedPlace = place
-                                    currentScreen = Screen.Place
+                                Box(modifier = Modifier.padding(paddingValues)) {
+
+                                    when (currentScreen) {
+
+                                        Screen.Home -> HomeScreen(
+                                            userFirstName = "Ryszard",
+                                            userProfileImage = Res.drawable.user_icon_example,
+                                        )
+
+                                        Screen.Add -> AddScreen(
+                                            userProfileImage = Res.drawable.user_icon_example,
+                                        )
+
+                                        Screen.Favorites -> FavoritesScreen(
+                                            userProfileImage = Res.drawable.user_icon_example,
+                                            onPlaceClick = { place ->
+                                                selectedPlace = place
+                                                currentScreen = Screen.Place
+                                            }
+                                        )
+
+                                        Screen.Survey -> SurveyScreen(
+                                            userProfileImage = Res.drawable.user_icon_example,
+                                        )
+
+                                        Screen.Place -> PlaceScreen(
+                                            place = selectedPlace
+                                        )
+
+                                        else -> {}
+                                    }
                                 }
-                            )
 
-                            Screen.Survey -> SurveyScreen(
-                                userProfileImage = Res.drawable.user_icon_example,
-                            )
-
-                            Screen.Place -> PlaceScreen(
-                                place = selectedPlace
-                            )
+                            }
                         }
                     }
                 }

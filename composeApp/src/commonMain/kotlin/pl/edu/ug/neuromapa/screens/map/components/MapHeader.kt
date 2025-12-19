@@ -3,6 +3,7 @@ package pl.edu.ug.neuromapa.screens.map.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -10,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.filter
@@ -18,10 +21,12 @@ import pl.edu.ug.neuromapa.screens.map.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
 import pl.edu.ug.neuromapa.ui.Background
+import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 
 @Composable
 fun MapHeader(
     searchBarPlaceHolder: String,
+    onFilterClick: () -> Unit,
 ) {
 
     var searchText by remember { mutableStateOf("") }
@@ -30,7 +35,13 @@ fun MapHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Background)
+            .clip(
+                RoundedCornerShape(
+                    bottomStart = globalComponentCornerRadius,
+                    bottomEnd = globalComponentCornerRadius
+                )
+            )
+            .background(Background,)
             .padding(
                 vertical = mediumPadding,
                 horizontal = widePadding
@@ -71,7 +82,7 @@ fun MapHeader(
             modifier = Modifier
                 .size(userProfileIconSize)
                 .clickable {
-                    // TODO
+                    onFilterClick()
                 },
             contentAlignment = Alignment.Center
         )
