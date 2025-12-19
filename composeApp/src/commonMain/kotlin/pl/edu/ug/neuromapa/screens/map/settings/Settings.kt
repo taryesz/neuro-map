@@ -2,6 +2,7 @@ package pl.edu.ug.neuromapa.screens.map.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraState
@@ -13,8 +14,15 @@ val widePadding = 30.dp
 val mediumPadding = 15.dp
 
 val wideSpacing = 30.dp
+val mediumSpacing = 15.dp
 
 val userProfileIconSize = 40.dp
+
+// MapLibre
+val iconSize = DpSize(30.dp, 30.dp)
+val iconHaloWidthValue = const(10.dp)
+val iconHaloColorValue = const(Color.White)
+val iconHaloBlurValue = const(1.dp)
 
 @Composable
 fun cameraSettings(): CameraState {
