@@ -67,6 +67,8 @@ import pl.edu.ug.neuromapa.ui.Background
 
 fun mapPointsToGeoJson(mapPoints: List<MapPoint>): String {
     val features = mapPoints.joinToString(separator = ",") { point ->
+        val sensoryJson = point.sensoryFeatures.joinToString(prefix = "[", postfix = "]") { "\"$it\"" }
+
         """
         {
             "type": "Feature",
@@ -77,20 +79,27 @@ fun mapPointsToGeoJson(mapPoints: List<MapPoint>): String {
             "properties": {
                 "id": ${point.id},
                 "name": "${point.name}",
-                "category": "${point.category}"
+                "category": "${point.category}",
+                "sensoryFeatures": $sensoryJson,
+                "hasMedal": ${point.hasMedal},
+                "hasHeart": ${point.hasHeart}
             }
         }
         """
     }
+    return """{"type": "FeatureCollection", "features": [$features]}"""
+}
 
-    return """
-        {
-            "type": "FeatureCollection",
-            "features": [
-                $features
-            ]
-        }
-    """
+fun String.toSlug(): String {
+    val polishChars = mapOf(
+        'ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n',
+        'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z'
+    )
+    return this.lowercase()
+        .map { polishChars[it] ?: it }
+        .joinToString("")
+        .replace(" ", "_")
+        .filter { it.isLetterOrDigit() || it == '_' }
 }
 
 @Composable
@@ -106,16 +115,52 @@ fun MapScreen(
     var selectedProperties by remember { mutableStateOf(setOf<String>()) }
     var selectedExcellences by remember { mutableStateOf(setOf<String>()) }
 
-    // wynik filtracji tutaj poniżej jako mapPoints
-    val geoJsonString = remember(mapPoints) {
-        mapPointsToGeoJson(mapPoints)
+    val filteredPoints = remember(mapPoints, selectedCategories, selectedProperties, selectedExcellences) {
+        val exceptions = mapOf(
+            "cisza" to "ciche",
+            "brak_intensywnych_zapachow" to "brak_zapachow",
+            "jasna_informacja" to "dostepnosc_informacyjna"
+        )
+
+        mapPoints.filter { point ->
+            val selectedPropsSlug = selectedProperties.map { raw ->
+                val slug = raw.toSlug()
+                exceptions[slug] ?: slug
+            }
+
+            val selectedCatsSlug = selectedCategories.map { it.toSlug() }
+
+            val pointCat = point.category.lowercase()
+            val pointProps = point.sensoryFeatures.map { it.lowercase() }
+
+            val catMatch = selectedCategories.isEmpty() || selectedCatsSlug.contains(pointCat)
+
+            val propMatch = selectedProperties.isEmpty() || pointProps.containsAll(selectedPropsSlug)
+
+            val excMatch = selectedExcellences.isEmpty() || run {
+                val wantsMedal = selectedExcellences.any { it.contains("medal", true) }
+                val wantsHeart = selectedExcellences.any { it.contains("serduszko", true) }
+
+                val medalOk = if (wantsMedal) point.hasMedal else true
+                val heartOk = if (wantsHeart) point.hasHeart else true
+
+                medalOk && heartOk
+            }
+
+            catMatch && propMatch && excMatch
+        }
     }
 
-    LaunchedEffect(mapPoints) {
-        println("=== TEST MAPY: START ===")
-        println("Liczba pobranych punktów: ${mapPoints.size}")
+    // wynik filtracji tutaj poniżej jako mapPoints
+    val geoJsonString = remember(filteredPoints) {
+        mapPointsToGeoJson(filteredPoints)
+    }
 
-        mapPoints.forEach { point ->
+    LaunchedEffect(filteredPoints) {
+        println("=== TEST MAPY: START ===")
+        println("Liczba pobranych punktów: ${filteredPoints.size}")
+
+        filteredPoints.forEach { point ->
             println("Punkt: $point")
         }
 //        println("GeoJSON: $geoJsonString")
