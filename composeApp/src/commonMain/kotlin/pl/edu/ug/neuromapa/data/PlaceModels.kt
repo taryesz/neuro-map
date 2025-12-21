@@ -65,5 +65,8 @@ data class MapPoint(
     val name: String,
     val latitude: Double,
     val longitude: Double,
-    val category: String
+    val category: String,
+    val sensoryFeatures: List<String>,
+    val hasMedal: Boolean,
+    val hasHeart: Boolean
 )

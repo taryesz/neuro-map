@@ -39,7 +39,10 @@ class PlaceViewModel : ViewModel() {
                             name = place.title.rendered,
                             latitude = lat,
                             longitude = lng,
-                            category = place.acfFields.category ?: "Without categories"
+                            category = place.acfFields.category ?: "Without categories",
+                            sensoryFeatures = place.acfFields.sensoryFeatures,
+                            hasMedal = place.acfFields.hasMedal,
+                            hasHeart = place.acfFields.hasHeart
                         )
                     } else {
                         null
