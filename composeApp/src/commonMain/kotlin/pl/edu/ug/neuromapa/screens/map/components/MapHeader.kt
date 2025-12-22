@@ -12,10 +12,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.filter
+import neuromapa.composeapp.generated.resources.search_bar_filter
 import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.screens.map.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
@@ -27,9 +26,9 @@ import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 fun MapHeader(
     searchBarPlaceHolder: String,
     onFilterClick: () -> Unit,
+    searchText: String,
+    onSearchTextChange: (String) -> Unit
 ) {
-
-    var searchText by remember { mutableStateOf("") }
 
     // Search Bar
     Row(
@@ -67,7 +66,7 @@ fun MapHeader(
 
             BasicTextField(
                 value = searchText,
-                onValueChange = { searchText = it },
+                onValueChange = onSearchTextChange,
                 textStyle = getAppTypography().bodySmall.copy(
                     color = MaterialTheme.colorScheme.onBackground
                 ),
@@ -88,7 +87,7 @@ fun MapHeader(
         )
         {
             Icon(
-                painter = painterResource(Res.drawable.filter),
+                painter = painterResource(Res.drawable.search_bar_filter),
                 contentDescription = "Filtruj wyniki",
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(userProfileIconSize),

@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -29,10 +30,12 @@ import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.about_project_description
 import neuromapa.composeapp.generated.resources.about_project_title
-import neuromapa.composeapp.generated.resources.faru_gummed_pg_ug_logo_blue
+import neuromapa.composeapp.generated.resources.logo_faru_gummed_pg_ug_blue
 import neuromapa.composeapp.generated.resources.key_operations_description
 import neuromapa.composeapp.generated.resources.key_operations_title
-import neuromapa.composeapp.generated.resources.neuromap_logo_dark
+import neuromapa.composeapp.generated.resources.logo_gdansk
+import neuromapa.composeapp.generated.resources.logo_investgda_fullcolor
+import neuromapa.composeapp.generated.resources.logo_neuromap_dark
 import neuromapa.composeapp.generated.resources.project_goals_description
 import neuromapa.composeapp.generated.resources.project_goals_title
 import neuromapa.composeapp.generated.resources.team_members_title
@@ -47,6 +50,8 @@ import pl.edu.ug.neuromapa.screens.home.settings.narrowPadding
 import pl.edu.ug.neuromapa.screens.home.settings.widePadding
 import pl.edu.ug.neuromapa.screens.home.settings.wideSpacing
 import pl.edu.ug.neuromapa.screens.home.settings.bulletPointHorizontalSpacing
+import pl.edu.ug.neuromapa.screens.home.settings.logoHeight
+import pl.edu.ug.neuromapa.screens.home.settings.logoSpacing
 import pl.edu.ug.neuromapa.screens.home.settings.superTextFontSize
 import pl.edu.ug.neuromapa.screens.home.settings.superTextLineHeight
 import pl.edu.ug.neuromapa.screens.home.settings.superTextNumberWidth
@@ -317,23 +322,28 @@ fun HomeScreen(
 
                 // Logos section
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(logoSpacing)
                 )
                 {
-
                     val logos = listOf(
-                        Res.drawable.neuromap_logo_dark to "Logotyp NeuroMapy.",
-                        Res.drawable.faru_gummed_pg_ug_logo_blue to "Logotyp FarU, GumMed, PG oraz UG.",
+                        Res.drawable.logo_neuromap_dark to "Logotyp NeuroMapy.",
+                        Res.drawable.logo_investgda_fullcolor to "Logotyp InvestGDA.",
+                        Res.drawable.logo_gdansk to "Logotyp miasta Gdańska.",
+                        Res.drawable.logo_faru_gummed_pg_ug_blue to "Logotyp FarU, GumMed, PG oraz UG.",
                     )
 
                     logos.forEach { (logo, contentDescription) ->
                         Image(
                             painter = painterResource(logo),
                             contentDescription = contentDescription,
-                            modifier = Modifier.fillMaxWidth()
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .height(logoHeight)
+                                .fillMaxWidth()
                         )
                     }
-
                 }
 
             }
