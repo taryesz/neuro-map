@@ -6,14 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -106,16 +103,27 @@ fun String.toSlug(): String {
 fun MapScreen(
     userProfileImage: DrawableResource,
     mapPoints: List<MapPoint>,
+    onPlaceClick: (Long) -> Unit,
     bottomPadding: Dp = 0.dp,
+    placeViewModel: PlaceViewModel
 ) {
 
-    // States of the filter button and the filters themselves
+    // States of the search_bar_filter button and the filters themselves
     var isFilterVisible by remember { mutableStateOf(false) }
-    var selectedCategories by remember { mutableStateOf(setOf<String>()) }
-    var selectedProperties by remember { mutableStateOf(setOf<String>()) }
-    var selectedExcellences by remember { mutableStateOf(setOf<String>()) }
 
-    val filteredPoints = remember(mapPoints, selectedCategories, selectedProperties, selectedExcellences) {
+    val searchQuery = placeViewModel.searchQuery.value
+
+    val selectedCategories = placeViewModel.selectedCategories.value
+    val selectedProperties = placeViewModel.selectedProperties.value
+    val selectedExcellences = placeViewModel.selectedExcellences.value
+
+    val filteredPoints = remember(
+        mapPoints,
+        selectedCategories,
+        selectedProperties,
+        selectedExcellences,
+        searchQuery
+    ) {
         val exceptions = mapOf(
             "cisza" to "ciche",
             "brak_intensywnych_zapachow" to "brak_zapachow",
@@ -147,7 +155,15 @@ fun MapScreen(
                 medalOk && heartOk
             }
 
-            catMatch && propMatch && excMatch
+            val searchMatch = if (searchQuery.isBlank()) {
+                true // If nothing is typed, show everything
+            } else {
+                // Check if the name has typed text
+                point.name.contains(searchQuery, ignoreCase = true)
+            }
+
+            catMatch && propMatch && excMatch && searchMatch
+
         }
     }
 
@@ -198,7 +214,7 @@ fun MapScreen(
                         title = "Kategorie",
                         items = getCategories(),
                         selectedItems = selectedCategories,
-                        onSelectionChange = { selectedCategories = it }
+                        onSelectionChange = { placeViewModel.selectedCategories.value = it }
                     )
 
                     // Sensory properties section
@@ -206,7 +222,7 @@ fun MapScreen(
                         title = "Cechy sensoryczne",
                         items = getSensoryProperties(),
                         selectedItems = selectedProperties,
-                        onSelectionChange = { selectedProperties = it }
+                        onSelectionChange = { placeViewModel.selectedProperties.value = it }
                     )
 
                     // Excellences section
@@ -214,7 +230,7 @@ fun MapScreen(
                         title = "Wyróżnienia",
                         items = getExcellenceMarks(),
                         selectedItems = selectedExcellences,
-                        onSelectionChange = { selectedExcellences = it }
+                        onSelectionChange = { placeViewModel.selectedExcellences.value = it }
                     )
 
                     // Button panel
@@ -229,9 +245,9 @@ fun MapScreen(
                             modifier = Modifier.weight(1f),
                             isPrimary = false,
                             onClick = {
-                                selectedCategories = emptySet()
-                                selectedProperties = emptySet()
-                                selectedExcellences = emptySet()
+                                placeViewModel.selectedCategories.value = emptySet()
+                                placeViewModel.selectedProperties.value = emptySet()
+                                placeViewModel.selectedExcellences.value = emptySet()
                             }
                         )
 
@@ -324,11 +340,11 @@ fun MapScreen(
                             iconIgnorePlacement = const(true)
                         )
 
-                        // WARSTWA 3: POJEDYNCZE PUNKTY (Nie-klastry) - wszysztkie punkty poza klastrami
+                        // WARSTWA 3: POJEDYNCZE PUNKTY (Nie-klastry) - wszystkie punkty poza klastrami
 //                    CircleLayer(
 //                        id = "unclustered-points",
 //                        source = pointsSource,
-//                        filter = !feature.has("point_count"),
+//                        search_bar_filter = !feature.has("point_count"),
 //                        color = const(Color.Cyan),
 //                        radius = const(5.dp),
 //                        strokeWidth = const(2.dp),
@@ -359,8 +375,13 @@ fun MapScreen(
                             iconAllowOverlap = const(true),
                             iconIgnorePlacement = const(true),
                             onClick = { features ->
-                                // Tu możesz dodać logikę, np. otwarcie BottomSheet
-                                println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                                val feature = features.firstOrNull()
+                                // Pobieramy ID i bezpiecznie konwertujemy na Long
+                                val clickedId = feature?.properties?.get("id")?.toString()?.toLongOrNull()
+
+                                if (clickedId != null) {
+                                    onPlaceClick(clickedId) // Przekazujemy Long do callbacku
+                                }
                                 ClickResult.Consume
                             }
                         )
@@ -384,8 +405,13 @@ fun MapScreen(
                             iconAllowOverlap = const(true),
                             iconIgnorePlacement = const(true),
                             onClick = { features ->
-                                // Tu możesz dodać logikę, np. otwarcie BottomSheet
-                                println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                                val feature = features.firstOrNull()
+                                // Pobieramy ID i bezpiecznie konwertujemy na Long
+                                val clickedId = feature?.properties?.get("id")?.toString()?.toLongOrNull()
+
+                                if (clickedId != null) {
+                                    onPlaceClick(clickedId) // Przekazujemy Long do callbacku
+                                }
                                 ClickResult.Consume
                             }
                         )
@@ -409,8 +435,13 @@ fun MapScreen(
                             iconAllowOverlap = const(true),
                             iconIgnorePlacement = const(true),
                             onClick = { features ->
-                                // Tu możesz dodać logikę, np. otwarcie BottomSheet
-                                println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                                val feature = features.firstOrNull()
+                                // Pobieramy ID i bezpiecznie konwertujemy na Long
+                                val clickedId = feature?.properties?.get("id")?.toString()?.toLongOrNull()
+
+                                if (clickedId != null) {
+                                    onPlaceClick(clickedId) // Przekazujemy Long do callbacku
+                                }
                                 ClickResult.Consume
                             }
                         )
@@ -434,8 +465,13 @@ fun MapScreen(
                             iconAllowOverlap = const(true),
                             iconIgnorePlacement = const(true),
                             onClick = { features ->
-                                // Tu możesz dodać logikę, np. otwarcie BottomSheet
-                                println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                                val feature = features.firstOrNull()
+                                // Pobieramy ID i bezpiecznie konwertujemy na Long
+                                val clickedId = feature?.properties?.get("id")?.toString()?.toLongOrNull()
+
+                                if (clickedId != null) {
+                                    onPlaceClick(clickedId) // Przekazujemy Long do callbacku
+                                }
                                 ClickResult.Consume
                             }
                         )
@@ -446,7 +482,7 @@ fun MapScreen(
                             filter =
                                 feature.has("point_count").not().and(      // Nie jest klastrem
                                     feature.has("category").and(              // Posiada klucz category
-                                        feature["category"].asString().eq(const("uslugi"))
+                                        feature["category"].asString().eq(const("usługi"))
                                     ) // TODO SPRAWDŹ POPRAWNOŚĆ NAZWY KATEGORII
                                 ),
                             iconImage = image(
@@ -459,8 +495,13 @@ fun MapScreen(
                             iconAllowOverlap = const(true),
                             iconIgnorePlacement = const(true),
                             onClick = { features ->
-                                // Tu możesz dodać logikę, np. otwarcie BottomSheet
-                                println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                                val feature = features.firstOrNull()
+                                // Pobieramy ID i bezpiecznie konwertujemy na Long
+                                val clickedId = feature?.properties?.get("id")?.toString()?.toLongOrNull()
+
+                                if (clickedId != null) {
+                                    onPlaceClick(clickedId) // Przekazujemy Long do callbacku
+                                }
                                 ClickResult.Consume
                             }
                         )
@@ -484,8 +525,13 @@ fun MapScreen(
                             iconAllowOverlap = const(true),
                             iconIgnorePlacement = const(true),
                             onClick = { features ->
-                                // Tu możesz dodać logikę, np. otwarcie BottomSheet
-                                println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                                val feature = features.firstOrNull()
+                                // Pobieramy ID i bezpiecznie konwertujemy na Long
+                                val clickedId = feature?.properties?.get("id")?.toString()?.toLongOrNull()
+
+                                if (clickedId != null) {
+                                    onPlaceClick(clickedId) // Przekazujemy Long do callbacku
+                                }
                                 ClickResult.Consume
                             }
                         )
@@ -509,8 +555,13 @@ fun MapScreen(
                             iconAllowOverlap = const(true),
                             iconIgnorePlacement = const(true),
                             onClick = { features ->
-                                // Tu możesz dodać logikę, np. otwarcie BottomSheet
-                                println("Kliknięto punkt: ${features.firstOrNull()?.properties}")
+                                val feature = features.firstOrNull()
+                                // Pobieramy ID i bezpiecznie konwertujemy na Long
+                                val clickedId = feature?.properties?.get("id")?.toString()?.toLongOrNull()
+
+                                if (clickedId != null) {
+                                    onPlaceClick(clickedId) // Przekazujemy Long do callbacku
+                                }
                                 ClickResult.Consume
                             }
                         )
@@ -521,6 +572,10 @@ fun MapScreen(
                     MapHeader(
                         searchBarPlaceHolder = "Wyszukaj miejsce...",
                         onFilterClick = { isFilterVisible = true },
+                        searchText = searchQuery,
+                        onSearchTextChange = { newText ->
+                            placeViewModel.searchQuery.value = newText
+                        }
                     )
 
                 }

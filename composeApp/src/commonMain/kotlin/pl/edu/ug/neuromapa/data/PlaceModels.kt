@@ -49,14 +49,14 @@ data class LocationData(
         if (lat == null) return null
         return try {
             lat.jsonPrimitive.doubleOrNull ?: lat.jsonPrimitive.contentOrNull?.toDoubleOrNull()
-        } catch (e: Exception) { null }
+        } catch (_: Exception) { null }
     }
 
     fun getLngDouble(): Double? {
         if (lng == null) return null
         return try {
             lng.jsonPrimitive.doubleOrNull ?: lng.jsonPrimitive.contentOrNull?.toDoubleOrNull()
-        } catch (e: Exception) { null }
+        } catch (_: Exception) { null }
     }
 }
 
@@ -68,5 +68,11 @@ data class MapPoint(
     val category: String,
     val sensoryFeatures: List<String>,
     val hasMedal: Boolean,
-    val hasHeart: Boolean
+    val hasHeart: Boolean,
+    val description: String,
+    val address: String,
+    val photoUrl: String,
+    val website: String,
+    val facebook: String,
+    val instagram: String
 )

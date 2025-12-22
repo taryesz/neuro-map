@@ -21,7 +21,7 @@ import pl.edu.ug.neuromapa.screens.place.settings.mediumSpacing
 import pl.edu.ug.neuromapa.screens.place.settings.sensoryPropertyIconSize
 
 @Composable
-fun SensoryProperty(
+fun PlaceFeature(
     icon: DrawableResource,
     iconContentDescription: String,
     name: String,

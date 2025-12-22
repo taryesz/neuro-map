@@ -26,7 +26,7 @@ import pl.edu.ug.neuromapa.ui.Primary
 import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
 import pl.edu.ug.neuromapa.ui.Surface
 import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.neuromap_logo_vertical_dark_no_text
+import neuromapa.composeapp.generated.resources.logo_neuromap_no_text
 import neuromapa.composeapp.generated.resources.*
 import pl.edu.ug.neuromapa.enums.Screen
 import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
@@ -138,11 +138,11 @@ fun NavigationBar(
 @Composable
 fun getIconPainter(screen: Screen): Painter {
     return when (screen) {
-        Screen.Home -> painterResource(Res.drawable.home)
-        Screen.Add -> painterResource(Res.drawable.add_circle)
-        Screen.Map -> painterResource(Res.drawable.neuromap_logo_vertical_dark_no_text)
-        Screen.Favorites -> painterResource(Res.drawable.favorite)
-        Screen.Survey -> painterResource(Res.drawable.comment)
-        else -> painterResource(Res.drawable.home)
+        Screen.Home -> painterResource(Res.drawable.navigation_bar_home)
+        Screen.Add -> painterResource(Res.drawable.navigation_bar_add)
+        Screen.Map -> painterResource(Res.drawable.logo_neuromap_no_text)
+        Screen.Favorites -> painterResource(Res.drawable.navigation_bar_favorites)
+        Screen.Survey -> painterResource(Res.drawable.navigation_bar_survey)
+        else -> painterResource(Res.drawable.navigation_bar_home)
     }
 }

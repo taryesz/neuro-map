@@ -28,8 +28,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.add_circle
-import neuromapa.composeapp.generated.resources.favorite
+import neuromapa.composeapp.generated.resources.navigation_bar_add
+import neuromapa.composeapp.generated.resources.navigation_bar_favorites
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.DrawableResource
 import pl.edu.ug.neuromapa.screens.place.settings.cornerRadius
@@ -95,7 +95,7 @@ fun PlaceHeader(
             Image(
                 modifier = Modifier.size(40.dp),
                 // TODO: change the icons!!!
-                painter = painterResource(if (!isFavorite) Res.drawable.favorite else Res.drawable.add_circle),
+                painter = painterResource(if (!isFavorite) Res.drawable.navigation_bar_favorites else Res.drawable.navigation_bar_add),
                 contentDescription = if (isFavorite) "Usuń z ulubionych." else "Dodaj do ulubionych.",
             )
         }
