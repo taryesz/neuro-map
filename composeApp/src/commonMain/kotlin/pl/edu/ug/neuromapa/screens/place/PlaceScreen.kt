@@ -23,13 +23,13 @@ import neuromapa.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.data.MapPoint
+import pl.edu.ug.neuromapa.platform.rememberMapNavigator
 import pl.edu.ug.neuromapa.screens.home.settings.cornerRadius
 import pl.edu.ug.neuromapa.screens.place.components.PlaceHeader
 import pl.edu.ug.neuromapa.screens.place.components.PlaceFeature
 import pl.edu.ug.neuromapa.screens.place.models.Link
 import pl.edu.ug.neuromapa.screens.place.models.LinkType
 import pl.edu.ug.neuromapa.screens.place.settings.*
-import pl.edu.ug.neuromapa.ui.SurfaceVariant
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.screens.place.helpers.*
 
@@ -37,8 +37,8 @@ import pl.edu.ug.neuromapa.screens.place.helpers.*
 fun PlaceScreen(
     mapPoint: MapPoint,
 ) {
+    val mapNavigator = rememberMapNavigator()
 
-    // Combine Sensory properties with heart/medal indicators into one list of features
     val allFeatures = remember(mapPoint) {
         val features = mapPoint.sensoryFeatures.toMutableList()
         if (mapPoint.hasMedal) features.add("hasMedal")
@@ -58,29 +58,22 @@ fun PlaceScreen(
         )
         {
 
-            // Header
             PlaceHeader(
                 name = mapPoint.name,
-                image = Res.drawable.no_photo, // TODO: use actual photos whenever added in the WP admin panel
+                image = Res.drawable.no_photo, 
                 imageDescription = "Zdjęcie miejsca ${mapPoint.name}",
                 categoryIcon = getCategoryIconHelper(mapPoint.category),
                 categoryIconDescription = mapPoint.category,
                 isFavorite = false,
-                onFavoriteButtonClick = { }, /*
-                    TODO: (isFavorite, onFavoriteButtonClick)
-                     after adding "save to favorites" functionality, check if navigation_bar_favorites to define
-                     the purpose of the heartIcon in the top right corner
-                */
+                onFavoriteButtonClick = { }, 
             )
 
-            // Content
             Column(
                 modifier = Modifier.fillMaxSize().padding(widePadding),
                 verticalArrangement = Arrangement.spacedBy(wideSpacing)
             )
             {
 
-                // Place's features horizontal list
                 if (allFeatures.isNotEmpty()) {
                     LazyRow(
                         modifier = Modifier.fillMaxWidth(),
@@ -96,7 +89,6 @@ fun PlaceScreen(
                     }
                 }
 
-                // Description
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(Res.string.about_place_title),
@@ -111,7 +103,6 @@ fun PlaceScreen(
                     )
                 }
 
-                // Location
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(Res.string.localization_title),
@@ -125,17 +116,15 @@ fun PlaceScreen(
                         style = getAppTypography().bodySmall,
                     )
 
-                    // Navigation button
                     Column(
                         modifier = Modifier
                             .padding(top = mediumPadding)
-                            .clickable {
-                                // TODO: use some kind of API request to Google Maps or whatnot
-                                println("Nawiguj do: ${mapPoint.latitude}, ${mapPoint.longitude}")
+                            .clickable { 
+                                mapNavigator.navigateTo(mapPoint.latitude, mapPoint.longitude, mapPoint.name)
                             }
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(cornerRadius))
-                            .background(SurfaceVariant)
+                            .background(MaterialTheme.colorScheme.primary)
                             .padding(horizontal = widePadding, vertical = mediumPadding),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -148,20 +137,16 @@ fun PlaceScreen(
                     }
                 }
 
-                // Links - add only those present in the API response from the link_website
                 val links = mutableListOf<Link>()
                 if (mapPoint.website.isNotBlank()) {
                     links.add(Link(LinkType.Website, mapPoint.website, "Strona internetowa"))
                 }
-
                 if (mapPoint.facebook.isNotBlank()) {
                     links.add(Link(LinkType.Facebook, mapPoint.facebook, "Facebook"))
                 }
-
                 if (mapPoint.instagram.isNotBlank()) {
                     links.add(Link(LinkType.Instagram, mapPoint.instagram, "Instagram"))
                 }
-
                 if (links.isNotEmpty()) {
                     Column {
                         Text(
