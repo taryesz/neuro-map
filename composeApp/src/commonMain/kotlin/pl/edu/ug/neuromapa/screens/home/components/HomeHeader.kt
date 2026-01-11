@@ -28,7 +28,8 @@ fun HomeHeader(
     buttonText: String,
     userProfileImage: DrawableResource,
     showProfile: Boolean,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
+    onButtonClick: () -> Unit
 ) {
 
     // Build Home Screen's Header basing on the original Header, adding own content to it
@@ -66,7 +67,7 @@ fun HomeHeader(
                 // Button panel
                 Box(
                     modifier = Modifier
-                        .clickable { println("Kliknięto przycisk Potrzebuję spokoju") } // TODO
+                        .clickable(onClick = onButtonClick)
                         .fillMaxWidth()
                         .background(
                             color = SurfaceVariant,     // Light green color
