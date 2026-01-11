@@ -1,0 +1,27 @@
+PODS:
+  - composeApp (1.0):
+    - MapLibre (= 5.12.0)
+  - MapboxMobileEvents (0.10.11)
+  - MapLibre (5.12.0):
+    - MapboxMobileEvents (= 0.10.11)
+
+DEPENDENCIES:
+  - composeApp (from `../composeApp`)
+
+SPEC REPOS:
+  trunk:
+    - MapboxMobileEvents
+    - MapLibre
+
+EXTERNAL SOURCES:
+  composeApp:
+    :path: "../composeApp"
+
+SPEC CHECKSUMS:
+  composeApp: d2f8cc06ca43ed1e0ab117aef4727456c694685e
+  MapboxMobileEvents: 1176afebbeca86806614a3dc409840bc02a3dd89
+  MapLibre: 81c5bc10ac54f7b142f89cbc14d618e22bbbbc53
+
+PODFILE CHECKSUM: 75e0f9d4c0de19d9f7906076ad2a91a1ec4b2399
+
+COCOAPODS: 1.16.2

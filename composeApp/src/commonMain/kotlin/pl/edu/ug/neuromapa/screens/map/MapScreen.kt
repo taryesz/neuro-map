@@ -179,7 +179,7 @@ fun MapScreen(
         filteredPoints.forEach { point ->
             println("Punkt: $point")
         }
-//        println("GeoJSON: $geoJsonString")
+        println("GeoJSON: $geoJsonString")
         println("=== TEST MAPY: KONIEC ===")
 
     }

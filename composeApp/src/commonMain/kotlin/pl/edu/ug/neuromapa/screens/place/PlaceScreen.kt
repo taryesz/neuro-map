@@ -32,6 +32,7 @@ import pl.edu.ug.neuromapa.screens.place.models.LinkType
 import pl.edu.ug.neuromapa.screens.place.settings.*
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.screens.place.helpers.*
+import pl.edu.ug.neuromapa.ui.SurfaceVariant
 
 @Composable
 fun PlaceScreen(
@@ -57,15 +58,15 @@ fun PlaceScreen(
                 .verticalScroll(rememberScrollState())
         )
         {
-
+            // ✅ Przywrócona wersja z mapą (latitude/longitude) zamiast zdjęcia
             PlaceHeader(
                 name = mapPoint.name,
-                image = Res.drawable.no_photo, 
-                imageDescription = "Zdjęcie miejsca ${mapPoint.name}",
                 categoryIcon = getCategoryIconHelper(mapPoint.category),
                 categoryIconDescription = mapPoint.category,
                 isFavorite = false,
-                onFavoriteButtonClick = { }, 
+                onFavoriteButtonClick = { },
+                latitude = mapPoint.latitude,
+                longitude = mapPoint.longitude,
             )
 
             Column(
@@ -119,12 +120,13 @@ fun PlaceScreen(
                     Column(
                         modifier = Modifier
                             .padding(top = mediumPadding)
-                            .clickable { 
+                            .clickable {
                                 mapNavigator.navigateTo(mapPoint.latitude, mapPoint.longitude, mapPoint.name)
                             }
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(cornerRadius))
-                            .background(MaterialTheme.colorScheme.primary)
+                            // ✅ Przywrócony Twój kolor SurfaceVariant
+                            .background(SurfaceVariant)
                             .padding(horizontal = widePadding, vertical = mediumPadding),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,

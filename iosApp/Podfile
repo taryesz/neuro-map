@@ -1,0 +1,11 @@
+# Podfile
+target 'iosApp' do
+  use_frameworks!
+  platform :ios, '14.1'
+
+  # 👇 TA LINIA JEST KLUCZOWA:
+  pod 'composeApp', :path => '../composeApp'
+
+  # Tu powinno być też MapLibre, jeśli dodałeś je ręcznie, 
+  # ale Gradle zazwyczaj sam to dodaje do zależności 'ComposeApp'.
+end

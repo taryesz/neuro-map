@@ -2,6 +2,7 @@ package pl.edu.ug.neuromapa.screens.place.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,9 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.navigation_bar_add
@@ -44,8 +45,8 @@ import pl.edu.ug.neuromapa.screens.place.settings.headerCategoryIconSize
 @Composable
 fun PlaceHeader(
     name: String,
-    image: DrawableResource,
-    imageDescription: String,
+    latitude: Double,
+    longitude: Double,
     categoryIcon: DrawableResource,
     categoryIconDescription: String,
     isFavorite: Boolean,
@@ -61,11 +62,10 @@ fun PlaceHeader(
     )
     {
 
-        // Set the background image
-        Image(
-            painter = painterResource(image),
-            contentDescription = imageDescription,
-            contentScale = ContentScale.Crop, // "Object-fit: cover" - fill the whole Header with the image
+        // Set the map snapshot of the place (solves the problem of lack of images access)
+        MapSnapshot(
+            latitude = latitude,
+            longitude = longitude,
             modifier = Modifier.fillMaxSize()
         )
 
@@ -131,24 +131,21 @@ fun PlaceHeader(
 
                 // Place name panel
                 Box(
-                    modifier = Modifier.fillMaxWidth().weight(1f)
+                    modifier = Modifier.weight(1f)
                 )
                 {
+                    Text(
+                        text = name,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = getAppTypography().titleLarge,
 
-                    // Place name wrapper
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .fillMaxWidth()
+                        maxLines = 1,
+                        overflow = TextOverflow.Visible,
+                        softWrap = false,
+
+                        // "Running text" effect
+                        modifier = Modifier.basicMarquee()
                     )
-                    {
-                        Text(
-                            text = name,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            style = getAppTypography().titleLarge
-                        )
-                    }
-
                 }
             }
 
