@@ -10,5 +10,3 @@ expect fun NativeMap(
     modifier: Modifier = Modifier,
     onPointClick: (Long) -> Unit
 )
-
-expect fun openNavigation(lat: Double, lng: Double)

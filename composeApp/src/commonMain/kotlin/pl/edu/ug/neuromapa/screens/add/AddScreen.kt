@@ -33,11 +33,16 @@ import pl.edu.ug.neuromapa.screens.add.components.FormSelection
 import pl.edu.ug.neuromapa.screens.add.settings.widePadding
 import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
 import pl.edu.ug.neuromapa.ui.Background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.platform.LocalFocusManager
 
 @Composable
 fun AddScreen(
     userProfileImage: DrawableResource,
 ) {
+
+    val focusManager = LocalFocusManager.current
 
     // Form states
     var name by remember { mutableStateOf("") }
@@ -58,6 +63,12 @@ fun AddScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    focusManager.clearFocus()
+                }
                 .verticalScroll(rememberScrollState())
         ) {
 

@@ -1,8 +1,13 @@
 package pl.edu.ug.neuromapa.components
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -27,14 +32,12 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.compose.*
 import com.google.maps.android.compose.clustering.Clustering
-import pl.edu.ug.neuromapa.data.MapPoint
-import androidx.compose.foundation.Image
+import neuromapa.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.*
+import pl.edu.ug.neuromapa.data.MapPoint
 
-// Wrapper potrzebny do klastrowania Google Maps
+// Wrapper do klastrowania (bez zmian)
 private class MapPointClusterItem(
     val mapPoint: MapPoint
 ) : ClusterItem {
@@ -65,18 +68,40 @@ actual fun NativeMap(
     onPointClick: (Long) -> Unit
 ) {
     val context = LocalContext.current
+
+    // 1. Stan początkowy kamery
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(54.35, 18.65), 10f)
     }
 
+    // 2. Stan uprawnień
     var hasLocationPermission by remember {
         mutableStateOf(
-            ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         )
     }
 
-    // Konwersja listy MapPoint na listę ClusterItem
+    // 3. Launcher do wywołania systemowego okienka z pytaniem
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        hasLocationPermission = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+    }
+
+    // 4. Próba uzyskania zgody przy starcie mapy (tylko raz)
+    LaunchedEffect(Unit) {
+        if (!hasLocationPermission) {
+            permissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
     val clusterItems = remember(points) {
         points.map { MapPointClusterItem(it) }
     }
@@ -102,7 +127,6 @@ actual fun NativeMap(
         if (points.isNotEmpty()) {
             try {
                 if (points.size == 1) {
-                    // ZMIANA: move zamiast animate usuwa animację przybliżania
                     val singlePoint = points.first()
                     cameraPositionState.move(
                         update = CameraUpdateFactory.newLatLngZoom(
@@ -111,7 +135,6 @@ actual fun NativeMap(
                         )
                     )
                 } else {
-                    // ZMIANA: Tutaj również move, aby główna mapa ładowała się natychmiast
                     val builder = LatLngBounds.Builder()
                     points.forEach { point ->
                         builder.include(LatLng(point.latitude, point.longitude))
@@ -122,7 +145,7 @@ actual fun NativeMap(
                     )
                 }
             } catch (e: Exception) {
-                // Mapa może nie być gotowa
+                // ignore
             }
         }
     }
@@ -132,17 +155,15 @@ actual fun NativeMap(
         cameraPositionState = cameraPositionState,
         properties = MapProperties(
             mapStyleOptions = MapStyleOptions(mapLibreStyleJson),
-            isMyLocationEnabled = hasLocationPermission
+            isMyLocationEnabled = hasLocationPermission // <-- Używamy bezpiecznej flagi
         ),
         uiSettings = MapUiSettings(
-            zoomControlsEnabled = false,   // ← PLUS / MINUS
+            zoomControlsEnabled = false,
+            myLocationButtonEnabled = hasLocationPermission // Przycisk widoczny tylko gdy jest zgoda
         )
     ) {
-        // --- UŻYCIE CLUSTERING ---
         Clustering(
             items = clusterItems,
-
-            // 1. Wygląd pojedynczego pinu (Marker)
             clusterItemContent = { item ->
                 val iconRes = getCategoryIcon(item.mapPoint.category)
                 Image(
@@ -151,20 +172,16 @@ actual fun NativeMap(
                     modifier = Modifier.size(40.dp)
                 )
             },
-
-            // 2. Obsługa kliknięcia w pojedynczy pin
             onClusterItemClick = { item ->
                 onPointClick(item.mapPoint.id.toLong())
                 true
             },
-
-            // 3. Wygląd KLASTRA (Kółko z liczbą)
             clusterContent = { cluster ->
                 Box(
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            color = Color(0x99489CA1), // Półprzezroczysty morski/teal (zgodny ze screenem)
+                            color = Color(0x99489CA1),
                             shape = CircleShape
                         )
                         .border(2.dp, Color.White, CircleShape),
@@ -181,14 +198,4 @@ actual fun NativeMap(
             }
         )
     }
-}
-
-actual fun openNavigation(lat: Double, lng: Double) { }
-
-fun launchGoogleMaps(context: Context, lat: Double, lng: Double) {
-    val uri = Uri.parse("google.navigation:q=$lat,$lng")
-    val intent = Intent(Intent.ACTION_VIEW, uri)
-    intent.setPackage("com.google.android.apps.maps")
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    context.startActivity(intent)
 }

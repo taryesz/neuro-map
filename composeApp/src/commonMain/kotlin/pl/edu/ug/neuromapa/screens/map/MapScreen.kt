@@ -34,6 +34,9 @@ import pl.edu.ug.neuromapa.ui.Background
 import pl.edu.ug.neuromapa.data.getCategories
 import pl.edu.ug.neuromapa.data.getExcellenceMarks
 import pl.edu.ug.neuromapa.data.getSensoryProperties
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.platform.LocalFocusManager
 
 fun String.toSlug(): String {
     val polishChars = mapOf(
@@ -55,6 +58,8 @@ fun MapScreen(
     bottomPadding: Dp = 0.dp,
     placeViewModel: PlaceViewModel
 ) {
+
+    val focusManager = LocalFocusManager.current
 
     // States of the search_bar_filter button and the filters themselves
     var isFilterVisible by remember { mutableStateOf(false) }
@@ -130,6 +135,12 @@ fun MapScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Background)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        focusManager.clearFocus()
+                    }
                     .verticalScroll(rememberScrollState())
                     .padding(widePadding)
                     .padding(bottom = bottomPadding),
@@ -162,6 +173,7 @@ fun MapScreen(
                         modifier = Modifier.weight(1f),
                         isPrimary = false,
                         onClick = {
+                            focusManager.clearFocus()
                             placeViewModel.selectedCategories.value = emptySet()
                             placeViewModel.selectedProperties.value = emptySet()
                             placeViewModel.selectedExcellences.value = emptySet()
@@ -171,13 +183,25 @@ fun MapScreen(
                         text = "Zastosuj",
                         modifier = Modifier.weight(1f),
                         isPrimary = true,
-                        onClick = { isFilterVisible = false }
+                        onClick = {
+                            focusManager.clearFocus()
+                            isFilterVisible = false
+                        }
                     )
                 }
             }
         } else {
             // --- MAPA NATYWNA ---
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        focusManager.clearFocus()
+                    }
+            ) {
 
                 // TU JEST KLUCZOWA ZMIANA:
                 NativeMap(
@@ -189,7 +213,10 @@ fun MapScreen(
                 // Header Extension (Search Bar) - na wierzchu mapy
                 MapHeader(
                     searchBarPlaceHolder = "Wyszukaj miejsce...",
-                    onFilterClick = { isFilterVisible = true },
+                    onFilterClick = {
+                        focusManager.clearFocus()
+                        isFilterVisible = true
+                    },
                     searchText = searchQuery,
                     onSearchTextChange = { newText ->
                         placeViewModel.searchQuery.value = newText

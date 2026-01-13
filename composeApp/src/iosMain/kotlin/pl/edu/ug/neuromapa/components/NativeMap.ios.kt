@@ -213,13 +213,3 @@ actual fun NativeMap(
         }
     )
 }
-
-@OptIn(ExperimentalForeignApi::class)
-actual fun openNavigation(lat: Double, lng: Double) {
-    val coordinate = CLLocationCoordinate2DMake(lat, lng)
-    val placemark = MKPlacemark(coordinate = coordinate, addressDictionary = null)
-    val mapItem = MKMapItem(placemark = placemark)
-    mapItem.name = "Cel podróży"
-    val launchOptions = mapOf(MKLaunchOptionsDirectionsModeKey to MKLaunchOptionsDirectionsModeDriving)
-    mapItem.openInMapsWithLaunchOptions(launchOptions as Map<Any?, *>)
-}
