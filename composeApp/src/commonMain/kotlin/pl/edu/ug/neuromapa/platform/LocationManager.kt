@@ -2,23 +2,21 @@ package pl.edu.ug.neuromapa.platform
 
 import androidx.compose.runtime.Composable
 
-// Defines the data structure for a location point
+// 1. Model danych
 data class Location(val latitude: Double, val longitude: Double)
 
-// Defines the possible outcomes of a location request
+// 2. Wynik żądania lokalizacji
 sealed class LocationRequestResult {
     data class Success(val location: Location) : LocationRequestResult()
-    object PermissionDenied : LocationRequestResult()
-    object Failure : LocationRequestResult()
+    data object PermissionDenied : LocationRequestResult()
+    data object Failure : LocationRequestResult()
 }
 
-// Defines the interface for our location manager
-interface LocationManager {
+// 3. Interfejs menedżera
+expect class LocationManager {
     fun requestLocation()
 }
 
-// The 'expect' declaration that the Android and iOS modules will implement
+// 4. Funkcja Composable do tworzenia menedżera
 @Composable
-expect fun rememberLocationManager(
-    onResult: (LocationRequestResult) -> Unit
-): LocationManager
+expect fun rememberLocationManager(onResult: (LocationRequestResult) -> Unit): LocationManager

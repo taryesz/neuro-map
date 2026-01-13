@@ -42,13 +42,16 @@ import pl.edu.ug.neuromapa.screens.place.settings.headerScrimOffset
 import pl.edu.ug.neuromapa.screens.place.settings.headerScrimOpacity
 import pl.edu.ug.neuromapa.screens.place.settings.headerCategoryIconSize
 
+import pl.edu.ug.neuromapa.components.NativeMap
+import pl.edu.ug.neuromapa.data.MapPoint
+
 @Composable
 fun PlaceHeader(
     name: String,
     latitude: Double,
     longitude: Double,
     categoryIcon: DrawableResource,
-    categoryIconDescription: String,
+    categoryIconDescription: String, // To pole przechowuje nazwę kategorii (np. "jedzenie")
     isFavorite: Boolean,
     onFavoriteButtonClick: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -61,15 +64,16 @@ fun PlaceHeader(
             .clip(RoundedCornerShape(bottomStart = cornerRadius, bottomEnd = cornerRadius))
     )
     {
-
-        // Set the map snapshot of the place (solves the problem of lack of images access)
+        // Wyświetlamy mapę w nagłówku
         MapSnapshot(
             latitude = latitude,
             longitude = longitude,
+            // POPRAWKA: Przekazujemy kategorię, żeby mapa wiedziała jaką ikonę wyświetlić
+            category = categoryIconDescription,
             modifier = Modifier.fillMaxSize()
         )
 
-        // Scrim for better title readability
+        // Cieniowanie (Scrim) dla czytelności tekstu
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -81,10 +85,10 @@ fun PlaceHeader(
                 )
         )
 
-        // "Save to favorites" button panel
+        // Przycisk ulubionych
         Box(
             modifier = Modifier
-                .align(Alignment.TopEnd)    // "position: absolute" in the top right corner of the box
+                .align(Alignment.TopEnd)
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(top = widePadding, end = widePadding)
                 .clip(CircleShape)
@@ -94,29 +98,27 @@ fun PlaceHeader(
         {
             Image(
                 modifier = Modifier.size(40.dp),
-                // TODO: change the icons!!!
                 painter = painterResource(if (!isFavorite) Res.drawable.navigation_bar_favorites else Res.drawable.navigation_bar_add),
                 contentDescription = if (isFavorite) "Usuń z ulubionych." else "Dodaj do ulubionych.",
             )
         }
 
-        // Main content
+        // Główna zawartość (Ikona kategorii i Tytuł)
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(horizontal = widePadding, vertical = widePadding),
-            verticalArrangement = Arrangement.Bottom    // Stick content to bottom
+            verticalArrangement = Arrangement.Bottom
         ) {
 
-            // Category icon & title wrapper
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(wideSpacing),
                 verticalAlignment = Alignment.Top,
             ) {
 
-                // Category icon panel
+                // Panel z ikoną kategorii
                 Box(
                     modifier = Modifier.clip(CircleShape),
                     contentAlignment = Alignment.Center
@@ -129,7 +131,7 @@ fun PlaceHeader(
                     )
                 }
 
-                // Place name panel
+                // Tytuł miejsca
                 Box(
                     modifier = Modifier.weight(1f)
                 )
@@ -143,14 +145,43 @@ fun PlaceHeader(
                         overflow = TextOverflow.Visible,
                         softWrap = false,
 
-                        // "Running text" effect
                         modifier = Modifier.basicMarquee()
                     )
                 }
             }
-
         }
-
     }
+}
 
+// --- POPRAWIONA FUNKCJA MAP SNAPSHOT ---
+@Composable
+fun MapSnapshot(
+    latitude: Double,
+    longitude: Double,
+    category: String, // POPRAWKA: Dodano parametr category
+    modifier: Modifier = Modifier
+) {
+    // Tworzymy tymczasowy punkt do wyświetlenia na mapie
+    val singlePoint = MapPoint(
+        id = -1, // Int
+        name = "",
+        category = category, // POPRAWKA: Przypisujemy prawdziwą kategorię!
+        latitude = latitude,
+        longitude = longitude,
+        sensoryFeatures = emptyList(),
+        hasMedal = false,
+        hasHeart = false,
+        description = "",
+        address = "",
+        photoUrl = "",
+        website = "",
+        facebook = "",
+        instagram = ""
+    )
+
+    NativeMap(
+        points = listOf(singlePoint),
+        modifier = modifier,
+        onPointClick = {}
+    )
 }

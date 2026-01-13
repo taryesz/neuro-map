@@ -2,7 +2,6 @@ package pl.edu.ug.neuromapa.platform
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,55 +10,77 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 
-@SuppressLint("MissingPermission")
-private fun requestActualLocation(context: Context, onResult: (LocationRequestResult) -> Unit) {
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-        .addOnSuccessListener { location ->
-            if (location != null) {
-                onResult(LocationRequestResult.Success(Location(location.latitude, location.longitude)))
-            } else {
-                onResult(LocationRequestResult.Failure)
-            }
-        }
-        .addOnFailureListener { 
-            onResult(LocationRequestResult.Failure)
-        }
+actual class LocationManager(
+    private val onPermissionRequest: () -> Unit,
+    private val onFetchLocation: () -> Unit
+) {
+    actual fun requestLocation() {
+        onPermissionRequest()
+    }
+
+    // Wywoływane wewnętrznie, gdy mamy już zgodę
+    fun fetch() {
+        onFetchLocation()
+    }
 }
 
 @Composable
-actual fun rememberLocationManager(
-    onResult: (LocationRequestResult) -> Unit
-): LocationManager {
+actual fun rememberLocationManager(onResult: (LocationRequestResult) -> Unit): LocationManager {
     val context = LocalContext.current
+
+    // Klient lokalizacji Google
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
+    // Funkcja pobierająca współrzędne (gdy mamy już zgodę)
+    val fetchLocation = {
+        try {
+            @SuppressLint("MissingPermission") // Sprawdzamy to wcześniej
+            val task = fusedLocationClient.lastLocation
+            task.addOnSuccessListener { location ->
+                if (location != null) {
+                    onResult(LocationRequestResult.Success(Location(location.latitude, location.longitude)))
+                } else {
+                    onResult(LocationRequestResult.Failure)
+                }
+            }
+            task.addOnFailureListener {
+                onResult(LocationRequestResult.Failure)
+            }
+        } catch (e: Exception) {
+            onResult(LocationRequestResult.Failure)
+        }
+    }
+
+    // Launcher uprawnień
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
+        ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val isGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                        permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        if (isGranted) {
-            requestActualLocation(context, onResult)
+        val fine = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+        val coarse = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+
+        if (fine || coarse) {
+            fetchLocation()
         } else {
             onResult(LocationRequestResult.PermissionDenied)
         }
     }
 
-    return remember(context, launcher, onResult) {
-        object : LocationManager {
-            override fun requestLocation() {
-                val hasPermission = ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-
-                if (hasPermission) {
-                    requestActualLocation(context, onResult)
+    return remember {
+        LocationManager(
+            onPermissionRequest = {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    fetchLocation()
                 } else {
-                    launcher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+                    launcher.launch(arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ))
                 }
-            }
-        }
+            },
+            onFetchLocation = { fetchLocation() }
+        )
     }
 }

@@ -74,7 +74,7 @@ fun HomeScreen(
     userFirstName: String,
     userProfileImage: DrawableResource,
 ) {
-    val placeViewModel: PlaceViewModel = viewModel()
+    val placeViewModel = viewModel { PlaceViewModel() }
     val placeDataState by placeViewModel.dataState.collectAsState()
     val mapNavigator = rememberMapNavigator()
 

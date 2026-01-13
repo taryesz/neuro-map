@@ -28,6 +28,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
             implementation("com.google.android.gms:play-services-location:21.3.0")
+            implementation("com.google.maps.android:maps-compose:4.3.0")
         }
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:$ktorVersion")
@@ -42,12 +43,11 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(compose.materialIconsExtended)
-
             implementation("io.ktor:ktor-client-core:$ktorVersion")
             implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-
-            implementation(libs.maplibre.compose)
+            implementation("com.google.android.gms:play-services-location:21.0.1")
+            implementation(libs.maps.compose.utils)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

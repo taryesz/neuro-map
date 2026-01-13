@@ -34,7 +34,7 @@ import pl.edu.ug.neuromapa.data.PlaceViewModel
 fun App() {
     NeuroMapaTheme {
 
-        val placeViewModel: PlaceViewModel = viewModel()
+        val placeViewModel = viewModel { PlaceViewModel() }
         val dataState by placeViewModel.dataState.collectAsState()
 
         var currentScreen by remember { mutableStateOf(Screen.Home) }

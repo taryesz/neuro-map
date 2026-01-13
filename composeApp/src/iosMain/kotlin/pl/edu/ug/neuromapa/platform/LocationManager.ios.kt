@@ -1,55 +1,80 @@
 package pl.edu.ug.neuromapa.platform
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
+import platform.CoreLocation.kCLLocationAccuracyBest
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
+import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
 import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
+import platform.CoreLocation.kCLAuthorizationStatusDenied
 import platform.darwin.NSObject
+import platform.Foundation.NSError
 
-@OptIn(ExperimentalForeignApi::class)
-class IOSLocationManager(
-    private val onResult: (LocationRequestResult) -> Unit
-) : NSObject(), CLLocationManagerDelegateProtocol, LocationManager {
-
-    private val locationManager = CLLocationManager().apply {
-        delegate = this@IOSLocationManager
-    }
-
-    override fun requestLocation() {
-        when (locationManager.authorizationStatus()) {
-            kCLAuthorizationStatusNotDetermined -> locationManager.requestWhenInUseAuthorization()
-            kCLAuthorizationStatusAuthorizedWhenInUse -> locationManager.requestLocation()
-            else -> onResult(LocationRequestResult.PermissionDenied)
-        }
-    }
-
-    override fun locationManagerDidChangeAuthorization(manager: CLLocationManager) {
-        if (manager.authorizationStatus() == kCLAuthorizationStatusAuthorizedWhenInUse) {
-            manager.requestLocation()
-        }
-    }
-
-    override fun locationManager(manager: CLLocationManager, didUpdateLocations: List<*>) {
-        val locations = didUpdateLocations as List<CLLocation>
-        locations.firstOrNull()?.let {
-            val coordinate = it.coordinate
-            onResult(LocationRequestResult.Success(Location(coordinate.useContents { latitude }, coordinate.useContents { longitude })))
-        }
-    }
-
-    override fun locationManager(manager: CLLocationManager, didFailWithError: platform.Foundation.NSError) {
-        onResult(LocationRequestResult.Failure)
+actual class LocationManager(
+    private val locationManager: CLLocationManager,
+    private val delegate: NSObject // Trzymamy referencję, żeby GC jej nie usunął
+) {
+    actual fun requestLocation() {
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun rememberLocationManager(
-    onResult: (LocationRequestResult) -> Unit
-): LocationManager {
-    return remember { IOSLocationManager(onResult) }
+actual fun rememberLocationManager(onResult: (LocationRequestResult) -> Unit): LocationManager {
+
+    val locationManager = remember { CLLocationManager() }
+
+    val delegate = remember {
+        LocationDelegate(onResult)
+    }
+
+    DisposableEffect(Unit) {
+        locationManager.delegate = delegate
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        onDispose {
+            locationManager.stopUpdatingLocation()
+        }
+    }
+
+    return remember { LocationManager(locationManager, delegate) }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private class LocationDelegate(
+    val onResult: (LocationRequestResult) -> Unit
+) : NSObject(), CLLocationManagerDelegateProtocol {
+
+    override fun locationManager(manager: CLLocationManager, didUpdateLocations: List<*>) {
+        val location = didUpdateLocations.lastOrNull() as? CLLocation
+        location?.let {
+            val lat = it.coordinate.useContents { latitude }
+            val lng = it.coordinate.useContents { longitude }
+
+            // Mamy lokalizację -> wysyłamy wynik i zatrzymujemy GPS (oszczędność baterii)
+            onResult(LocationRequestResult.Success(Location(lat, lng)))
+            manager.stopUpdatingLocation()
+        }
+    }
+
+    override fun locationManager(manager: CLLocationManager, didFailWithError: NSError) {
+        onResult(LocationRequestResult.Failure)
+    }
+
+    override fun locationManagerDidChangeAuthorization(manager: CLLocationManager) {
+        // Opcjonalnie: Reagowanie na zmianę uprawnień w locie
+        /*
+        val status = manager.authorizationStatus
+        if (status == kCLAuthorizationStatusDenied) {
+            onResult(LocationRequestResult.PermissionDenied)
+        }
+        */
+    }
 }
