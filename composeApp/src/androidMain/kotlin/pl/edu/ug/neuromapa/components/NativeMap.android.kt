@@ -108,19 +108,118 @@ actual fun NativeMap(
 
     val mapLibreStyleJson = """
     [
-      { "elementType": "geometry", "stylers": [ { "color": "#f2f2f0" } ] },
-      { "elementType": "labels.text.fill", "stylers": [ { "color": "#525252" } ] },
-      { "elementType": "labels.text.stroke", "stylers": [ { "color": "#ffffff" }, { "weight": 3 } ] },
-      { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [ { "color": "#c9c9c9" }, { "weight": 1.2 } ] },
-      { "featureType": "poi", "stylers": [ { "visibility": "off" } ] },
-      { "featureType": "transit", "stylers": [ { "visibility": "off" } ] },
-      { "featureType": "road", "elementType": "geometry.fill", "stylers": [ { "color": "#ffffff" } ] },
-      { "featureType": "road", "elementType": "geometry.stroke", "stylers": [ { "color": "#d6d6d6" } ] },
-      { "featureType": "road.highway", "elementType": "geometry.fill", "stylers": [ { "color": "#ffffff" } ] },
-      { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [ { "color": "#c5c5c5" } ] },
-      { "featureType": "water", "elementType": "geometry.fill", "stylers": [ { "color": "#b8d9e3" } ] },
-      { "featureType": "water", "elementType": "labels.text.fill", "stylers": [ { "color": "#7a7a7a" } ] }
+  {
+    "elementType": "geometry",
+    "stylers": [
+      { "color": "#f5f5f0" }
     ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      { "color": "#6e6e6e" }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      { "color": "#ffffff" },
+      { "weight": 4 }
+    ]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      { "color": "#dcdcdc" },
+      { "weight": 1 }
+    ]
+  },
+  {
+    "featureType": "landscape.man_made",
+    "elementType": "geometry.fill",
+    "stylers": [
+      { "color": "#ececec" }
+    ]
+  },
+  {
+    "featureType": "landscape.natural",
+    "elementType": "geometry.fill",
+    "stylers": [
+      { "color": "#dceccb" }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry.fill",
+    "stylers": [
+      { "visibility": "on" },
+      { "color": "#dceccb" }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry.fill",
+    "stylers": [
+      { "color": "#ffffff" }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      { "color": "#e6e6e6" },
+      { "weight": 1 }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      { "color": "#8a8a8a" }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.fill",
+    "stylers": [
+      { "color": "#ffffff" }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      { "color": "#e0e0e0" }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry.fill",
+    "stylers": [
+      { "color": "#d8eff5" }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      { "color": "#9db4bd" }
+    ]
+  }
+]
     """.trimIndent()
 
     LaunchedEffect(points) {

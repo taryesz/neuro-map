@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.components // <-- Ważne: ten pakiet musi być taki sam jak w android/ios
+package pl.edu.ug.neuromapa.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
