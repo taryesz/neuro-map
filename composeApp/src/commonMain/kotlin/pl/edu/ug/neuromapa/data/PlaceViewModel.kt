@@ -33,40 +33,51 @@ class PlaceViewModel : ViewModel() {
     private fun fetchPlaces() {
         viewModelScope.launch {
             try {
+
+                // Get all the places data from "https://neuromapa.ug.edu.pl/"
                 val fetchedPlaces = api.getPlaces()
 
+                // Compose a list of places - for each place...
                 val mapPoints = fetchedPlaces.mapNotNull { place ->
-                    // Pobieramy koordynaty bezpiecznie
+
+                    // ... get its coordinates
                     val lat = place.acfFields?.location?.getLatDouble()
                     val lng = place.acfFields?.location?.getLngDouble()
 
-                    // Sprawdzamy, czy koordynaty istnieją
+                    // ... check if the coordinates are valid
+                    // If so, create an object with all the necessary information about the place
                     if (lat != null && lng != null) {
+
+                        // This text will be shown if there is a piece of information missing about the place
+                        val noInformation = "Datum not available"
+
                         MapPoint(
                             id = place.id,
                             name = place.title.rendered,
                             latitude = lat,
                             longitude = lng,
-                            category = place.acfFields.category ?: "Bez kategorii",
+                            category = place.acfFields.category ?: noInformation,
                             sensoryFeatures = place.acfFields.sensoryFeatures,
                             hasMedal = place.acfFields.hasMedal,
                             hasHeart = place.acfFields.hasHeart,
-                            description = place.acfFields.description ?: "Bez opisu",
-                            address = place.acfFields.address ?: "Bez adresu",
-                            photoUrl = place.acfFields.photoUrl ?: "Bez zdjęcia",
-                            website = place.acfFields.website ?: "Bez strony www",
-                            facebook = place.acfFields.facebook ?: "Bez profilu na Facebook",
-                            instagram = place.acfFields.instagram ?: "Bez profilu na Instagram",
+                            description = place.acfFields.description ?: noInformation,
+                            address = place.acfFields.address ?: noInformation,
+                            photoUrl = place.acfFields.photoUrl ?: noInformation,
+                            website = place.acfFields.website ?: noInformation,
+                            facebook = place.acfFields.facebook ?: noInformation,
+                            instagram = place.acfFields.instagram ?: noInformation,
                         )
+
                     } else {
                         null
                     }
                 }
 
+                // Update the state to Success (at this point, all the data should be available in mapPoints)
                 _dataState.value = PlaceDataState.Success(mapPoints)
-                println("Pobrano punktów: ${mapPoints.size}")
 
             } catch (e: Exception) {
+                // TODO: add a UI response to when there is a problem with data fetching
                 e.printStackTrace()
                 _dataState.value = PlaceDataState.Error("Błąd pobierania danych: ${e.message}")
             }

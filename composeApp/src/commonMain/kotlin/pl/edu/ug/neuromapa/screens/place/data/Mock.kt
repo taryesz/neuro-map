@@ -7,7 +7,7 @@ import neuromapa.composeapp.generated.resources.sensory_property_dark_access
 import neuromapa.composeapp.generated.resources.sensory_property_dark_quiet
 import neuromapa.composeapp.generated.resources.sensory_property_dark_relax
 import neuromapa.composeapp.generated.resources.sensory_property_dark_staff
-import pl.edu.ug.neuromapa.screens.place.models.*
+import pl.edu.ug.neuromapa.screens.place.enums.LinkType
 
 val mockPlaceKotkaCafe = Place(
     name = "Kotka Café (dla 14+)",

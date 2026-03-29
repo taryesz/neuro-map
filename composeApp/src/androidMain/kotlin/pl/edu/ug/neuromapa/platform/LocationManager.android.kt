@@ -19,7 +19,6 @@ actual class LocationManager(
         onPermissionRequest()
     }
 
-    // Wywoływane wewnętrznie, gdy mamy już zgodę
     fun fetch() {
         onFetchLocation()
     }
@@ -29,13 +28,11 @@ actual class LocationManager(
 actual fun rememberLocationManager(onResult: (LocationRequestResult) -> Unit): LocationManager {
     val context = LocalContext.current
 
-    // Klient lokalizacji Google
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
-    // Funkcja pobierająca współrzędne (gdy mamy już zgodę)
     val fetchLocation = {
         try {
-            @SuppressLint("MissingPermission") // Sprawdzamy to wcześniej
+            @SuppressLint("MissingPermission")
             val task = fusedLocationClient.lastLocation
             task.addOnSuccessListener { location ->
                 if (location != null) {
@@ -52,7 +49,6 @@ actual fun rememberLocationManager(onResult: (LocationRequestResult) -> Unit): L
         }
     }
 
-    // Launcher uprawnień
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->

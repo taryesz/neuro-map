@@ -27,8 +27,8 @@ import pl.edu.ug.neuromapa.platform.rememberMapNavigator
 import pl.edu.ug.neuromapa.screens.home.settings.cornerRadius
 import pl.edu.ug.neuromapa.screens.place.components.PlaceHeader
 import pl.edu.ug.neuromapa.screens.place.components.PlaceFeature
-import pl.edu.ug.neuromapa.screens.place.models.Link
-import pl.edu.ug.neuromapa.screens.place.models.LinkType
+import pl.edu.ug.neuromapa.screens.place.data.Link
+import pl.edu.ug.neuromapa.screens.place.enums.LinkType
 import pl.edu.ug.neuromapa.screens.place.settings.*
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.screens.place.helpers.*
@@ -38,6 +38,7 @@ import pl.edu.ug.neuromapa.ui.SurfaceVariant
 fun PlaceScreen(
     mapPoint: MapPoint,
 ) {
+
     val mapNavigator = rememberMapNavigator()
 
     val allFeatures = remember(mapPoint) {
@@ -47,18 +48,22 @@ fun PlaceScreen(
         features
     }
 
+    // Wrapper of the whole screen
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
     )
     {
+
+        // One more wrapper...
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         )
         {
-            // ✅ Przywrócona wersja z mapą (latitude/longitude) zamiast zdjęcia
+
+            // Custom Header (it has a snapshot of a map instead of the turquoise title)
             PlaceHeader(
                 name = mapPoint.name,
                 categoryIcon = getCategoryIconHelper(mapPoint.category),
@@ -69,6 +74,7 @@ fun PlaceScreen(
                 longitude = mapPoint.longitude,
             )
 
+            // Place description section (Wrapper)
             Column(
                 modifier = Modifier.fillMaxSize().padding(widePadding),
                 verticalArrangement = Arrangement.spacedBy(wideSpacing)
@@ -76,6 +82,8 @@ fun PlaceScreen(
             {
 
                 if (allFeatures.isNotEmpty()) {
+
+                    // The horizontal scrollable list of all features the places has
                     LazyRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(mediumSpacing)
@@ -90,6 +98,9 @@ fun PlaceScreen(
                     }
                 }
 
+                // The rest of the description of the place is here:
+
+                // "About"
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(Res.string.about_place_title),
@@ -104,6 +115,7 @@ fun PlaceScreen(
                     )
                 }
 
+                // "Localization"
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = stringResource(Res.string.localization_title),
@@ -117,6 +129,7 @@ fun PlaceScreen(
                         style = getAppTypography().bodySmall,
                     )
 
+                    // The "Navigate" button
                     Column(
                         modifier = Modifier
                             .padding(top = mediumPadding)
@@ -125,7 +138,6 @@ fun PlaceScreen(
                             }
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(cornerRadius))
-                            // ✅ Przywrócony Twój kolor SurfaceVariant
                             .background(SurfaceVariant)
                             .padding(horizontal = widePadding, vertical = mediumPadding),
                         verticalArrangement = Arrangement.Center,
@@ -139,17 +151,46 @@ fun PlaceScreen(
                     }
                 }
 
+                // All the place-related links
                 val links = mutableListOf<Link>()
+
                 if (mapPoint.website.isNotBlank()) {
-                    links.add(Link(LinkType.Website, mapPoint.website, "Strona internetowa"))
+                    links.add(
+                        Link(
+                            LinkType.Website,
+                            mapPoint.website,
+                            stringResource(
+                                Res.string.place_screen_place__description_instagram_link_label
+                            )
+                        )
+                    )
                 }
                 if (mapPoint.facebook.isNotBlank()) {
-                    links.add(Link(LinkType.Facebook, mapPoint.facebook, "Facebook"))
+                    links.add(
+                        Link(
+                            LinkType.Facebook,
+                            mapPoint.facebook,
+                            stringResource(
+                                Res.string.place_screen_place__description_facebook_link_label
+                            )
+                        )
+                    )
                 }
                 if (mapPoint.instagram.isNotBlank()) {
-                    links.add(Link(LinkType.Instagram, mapPoint.instagram, "Instagram"))
+                    links.add(
+                        Link(
+                            LinkType.Instagram,
+                            mapPoint.instagram,
+                            stringResource(
+                                Res.string.place_screen_place__description_website_link_label
+                            )
+                        )
+                    )
                 }
+
                 if (links.isNotEmpty()) {
+
+                    // Show one more section with links (if any)
                     Column {
                         Text(
                             text = stringResource(Res.string.useful_link_title),
@@ -157,30 +198,43 @@ fun PlaceScreen(
                             style = getAppTypography().titleMedium,
                             modifier = Modifier.padding(bottom = mediumPadding)
                         )
+
                         links.forEach { link ->
+
+                            // Link wrapper
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(bottom = narrowPadding),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+
+                                // An icon describing the link
                                 Icon(
                                     painter = painterResource(link.type.icon),
                                     contentDescription = null,
                                     modifier = Modifier.size(linkIconSize),
                                     tint = MaterialTheme.colorScheme.onBackground
                                 )
+
                                 Spacer(modifier = Modifier.width(mediumSpacing))
+
                                 val uriHandler = LocalUriHandler.current
+
+                                // The link itself
                                 Text(
                                     modifier = Modifier.clickable { uriHandler.openUri(link.url) },
                                     text = link.label,
                                     color = MaterialTheme.colorScheme.onBackground,
                                     style = getAppTypography().bodySmall,
                                 )
+
                             }
+
                         }
+
                     }
+
                 }
             }
         }

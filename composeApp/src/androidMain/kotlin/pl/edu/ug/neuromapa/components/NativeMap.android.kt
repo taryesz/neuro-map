@@ -1,10 +1,7 @@
 package pl.edu.ug.neuromapa.components
 
 import android.Manifest
-import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -69,12 +66,10 @@ actual fun NativeMap(
 ) {
     val context = LocalContext.current
 
-    // 1. Stan początkowy kamery
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(54.35, 18.65), 10f)
     }
 
-    // 2. Stan uprawnień
     var hasLocationPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
@@ -82,7 +77,6 @@ actual fun NativeMap(
         )
     }
 
-    // 3. Launcher do wywołania systemowego okienka z pytaniem
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -90,7 +84,7 @@ actual fun NativeMap(
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
     }
 
-    // 4. Próba uzyskania zgody przy starcie mapy (tylko raz)
+    // At the start ask for location permission
     LaunchedEffect(Unit) {
         if (!hasLocationPermission) {
             permissionLauncher.launch(
@@ -106,6 +100,7 @@ actual fun NativeMap(
         points.map { MapPointClusterItem(it) }
     }
 
+    // Map appearance configuration
     val mapLibreStyleJson = """
     [
   {
@@ -222,6 +217,7 @@ actual fun NativeMap(
 ]
     """.trimIndent()
 
+    // Move the camera so that all points were seen at once
     LaunchedEffect(points) {
         if (points.isNotEmpty()) {
             try {
@@ -254,11 +250,11 @@ actual fun NativeMap(
         cameraPositionState = cameraPositionState,
         properties = MapProperties(
             mapStyleOptions = MapStyleOptions(mapLibreStyleJson),
-            isMyLocationEnabled = hasLocationPermission // <-- Używamy bezpiecznej flagi
+            isMyLocationEnabled = hasLocationPermission
         ),
         uiSettings = MapUiSettings(
             zoomControlsEnabled = false,
-            myLocationButtonEnabled = hasLocationPermission // Przycisk widoczny tylko gdy jest zgoda
+            myLocationButtonEnabled = false
         )
     ) {
         Clustering(

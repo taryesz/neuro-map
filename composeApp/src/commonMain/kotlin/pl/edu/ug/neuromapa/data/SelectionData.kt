@@ -2,7 +2,7 @@ package pl.edu.ug.neuromapa.data
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import pl.edu.ug.neuromapa.screens.add.models.SelectionItem
+import pl.edu.ug.neuromapa.screens.add.data.SelectionItem
 import pl.edu.ug.neuromapa.ui.icons.*
 
 @Composable

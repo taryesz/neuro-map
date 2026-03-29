@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 
 actual class MapNavigator(private val context: Context) {
     actual fun navigateTo(latitude: Double, longitude: Double, name: String) {
-        // Tworzymy intencję uruchomienia Google Maps
         val uri = Uri.parse("google.navigation:q=$latitude,$longitude")
         val intent = Intent(Intent.ACTION_VIEW, uri).apply {
             setPackage("com.google.android.apps.maps")
@@ -19,15 +18,14 @@ actual class MapNavigator(private val context: Context) {
         try {
             context.startActivity(intent)
         } catch (e: Exception) {
-            // Jeśli nie ma aplikacji map, logujemy błąd lub otwieramy w przeglądarce
             e.printStackTrace()
         }
+
     }
 }
 
 @Composable
 actual fun rememberMapNavigator(): MapNavigator {
-    // Na Androidzie pobieramy Context z Composable i przekazujemy go do klasy
     val context = LocalContext.current
     return remember(context) { MapNavigator(context) }
 }

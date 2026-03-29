@@ -59,7 +59,7 @@ fun NavigationBar(
         ) {
 
             Screen.entries
-                .filter { it.label != "Lokalizacja" }
+                .filter { it.label != "Lokalizacja" && it.label != "Logowanie" }
                 .forEach { screen ->
 
                     // Check if the the screen is selected

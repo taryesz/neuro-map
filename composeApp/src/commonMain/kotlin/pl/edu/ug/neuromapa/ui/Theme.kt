@@ -1,12 +1,10 @@
 package pl.edu.ug.neuromapa.ui
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 
 @Composable
-fun NeuroMapaTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+fun NeuroMapTheme(
     content: @Composable () -> Unit
 ) {
 

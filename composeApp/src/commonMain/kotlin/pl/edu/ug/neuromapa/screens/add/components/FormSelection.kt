@@ -1,13 +1,12 @@
 package pl.edu.ug.neuromapa.screens.add.components
 
-import pl.edu.ug.neuromapa.screens.add.models.SelectionItem
+import pl.edu.ug.neuromapa.screens.add.data.SelectionItem
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import pl.edu.ug.neuromapa.screens.add.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
 import pl.edu.ug.neuromapa.ui.getAppTypography
@@ -20,24 +19,26 @@ fun FormSelection(
     onSelectionChange: (Set<String>) -> Unit,
     showDescription: Boolean = false,
     description: String? = null,
+    isSingleSelection: Boolean = false
 ) {
 
-    // Categories / sensory properties / excellences by 3 items in each row
+    // Divide categories / sensory properties / excellences by 3 items per row
     val chunkedItems = remember(items) { items.chunked(3) }
 
+    // Wrapper
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(mediumSpacing),
     )
     {
 
-        // Form title
+        // Filed title
         Text(
             text = title,
             style = getAppTypography().titleMedium,
         )
 
-        // Clickable icons
+        // Buttons
         chunkedItems.forEach { rowItems ->
             Row(
                 modifier = Modifier
@@ -55,15 +56,27 @@ fun FormSelection(
                         modifier = Modifier.weight(1f),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        CategoryItem(
+                        SelectionItem(
                             icon = iconToShow,
                             iconDescription = item.description,
                             name = item.name,
                             onClick = {
-                                val newSelection = if (selectedItems.contains(item.name)) {
-                                    selectedItems - item.name
+                                val newSelection = if (isSingleSelection) {
+
+                                    // Only one option can be clicked and chosen at a time
+                                    if (selectedItems.contains(item.name)) {
+                                        emptySet()  // If it was already chosen, unchoose it
+                                    } else {
+                                        // If a new option was chosen, overwrite the old one with the new one
+                                        setOf(item.name)
+                                    }
                                 } else {
-                                    selectedItems + item.name
+                                    // Multiple options can be clicked and chosen
+                                    if (selectedItems.contains(item.name)) {
+                                        selectedItems - item.name
+                                    } else {
+                                        selectedItems + item.name
+                                    }
                                 }
                                 onSelectionChange(newSelection)
                             }

@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.screens.place.models
+package pl.edu.ug.neuromapa.screens.place.data
 
 import org.jetbrains.compose.resources.DrawableResource
 

@@ -25,7 +25,7 @@ import pl.edu.ug.neuromapa.ui.ProfileIcon
 @Composable
 fun Header(
     title: String,
-    userProfileImage: DrawableResource,
+    userProfileImage: DrawableResource? = null,
     showProfile: Boolean = true,
     roundBottomCorners: Boolean = true,
     onProfileClick: () -> Unit = {},
@@ -79,16 +79,26 @@ fun Header(
 
             // Profile picture panel : contains user photo. Showed optionally
             if (showProfile) {
-                Image(
-                    painter = painterResource(userProfileImage),
-                    contentDescription = "Zdjęcie profilowe użytkownika",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(userProfileIconSize)
-                        .clip(CircleShape)
-                        .background(ProfileIcon) // In case the image doesn't load
-                        .clickable { onProfileClick() }
-                )
+                val modifier = Modifier
+                    .size(userProfileIconSize)
+                    .clip(CircleShape)
+                    .background(ProfileIcon) // placeholder for when there is no profile picture
+                    .clickable { onProfileClick() }
+
+                // There is a proifile picture to show...
+                if (userProfileImage != null) {
+                    Image(
+                        painter = painterResource(userProfileImage),
+                        contentDescription = "Zdjęcie profilowe użytkownika",
+                        contentScale = ContentScale.Crop,
+                        modifier = modifier
+                    )
+                }
+                // Or no profile picture - then show juz a beige shape
+                else {
+                    Box(modifier = modifier)
+                }
+
             }
         }
 

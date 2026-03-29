@@ -42,21 +42,19 @@ import pl.edu.ug.neuromapa.screens.place.settings.headerScrimOffset
 import pl.edu.ug.neuromapa.screens.place.settings.headerScrimOpacity
 import pl.edu.ug.neuromapa.screens.place.settings.headerCategoryIconSize
 
-import pl.edu.ug.neuromapa.components.NativeMap
-import pl.edu.ug.neuromapa.data.MapPoint
-
 @Composable
 fun PlaceHeader(
     name: String,
     latitude: Double,
     longitude: Double,
     categoryIcon: DrawableResource,
-    categoryIconDescription: String, // To pole przechowuje nazwę kategorii (np. "jedzenie")
+    categoryIconDescription: String,
     isFavorite: Boolean,
     onFavoriteButtonClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
 
+    // Wrapper
     Box(
         modifier = modifier
             .height(headerHeight)
@@ -64,16 +62,16 @@ fun PlaceHeader(
             .clip(RoundedCornerShape(bottomStart = cornerRadius, bottomEnd = cornerRadius))
     )
     {
-        // Wyświetlamy mapę w nagłówku
+
+        // Show a mini-map (snapshot) where only one selected place will be shown
         MapSnapshot(
             latitude = latitude,
             longitude = longitude,
-            // POPRAWKA: Przekazujemy kategorię, żeby mapa wiedziała jaką ikonę wyświetlić
             category = categoryIconDescription,
             modifier = Modifier.fillMaxSize()
         )
 
-        // Cieniowanie (Scrim) dla czytelności tekstu
+        // Scrim-box (for better readability)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,7 +83,7 @@ fun PlaceHeader(
                 )
         )
 
-        // Przycisk ulubionych
+        // Add to favorites / Remove from favorites button
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -98,12 +96,13 @@ fun PlaceHeader(
         {
             Image(
                 modifier = Modifier.size(40.dp),
+                // TODO: replace the icons (or at least an icon for when we want to remove the place)
                 painter = painterResource(if (!isFavorite) Res.drawable.navigation_bar_favorites else Res.drawable.navigation_bar_add),
                 contentDescription = if (isFavorite) "Usuń z ulubionych." else "Dodaj do ulubionych.",
             )
         }
 
-        // Główna zawartość (Ikona kategorii i Tytuł)
+        // Main place information (Category icon + dynamic place name)
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -112,76 +111,46 @@ fun PlaceHeader(
             verticalArrangement = Arrangement.Bottom
         ) {
 
+            // Wrapper
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(wideSpacing),
                 verticalAlignment = Alignment.Top,
             ) {
 
-                // Panel z ikoną kategorii
+                // Category icon Wrapper
                 Box(
                     modifier = Modifier.clip(CircleShape),
                     contentAlignment = Alignment.Center
                 )
                 {
+
                     Image(
                         modifier = Modifier.size(headerCategoryIconSize),
                         painter = painterResource(categoryIcon),
                         contentDescription = categoryIconDescription,
                     )
+
                 }
 
-                // Tytuł miejsca
+                // Place name Wrapper
                 Box(
                     modifier = Modifier.weight(1f)
                 )
                 {
+
                     Text(
                         text = name,
                         color = MaterialTheme.colorScheme.onPrimary,
                         style = getAppTypography().titleLarge,
-
                         maxLines = 1,
                         overflow = TextOverflow.Visible,
                         softWrap = false,
-
                         modifier = Modifier.basicMarquee()
                     )
+
                 }
             }
         }
     }
-}
-
-// --- POPRAWIONA FUNKCJA MAP SNAPSHOT ---
-@Composable
-fun MapSnapshot(
-    latitude: Double,
-    longitude: Double,
-    category: String, // POPRAWKA: Dodano parametr category
-    modifier: Modifier = Modifier
-) {
-    // Tworzymy tymczasowy punkt do wyświetlenia na mapie
-    val singlePoint = MapPoint(
-        id = -1, // Int
-        name = "",
-        category = category, // POPRAWKA: Przypisujemy prawdziwą kategorię!
-        latitude = latitude,
-        longitude = longitude,
-        sensoryFeatures = emptyList(),
-        hasMedal = false,
-        hasHeart = false,
-        description = "",
-        address = "",
-        photoUrl = "",
-        website = "",
-        facebook = "",
-        instagram = ""
-    )
-
-    NativeMap(
-        points = listOf(singlePoint),
-        modifier = modifier,
-        onPointClick = {}
-    )
 }

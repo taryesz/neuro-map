@@ -9,16 +9,12 @@ import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.CLLocationManagerDelegateProtocol
 import platform.CoreLocation.kCLLocationAccuracyBest
-import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
-import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
-import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
-import platform.CoreLocation.kCLAuthorizationStatusDenied
 import platform.darwin.NSObject
 import platform.Foundation.NSError
 
 actual class LocationManager(
     private val locationManager: CLLocationManager,
-    private val delegate: NSObject // Trzymamy referencję, żeby GC jej nie usunął
+    private val delegate: NSObject
 ) {
     actual fun requestLocation() {
         locationManager.requestWhenInUseAuthorization()
@@ -58,7 +54,6 @@ private class LocationDelegate(
             val lat = it.coordinate.useContents { latitude }
             val lng = it.coordinate.useContents { longitude }
 
-            // Mamy lokalizację -> wysyłamy wynik i zatrzymujemy GPS (oszczędność baterii)
             onResult(LocationRequestResult.Success(Location(lat, lng)))
             manager.stopUpdatingLocation()
         }
@@ -69,12 +64,5 @@ private class LocationDelegate(
     }
 
     override fun locationManagerDidChangeAuthorization(manager: CLLocationManager) {
-        // Opcjonalnie: Reagowanie na zmianę uprawnień w locie
-        /*
-        val status = manager.authorizationStatus
-        if (status == kCLAuthorizationStatusDenied) {
-            onResult(LocationRequestResult.PermissionDenied)
-        }
-        */
     }
 }

@@ -20,13 +20,15 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.screens.favorites.settings.cornerRadius
 import pl.edu.ug.neuromapa.screens.favorites.settings.mediumPadding
+import pl.edu.ug.neuromapa.screens.favorites.settings.placeCardDeletionStateColor
+import pl.edu.ug.neuromapa.screens.favorites.settings.placeCardNavigationStateColor
 import pl.edu.ug.neuromapa.screens.favorites.settings.widePadding
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.ui.onPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoriteCard(
+fun FavoritePlaceCard(
     title: String,
     background: DrawableResource,
     onClick: () -> Unit = {},
@@ -34,6 +36,8 @@ fun FavoriteCard(
     onNavigate: () -> Unit
 ) {
 
+    // This allows to track if the card is being swiped to left (which deleted the card)
+    // or to the right (which launcher navigation to the place)
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
             when (dismissValue) {
@@ -41,13 +45,13 @@ fun FavoriteCard(
                 // Swipe left -> delete
                 SwipeToDismissBoxValue.EndToStart -> {
                     onDelete()
-                    true    // Delete and remove the item
+                    true    // Deletes and removes the item both from a list and visually
                 }
 
                 // Swipe right -> navigation
                 SwipeToDismissBoxValue.StartToEnd -> {
                     onNavigate()
-                    false   // Perform an action, leave the item as is
+                    false   // Launches the navigation, but snaps the card back to its place
                 }
 
                 else -> false
@@ -56,11 +60,12 @@ fun FavoriteCard(
         }
     )
 
-    // Swipe Box
+    // This is a blueprint of a card which contains a place information in a shortened form in FavoritesScreen.kt
+    // Here SwipeToDismissBox is used to inherit all the animations of the swipes
     SwipeToDismissBox(
-        state = dismissState,
+        state = dismissState,                   // Assign the card's state (detect the swipe and save it here)
         backgroundContent = {
-            DismissBackground(dismissState)     // Lower layer (what can be seen under the card)
+            DismissBackground(dismissState)     // Lower layer (what can be seen under the card when the card is moved)
         },
         content = {
 
@@ -70,7 +75,7 @@ fun FavoriteCard(
                     .fillMaxWidth()
                     .height(IntrinsicSize.Min)
                     .clip(RoundedCornerShape(cornerRadius))
-                    .clickable { onClick() }
+                    .clickable { onClick() }    // TODO: when clicked -> show PlaceScreen.kt
             ) {
 
                 // Background Image
@@ -97,6 +102,7 @@ fun FavoriteCard(
                         color = onPrimary
                     )
                 }
+
             }
         }
     )
@@ -108,33 +114,38 @@ fun DismissBackground(dismissState: SwipeToDismissBoxState) {
 
     val direction = dismissState.dismissDirection
 
-    // Colors depending on the direction of swipe
+    // Set the color of the card background depending on the direction of swipe
     val color = when (direction) {
-        SwipeToDismissBoxValue.StartToEnd -> Color(0xFF4CAF50) // Green (Right - Map)
-        SwipeToDismissBoxValue.EndToStart -> Color(0xFFE53935) // Red (Left - Delete)
+        SwipeToDismissBoxValue.StartToEnd -> Color(placeCardNavigationStateColor)   // Green (to the right - navigation)
+        SwipeToDismissBoxValue.EndToStart -> Color(placeCardDeletionStateColor)     // Red (to the left - delete)
         else -> Color.Transparent
     }
 
+    // Set the alignment of the card background depending on the direction of swipe
     val alignment = when (direction) {
-        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
-        SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart      // The background keeps left
+        SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd        // The background keeps right
         else -> Alignment.Center
     }
 
+    // Set the icon seen in the card's background depending on the direction of swipe
     val icon = when (direction) {
-        SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Place    // TODO: replace the icon
-        SwipeToDismissBoxValue.EndToStart -> Icons.Default.Delete   // TODO: replace the icon
+        SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Place        // Pin (to the right - navigation)
+        SwipeToDismissBoxValue.EndToStart -> Icons.Default.Delete       // Bin (to the left - navigation)
         else -> Icons.Default.Delete
     }
 
+    // The background that is shown when the card is being moved
     Box(
         modifier = Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(cornerRadius))
-            .background(color)
+            .background(color)          // Assign the color depending on the direction of the swipe
             .padding(horizontal = mediumPadding),
-        contentAlignment = alignment
+        contentAlignment = alignment    // Assign the alignment of the background of the card
     ) {
+
+        // This shows the icons (pin or bin) whenever the card is moved
         if (direction != SwipeToDismissBoxValue.Settled) {
             Icon(
                 imageVector = icon,

@@ -7,7 +7,6 @@ import platform.UIKit.UIApplication
 
 actual class MapNavigator {
     actual fun navigateTo(latitude: Double, longitude: Double, name: String) {
-        // Na iOS otwieramy Apple Maps
         val urlString = "http://maps.apple.com/?daddr=$latitude,$longitude"
         val url = NSURL(string = urlString)
 

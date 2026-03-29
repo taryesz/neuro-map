@@ -6,5 +6,6 @@ enum class Screen(val label: String) {
     Map("Mapa"),
     Favorites("Ulubione"),
     Survey("Ankieta"),
-    Place("Lokalizacja")
+    Place("Lokalizacja"),
+    Login("Logowanie")
 }

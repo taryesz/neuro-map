@@ -23,16 +23,17 @@ import pl.edu.ug.neuromapa.screens.favorites.FavoritesScreen
 import pl.edu.ug.neuromapa.screens.home.HomeScreen
 import pl.edu.ug.neuromapa.screens.map.MapScreen
 import pl.edu.ug.neuromapa.screens.place.PlaceScreen
-import pl.edu.ug.neuromapa.screens.survey.SurveyScreen
-import pl.edu.ug.neuromapa.ui.NeuroMapaTheme
+import pl.edu.ug.neuromapa.ui.NeuroMapTheme
 import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.data.PlaceDataState
 import pl.edu.ug.neuromapa.data.PlaceViewModel
+import pl.edu.ug.neuromapa.screens.login.LoginScreen
 
 @Composable
 @Preview
 fun App() {
-    NeuroMapaTheme {
+
+    NeuroMapTheme {
 
         val placeViewModel = viewModel { PlaceViewModel() }
         val dataState by placeViewModel.dataState.collectAsState()
@@ -54,18 +55,21 @@ fun App() {
                 )
             },
             contentWindowInsets = WindowInsets(0.dp)
-        ) { paddingValues ->
+        )
+        { paddingValues ->
 
             Box(modifier = Modifier.fillMaxSize()) {
 
                 when (dataState) {
 
+                    // Show a loading screen when the place data is being fetched from the NeuroMapa website
                     is PlaceDataState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator()
                         }
                     }
 
+                    // Show an error in case one happends
                     is PlaceDataState.Error -> {
                         val message = (dataState as PlaceDataState.Error).message
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -76,12 +80,13 @@ fun App() {
                         }
                     }
 
+                    // Show the application in case the data is fetched completely and successfully
                     is PlaceDataState.Success -> {
 
                         when (currentScreen) {
 
                             Screen.Map -> MapScreen(
-                                userProfileImage = Res.drawable.user_pfp_example,
+                                userProfileImage = Res.drawable.user_pfp_example,   // TODO: change accordingly
                                 mapPoints = mapPoints,
                                 bottomPadding = paddingValues.calculateBottomPadding(),
                                 placeViewModel = placeViewModel,
@@ -90,12 +95,14 @@ fun App() {
                                     // Find a point by id
                                     val point = mapPoints.find { it.id.toLong() == clickedId }
 
+                                    // Go to the place details (Place Screen)
                                     if (point != null) {
                                         selectedMapPoint = point
                                         currentScreen = Screen.Place
                                     }
 
-                                }
+                                },
+                                onProfileClick = { currentScreen = Screen.Login }
                             )
 
                             else -> {
@@ -105,24 +112,23 @@ fun App() {
                                     when (currentScreen) {
 
                                         Screen.Home -> HomeScreen(
-                                            userFirstName = "User",
-                                            userProfileImage = Res.drawable.user_pfp_example,
+                                            userFirstName = "User", // TODO: change accordingly
+                                            userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
+                                            onProfileClick = { currentScreen = Screen.Login }
                                         )
 
                                         Screen.Add -> AddScreen(
-                                            userProfileImage = Res.drawable.user_pfp_example,
+                                            userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
+                                            onProfileClick = { currentScreen = Screen.Login }
                                         )
 
                                         Screen.Favorites -> FavoritesScreen(
-                                            userProfileImage = Res.drawable.user_pfp_example,
+                                            userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
                                             onPlaceClick = { place ->
                                                 // TODO: clicking on a saved place shows its details
                                                 println("Kliknięto w ulubione: ${place.name}")
-                                            }
-                                        )
-
-                                        Screen.Survey -> SurveyScreen(
-                                            userProfileImage = Res.drawable.user_pfp_example,
+                                            },
+                                            onProfileClick = { currentScreen = Screen.Login }
                                         )
 
                                         Screen.Place -> {
@@ -130,6 +136,8 @@ fun App() {
                                                 PlaceScreen(mapPoint = selectedMapPoint!!)
                                             }
                                         }
+
+                                        Screen.Login -> LoginScreen()
 
                                         else -> {}
 

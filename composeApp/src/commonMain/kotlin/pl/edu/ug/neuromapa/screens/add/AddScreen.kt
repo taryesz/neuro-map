@@ -20,7 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.excellence_description
+import neuromapa.composeapp.generated.resources.add_screen_excellence_description
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.components.Header
@@ -36,15 +36,36 @@ import pl.edu.ug.neuromapa.ui.Background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.platform.LocalFocusManager
+import neuromapa.composeapp.generated.resources.add_screen_form_erase_button
+import neuromapa.composeapp.generated.resources.add_screen_form_field_place_address
+import neuromapa.composeapp.generated.resources.add_screen_form_field_place_category
+import neuromapa.composeapp.generated.resources.add_screen_form_field_place_description
+import neuromapa.composeapp.generated.resources.add_screen_form_field_place_excellences
+import neuromapa.composeapp.generated.resources.add_screen_form_field_place_facebook
+import neuromapa.composeapp.generated.resources.add_screen_form_field_place_instagram
+import neuromapa.composeapp.generated.resources.add_screen_form_field_place_name
+import neuromapa.composeapp.generated.resources.add_screen_form_field_place_sensory_properties
+import neuromapa.composeapp.generated.resources.add_screen_form_field_place_website
+import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholder_place_address
+import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholder_place_description
+import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholder_place_facebook
+import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholder_place_instagram
+import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholder_place_name
+import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholder_place_website
+import neuromapa.composeapp.generated.resources.add_screen_form_submit_button
+import neuromapa.composeapp.generated.resources.add_screen_header_title
 
 @Composable
 fun AddScreen(
     userProfileImage: DrawableResource,
+    onProfileClick: () -> Unit,
 ) {
 
+    // This is used to hide the keyboard whenever the user clicks somewhere NOT in the form field
     val focusManager = LocalFocusManager.current
 
-    // Form states
+    // Each of these variables is a state of a specific form field
+    // By default, they are empty, but later can store some user input
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
@@ -55,33 +76,36 @@ fun AddScreen(
     var selectedProperties by remember { mutableStateOf(setOf<String>()) }
     var selectedExcellences by remember { mutableStateOf(setOf<String>()) }
 
+    // Wrapper of the whole screen
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
     ) {
 
+        // One more wrapper...
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
+                    interactionSource = remember { MutableInteractionSource() },    // This allows tracking the clicks
+                    indication = null                                               // This makes the clicks non-visible
                 ) {
-                    focusManager.clearFocus()
+                    focusManager.clearFocus()   // If the user clicked somewhere in the screen but not a form field,
+                                                // the keyboard hides ("focus is lost")
                 }
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState())  // Make the screen scrollable
         ) {
 
-            // Base Header
+            // Header (turquoise panel at the very top)
             Header(
-                title = "Zgłoś miejsce",
+                title = stringResource(Res.string.add_screen_header_title),
                 userProfileImage = userProfileImage,
                 showProfile = true,
                 roundBottomCorners = true,
-                onProfileClick = { println("Profile clicked") },
+                onProfileClick = onProfileClick,
             )
 
-            // Body (Content)
+            // Body (main content)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,80 +115,92 @@ fun AddScreen(
             )
             {
 
+                // Let the user INPUT a place name
                 FormSection(
-                    title = "Nazwa",
-                    placeholder = "Jak nazywa się to wyjątkowe miejsce?",
+                    title = stringResource(Res.string.add_screen_form_field_place_name),
+                    placeholder = stringResource(Res.string.add_screen_form_field_placeholder_place_name),
                     value = name,
                     onValueChange = { name = it }
                 )
 
+                // Let the user CHOOSE a place category
                 FormSelection(
-                    title = "Kategoria",
+                    title = stringResource(Res.string.add_screen_form_field_place_category),
                     items = getCategories(),
                     selectedItems = selectedCategories,
-                    onSelectionChange = { selectedCategories = it }
+                    onSelectionChange = { selectedCategories = it },
+                    isSingleSelection = true
                 )
 
+                // Let the user INPUT a place description
                 FormSection(
-                    title = "Opis",
-                    placeholder = "Co sprawia, że czujesz się tu dobrze?",
+                    title = stringResource(Res.string.add_screen_form_field_place_description),
+                    placeholder = stringResource(Res.string.add_screen_form_field_placeholder_place_description),
                     value = description,
                     onValueChange = { description = it }
                 )
 
+                // Let the user INPUT a place address
                 FormSection(
-                    title = "Adres",
-                    placeholder = "Gdzie znajdziemy ten bezpieczny zakątek?",
+                    title = stringResource(Res.string.add_screen_form_field_place_address),
+                    placeholder = stringResource(Res.string.add_screen_form_field_placeholder_place_address),
                     value = address,
                     onValueChange = { address = it }
                 )
 
+                // Let the user CHOOSE a place properties
                 FormSelection(
-                    title = "Cechy sensoryczne",
+                    title = stringResource(Res.string.add_screen_form_field_place_sensory_properties),
                     items = getSensoryProperties(),
                     selectedItems = selectedProperties,
                     onSelectionChange = { selectedProperties = it }
                 )
 
+                // Let the user CHOOSE a place excellences
                 FormSelection(
-                    title = "Wyróżnienia",
+                    title = stringResource(Res.string.add_screen_form_field_place_excellences),
                     items = getExcellenceMarks(),
                     selectedItems = selectedExcellences,
                     onSelectionChange = { selectedExcellences = it },
                     showDescription = true,
-                    description = stringResource(Res.string.excellence_description),
+                    description = stringResource(Res.string.add_screen_excellence_description),
                 )
 
+                // Let the user INPUT a place Instagram profile
                 FormSection(
-                    title = "Instagram",
-                    placeholder = "Gdzie dzielą się pięknymi chwilami?",
+                    title = stringResource(Res.string.add_screen_form_field_place_instagram),
+                    placeholder = stringResource(Res.string.add_screen_form_field_placeholder_place_instagram),
                     value = instagram,
                     onValueChange = { instagram = it }
                 )
 
+                // Let the user INPUT a place Facebook profile
                 FormSection(
-                    title = "Facebook",
-                    placeholder = "Gdzie budują swoją społeczność?",
+                    title = stringResource(Res.string.add_screen_form_field_place_facebook),
+                    placeholder = stringResource(Res.string.add_screen_form_field_placeholder_place_facebook),
                     value = facebook,
                     onValueChange = { facebook = it }
                 )
 
+                // Let the user INPUT a place website
                 FormSection(
-                    title = "Strona internetowa",
-                    placeholder = "Gdzie w sieci możemy poczytać o nich więcej?",
+                    title = stringResource(Res.string.add_screen_form_field_place_website),
+                    placeholder = stringResource(Res.string.add_screen_form_field_placeholder_place_website),
                     value = website,
                     onValueChange = { website = it }
                 )
 
+                // Form button wrapper at the very bottom of the screen
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(15.dp),
                 ) {
 
+                    // Button that clears the form (erases all the user input)
                     FormButton(
-                        text = "Wyczyść",
+                        text = stringResource(Res.string.add_screen_form_erase_button),
                         modifier = Modifier.weight(1f),
-                        onClick = {                     // Clear the form
+                        onClick = {
                             name = ""
                             description = ""
                             address = ""
@@ -175,16 +211,17 @@ fun AddScreen(
                             selectedProperties = emptySet()
                             selectedExcellences = emptySet()
                         },
-                        isPrimary = false
+                        isPrimary = false   // This gives the button more muted color
                     )
 
+                    // Button that sends the data to the database admin
                     FormButton(
-                        text = "Wyślij",
+                        text = stringResource(Res.string.add_screen_form_submit_button),
                         modifier = Modifier.weight(1f),
                         onClick = {
                             println("Kliknięto Wyślij")     // TODO: zip the data to a json for API??
                         },
-                        isPrimary = true
+                        isPrimary = true    // This gives the button more vibrant color
                     )
 
                 }

@@ -56,7 +56,7 @@ fun HomeHeader(
                 )
             }
 
-            // Button wrapper
+            // "Need quiet" button wrapper
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

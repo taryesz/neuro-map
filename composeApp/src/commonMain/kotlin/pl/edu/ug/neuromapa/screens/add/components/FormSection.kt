@@ -27,6 +27,7 @@ fun FormSection(
     onValueChange: (String) -> Unit
 ) {
 
+    // Wrapper
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -34,11 +35,13 @@ fun FormSection(
     )
     {
 
+        // Field title
         Text(
             text = title,
             style = getAppTypography().titleMedium,
         )
 
+        // Field wrapper
         Row(
             modifier = Modifier
                 .padding(vertical = narrowPadding)
@@ -48,7 +51,7 @@ fun FormSection(
         )
         {
 
-            // Place name Text field
+            // Field
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(cornerRadius))
@@ -58,6 +61,7 @@ fun FormSection(
             )
             {
 
+                // Show placeholder if no value is input
                 if (value.isEmpty()) {
                     Text(
                         text = placeholder,
@@ -66,17 +70,18 @@ fun FormSection(
                     )
                 }
 
-                    BasicTextField(
-                        value = value,
-                        onValueChange = onValueChange,
-                        textStyle = getAppTypography().bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onBackground
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = false
-                    )
+                // Fill the field with whatever the user input
+                BasicTextField(
+                    value = value,
+                    onValueChange = onValueChange,
+                    textStyle = getAppTypography().bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = false
+                )
 
-                }
+            }
 
         }
 

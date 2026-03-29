@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import pl.edu.ug.neuromapa.screens.add.settings.cornerRadius
 import pl.edu.ug.neuromapa.screens.add.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.add.settings.widePadding
@@ -28,6 +27,7 @@ fun FormButton(
     onClick: () -> Unit = {}
 ) {
 
+    // This is a blueprint of a button that is being used in AddScreen.kt
     Column(
         modifier = modifier
             .fillMaxWidth()

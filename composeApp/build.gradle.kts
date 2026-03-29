@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -48,6 +50,8 @@ kotlin {
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
             implementation("com.google.android.gms:play-services-location:21.0.1")
             implementation(libs.maps.compose.utils)
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -59,13 +63,6 @@ android {
     namespace = "pl.edu.ug.neuromapa"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
-    defaultConfig {
-        applicationId = "pl.edu.ug.neuromapa"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -79,6 +76,24 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    defaultConfig {
+        applicationId = "pl.edu.ug.neuromapa"
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        versionCode = 1
+        versionName = "1.0"
+
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { localProperties.load(it) }
+        }
+
+        val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+
     }
 }
 

@@ -37,18 +37,16 @@ import pl.edu.ug.neuromapa.data.getSensoryProperties
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.platform.LocalFocusManager
-
-fun String.toSlug(): String {
-    val polishChars = mapOf(
-        'ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n',
-        'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z'
-    )
-    return this.lowercase()
-        .map { polishChars[it] ?: it }
-        .joinToString("")
-        .replace(" ", "_")
-        .filter { it.isLetterOrDigit() || it == '_' }
-}
+import neuromapa.composeapp.generated.resources.Res
+import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_form_erase_button
+import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_form_field_place_categories
+import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_form_field_place_excellences
+import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_form_field_place_sensory_properties
+import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_form_submit_button
+import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_header_title
+import neuromapa.composeapp.generated.resources.map_screen_header_searchbar_placeholder
+import neuromapa.composeapp.generated.resources.map_screen_header_title
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MapScreen(
@@ -56,7 +54,8 @@ fun MapScreen(
     mapPoints: List<MapPoint>,
     onPlaceClick: (Long) -> Unit,
     bottomPadding: Dp = 0.dp,
-    placeViewModel: PlaceViewModel
+    placeViewModel: PlaceViewModel,
+    onProfileClick: () -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -64,12 +63,28 @@ fun MapScreen(
     // States of the search_bar_filter button and the filters themselves
     var isFilterVisible by remember { mutableStateOf(false) }
 
-    val searchQuery = placeViewModel.searchQuery.value
-    val selectedCategories = placeViewModel.selectedCategories.value
-    val selectedProperties = placeViewModel.selectedProperties.value
-    val selectedExcellences = placeViewModel.selectedExcellences.value
+    // Current values of selected filters stored in ViewModel
+    val searchQuery = placeViewModel.searchQuery.value                  // ... current text input in the search bar
+    val selectedCategories = placeViewModel.selectedCategories.value    // ... currently selected categories
+    val selectedProperties = placeViewModel.selectedProperties.value    // ... currently selected properties
+    val selectedExcellences = placeViewModel.selectedExcellences.value  // ... currently selected excellences
 
-    // --- LOGIKA FILTROWANIA (BEZ ZMIAN) ---
+    // This replaces "normal" text to "technical" one
+    // e.g. "Brak intensywnych zapachów" -> "brak_intensywnych_zapachow"
+    // It is necessary to compare the data fetched from API with what the user inputs
+    fun String.toSlug(): String {
+        val polishChars = mapOf(
+            'ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n',
+            'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z'
+        )
+        return this.lowercase()
+            .map { polishChars[it] ?: it }
+            .joinToString("")
+            .replace(" ", "_")
+            .filter { it.isLetterOrDigit() || it == '_' }
+    }
+
+    // This is a list of filtered places (it auto-updates whenever anything in those 5 arguments changes)
     val filteredPoints = remember(
         mapPoints,
         selectedCategories,
@@ -77,6 +92,7 @@ fun MapScreen(
         selectedExcellences,
         searchQuery
     ) {
+
         val exceptions = mapOf(
             "cisza" to "ciche",
             "brak_intensywnych_zapachow" to "brak_zapachow",
@@ -84,6 +100,8 @@ fun MapScreen(
         )
 
         mapPoints.filter { point ->
+
+            // Create a "technical" version of the selected properties (to be able to compare)
             val selectedPropsSlug = selectedProperties.map { raw ->
                 val slug = raw.toSlug()
                 exceptions[slug] ?: slug
@@ -93,44 +111,47 @@ fun MapScreen(
             val pointCat = point.category.lowercase()
             val pointProps = point.sensoryFeatures.map { it.lowercase() }
 
+            // Check if the current place falls under the filters or input text in search bar -> true if yes
             val catMatch = selectedCategories.isEmpty() || selectedCatsSlug.contains(pointCat)
             val propMatch = selectedProperties.isEmpty() || pointProps.containsAll(selectedPropsSlug)
-
             val excMatch = selectedExcellences.isEmpty() || run {
                 val wantsMedal = selectedExcellences.any { it.contains("medal", true) }
                 val wantsHeart = selectedExcellences.any { it.contains("serduszko", true) }
                 val medalOk = if (wantsMedal) point.hasMedal else true
                 val heartOk = if (wantsHeart) point.hasHeart else true
-                medalOk && heartOk
+                medalOk && heartOk  // Check if both conditions are met
             }
-
             val searchMatch = if (searchQuery.isBlank()) {
                 true
             } else {
                 point.name.contains(searchQuery, ignoreCase = true)
             }
 
-            catMatch && propMatch && excMatch && searchMatch
+            catMatch && propMatch && excMatch && searchMatch    // Check if all 4 conditions are met. If yes ->
+                                                                // use this place in the list of the results
         }
+
     }
 
-    LaunchedEffect(filteredPoints) {
-        println("=== Native Map Points: ${filteredPoints.size} ===")
-    }
-
+    // Wrapper...
     Column(modifier = Modifier.fillMaxSize()) {
 
         // Base Header
         Header(
-            title = if (isFilterVisible) "Filtruj" else "NeuroMapa",
+
+            // The title changes depending on if the filter panel is turned on or not
+            title =
+                if (isFilterVisible) stringResource(Res.string.map_screen_filter_overlay_header_title)
+                else stringResource(Res.string.map_screen_header_title),
             userProfileImage = userProfileImage,
             showProfile = true,
             roundBottomCorners = isFilterVisible,
-            onProfileClick = { println("Profile clicked") },
+            onProfileClick = onProfileClick,
         )
 
+        // Show the map filter overlay (if turned on)
         if (isFilterVisible) {
-            // --- UI FILTRÓW (BEZ ZMIAN) ---
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -146,30 +167,40 @@ fun MapScreen(
                     .padding(bottom = bottomPadding),
                 verticalArrangement = Arrangement.spacedBy(mediumSpacing)
             ) {
+
+                // Let the user CHOOSE category or categories of the places to be shown
                 FormSelection(
-                    title = "Kategorie",
+                    title = stringResource(Res.string.map_screen_filter_overlay_form_field_place_categories),
                     items = getCategories(),
                     selectedItems = selectedCategories,
                     onSelectionChange = { placeViewModel.selectedCategories.value = it }
                 )
+
+                // Let the user CHOOSE sensory property or properties of the places to be shown
                 FormSelection(
-                    title = "Cechy sensoryczne",
+                    title = stringResource(Res.string.map_screen_filter_overlay_form_field_place_sensory_properties),
                     items = getSensoryProperties(),
                     selectedItems = selectedProperties,
                     onSelectionChange = { placeViewModel.selectedProperties.value = it }
                 )
+
+                // Let the user CHOOSE excellence or excellences of the places to be shown
                 FormSelection(
-                    title = "Wyróżnienia",
+                    title = stringResource(Res.string.map_screen_filter_overlay_form_field_place_excellences),
                     items = getExcellenceMarks(),
                     selectedItems = selectedExcellences,
                     onSelectionChange = { placeViewModel.selectedExcellences.value = it }
                 )
+
+                // Form button wrapper at the very bottom of the screen
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(15.dp)
                 ) {
+
+                    // Button that clears the form (erases all the user input)
                     FormButton(
-                        text = "Wyczyść",
+                        text = stringResource(Res.string.map_screen_filter_overlay_form_erase_button),
                         modifier = Modifier.weight(1f),
                         isPrimary = false,
                         onClick = {
@@ -179,19 +210,24 @@ fun MapScreen(
                             placeViewModel.selectedExcellences.value = emptySet()
                         }
                     )
+
+                    // Button that applies the filters the user just input
                     FormButton(
-                        text = "Zastosuj",
+                        text = stringResource(Res.string.map_screen_filter_overlay_form_submit_button),
                         modifier = Modifier.weight(1f),
                         isPrimary = true,
                         onClick = {
                             focusManager.clearFocus()
-                            isFilterVisible = false
+                            isFilterVisible = false     // Hides the filter overlay
                         }
                     )
+
                 }
             }
-        } else {
-            // --- MAPA NATYWNA ---
+        }
+        // Show the map if the filters are off
+        else {
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -203,25 +239,26 @@ fun MapScreen(
                     }
             ) {
 
-                // TU JEST KLUCZOWA ZMIANA:
+                // THE NEURO MAP
                 NativeMap(
                     points = filteredPoints,
                     modifier = Modifier.fillMaxSize(),
                     onPointClick = onPlaceClick
                 )
 
-                // Header Extension (Search Bar) - na wierzchu mapy
+                // Custom Header that has a search bar
                 MapHeader(
-                    searchBarPlaceHolder = "Wyszukaj miejsce...",
+                    searchBarPlaceHolder = stringResource(Res.string.map_screen_header_searchbar_placeholder),
                     onFilterClick = {
                         focusManager.clearFocus()
-                        isFilterVisible = true
+                        isFilterVisible = true  // Shows the filter overlay if a button clicked
                     },
                     searchText = searchQuery,
                     onSearchTextChange = { newText ->
                         placeViewModel.searchQuery.value = newText
                     }
                 )
+
             }
         }
     }

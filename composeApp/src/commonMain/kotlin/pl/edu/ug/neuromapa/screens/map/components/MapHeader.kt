@@ -14,8 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import neuromapa.composeapp.generated.resources.Res
+import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_filter_button_alttext
 import neuromapa.composeapp.generated.resources.search_bar_filter
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.screens.map.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
@@ -30,7 +32,7 @@ fun MapHeader(
     onSearchTextChange: (String) -> Unit
 ) {
 
-    // Search Bar
+    // Search Bar (Wrapper)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -40,7 +42,7 @@ fun MapHeader(
                     bottomEnd = globalComponentCornerRadius
                 )
             )
-            .background(Background,)
+            .background(Background)
             .padding(
                 vertical = mediumPadding,
                 horizontal = widePadding
@@ -49,7 +51,7 @@ fun MapHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
 
-        // Text Field
+        // Text field for user input
         Box(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.CenterStart
@@ -76,7 +78,7 @@ fun MapHeader(
 
         }
 
-        // Settings / Filter Button
+        // Filter button (Wrapper)
         Box(
             modifier = Modifier
                 .size(userProfileIconSize)
@@ -87,8 +89,10 @@ fun MapHeader(
         )
         {
             Icon(
-                painter = painterResource(Res.drawable.search_bar_filter),
-                contentDescription = "Filtruj wyniki",
+                painter =
+                    painterResource(Res.drawable.search_bar_filter),
+                contentDescription =
+                    stringResource(Res.string.map_screen_filter_overlay_filter_button_alttext),
                 tint = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.size(userProfileIconSize),
             )

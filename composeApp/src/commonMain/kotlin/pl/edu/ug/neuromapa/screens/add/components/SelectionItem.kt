@@ -28,13 +28,14 @@ import pl.edu.ug.neuromapa.screens.add.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.add.settings.cornerRadius
 
 @Composable
-fun CategoryItem(
+fun SelectionItem(
     icon: DrawableResource,
     iconDescription: String,
     name: String,
     onClick: () -> Unit
 ) {
 
+    // This is a blueprint of a button used in FormSelection.kt
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(cornerRadius))
@@ -45,6 +46,7 @@ fun CategoryItem(
     )
     {
 
+        // Icon
         Image(
             painter = painterResource(icon),
             contentDescription = iconDescription,
@@ -54,6 +56,7 @@ fun CategoryItem(
                 .clip(CircleShape)
         )
 
+        // Description
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = name,

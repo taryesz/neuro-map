@@ -5,23 +5,17 @@ import neuromapa.composeapp.generated.resources.excellence_dark_heart
 import neuromapa.composeapp.generated.resources.excellence_dark_medal
 import neuromapa.composeapp.generated.resources.excellence_light_heart
 import neuromapa.composeapp.generated.resources.excellence_light_medal
-import org.jetbrains.compose.resources.DrawableResource
-
-data class ExcellenceIcon(
-    val icon: DrawableResource,
-    val iconName: String,
-    val iconDescription: String,
-)
+import pl.edu.ug.neuromapa.ui.icons.data.Icon
 
 object ExcellencesLight {
 
-    val excellenceLightHeart = CategoryIcon(
+    val excellenceLightHeart = Icon(
         icon = Res.drawable.excellence_light_heart,
         iconName = "Serduszko",
         iconDescription = "Ikona wyróżnienia 'Serduszko' w wersji jasnej."
     )
 
-    val excellenceLightMedal = CategoryIcon(
+    val excellenceLightMedal = Icon(
         icon = Res.drawable.excellence_light_medal,
         iconName = "Medal",
         iconDescription = "Ikona wyróżnienia 'Medal' w wersji jasnej."
@@ -31,13 +25,13 @@ object ExcellencesLight {
 
 object ExcellencesDark {
 
-    val excellenceDarkHeart = CategoryIcon(
+    val excellenceDarkHeart = Icon(
         icon = Res.drawable.excellence_dark_heart,
         iconName = "Serduszko",
         iconDescription = "Ikona wyróżnienia 'Serduszko' w wersji ciemnej."
     )
 
-    val excellenceDarkMedal = CategoryIcon(
+    val excellenceDarkMedal = Icon(
         icon = Res.drawable.excellence_dark_medal,
         iconName = "Medal",
         iconDescription = "Ikona wyróżnienia 'Medal' w wersji ciemnej."

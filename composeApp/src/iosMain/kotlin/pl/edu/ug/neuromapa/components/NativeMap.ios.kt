@@ -15,8 +15,6 @@ import platform.Foundation.NSString
 import platform.Foundation.create
 import kotlin.math.max
 
-// --- FUNKCJE POMOCNICZE DO RYSOWANIA ---
-
 @OptIn(ExperimentalForeignApi::class)
 private fun UIImage.resize(width: Double, height: Double): UIImage? {
     val targetSize = CGSizeMake(width, height)
@@ -80,12 +78,10 @@ private class MapDelegate(
     override fun mapView(mapView: MKMapView, viewForAnnotation: MKAnnotationProtocol): MKAnnotationView? {
         if (viewForAnnotation is MKUserLocation) return null
 
-        // --- OBSŁUGA POJEDYNCZEGO PUNKTU ---
         if (viewForAnnotation is MKPointAnnotation) {
             val category = (viewForAnnotation.subtitle ?: "default").trim().lowercase()
             val reuseId = "pin_$category"
 
-            // Pobieramy istniejący widok lub tworzymy nowy bez użycia operatora Elvis w linii val
             var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId)
 
             if (annotationView == null) {
@@ -117,7 +113,6 @@ private class MapDelegate(
             return annotationView
         }
 
-        // --- OBSŁUGA KLASTRA (GRUPY) ---
         if (viewForAnnotation is MKClusterAnnotation) {
             val reuseId = "cluster"
 
