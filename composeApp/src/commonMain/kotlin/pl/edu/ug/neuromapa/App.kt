@@ -17,7 +17,7 @@ import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.user_pfp_example
 import pl.edu.ug.neuromapa.enums.Screen
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import pl.edu.ug.neuromapa.components.NavigationBar
+import pl.edu.ug.neuromapa.components.navigation_bar.NavigationBar
 import pl.edu.ug.neuromapa.screens.add.AddScreen
 import pl.edu.ug.neuromapa.screens.favorites.FavoritesScreen
 import pl.edu.ug.neuromapa.screens.home.HomeScreen
