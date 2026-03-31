@@ -1,7 +1,6 @@
 package pl.edu.ug.neuromapa.screens.home.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +18,7 @@ import pl.edu.ug.neuromapa.screens.home.settings.cornerRadius
 import pl.edu.ug.neuromapa.screens.home.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.mediumPadding
 import pl.edu.ug.neuromapa.ui.SurfaceVariant
+import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.getAppTypography
 
 @Composable
@@ -67,7 +67,7 @@ fun HomeHeader(
                 // Button panel
                 Box(
                     modifier = Modifier
-                        .clickable(onClick = onButtonClick)
+                        .bounceClick(onClick = onButtonClick)
                         .fillMaxWidth()
                         .background(
                             color = SurfaceVariant,     // Light green color

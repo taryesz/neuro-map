@@ -35,6 +35,7 @@ import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
 import pl.edu.ug.neuromapa.ui.Background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.platform.LocalFocusManager
 import neuromapa.composeapp.generated.resources.add_screen_form_erase_button
 import neuromapa.composeapp.generated.resources.add_screen_form_field_place_address
@@ -54,6 +55,7 @@ import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholde
 import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholder_place_website
 import neuromapa.composeapp.generated.resources.add_screen_form_submit_button
 import neuromapa.composeapp.generated.resources.add_screen_header_title
+import pl.edu.ug.neuromapa.ui.animations.bounceClick
 
 @Composable
 fun AddScreen(
@@ -196,33 +198,41 @@ fun AddScreen(
                     horizontalArrangement = Arrangement.spacedBy(15.dp),
                 ) {
 
-                    // Button that clears the form (erases all the user input)
-                    FormButton(
-                        text = stringResource(Res.string.add_screen_form_erase_button),
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            name = ""
-                            description = ""
-                            address = ""
-                            instagram = ""
-                            facebook = ""
-                            website = ""
-                            selectedCategories = emptySet()
-                            selectedProperties = emptySet()
-                            selectedExcellences = emptySet()
-                        },
-                        isPrimary = false   // This gives the button more muted color
-                    )
+                    // Wrapper for ERASE BUTTON (needed for the animation to work)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .bounceClick {
+                                name = ""
+                                description = ""
+                                address = ""
+                                instagram = ""
+                                facebook = ""
+                                website = ""
+                                selectedCategories = emptySet()
+                                selectedProperties = emptySet()
+                                selectedExcellences = emptySet()
+                            }
+                    ) {
+                        FormButton(
+                            text = stringResource(Res.string.add_screen_form_erase_button),
+                            isPrimary = false
+                        )
+                    }
 
-                    // Button that sends the data to the database admin
-                    FormButton(
-                        text = stringResource(Res.string.add_screen_form_submit_button),
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            println("Kliknięto Wyślij")     // TODO: zip the data to a json for API??
-                        },
-                        isPrimary = true    // This gives the button more vibrant color
-                    )
+                    // Wrapper for SUBMIT BUTTON (needed for the animation to work)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .bounceClick {
+                                // TODO: send the information to the admin panel
+                            }
+                    ) {
+                        FormButton(
+                            text = stringResource(Res.string.add_screen_form_submit_button),
+                            isPrimary = true
+                        )
+                    }
 
                 }
 

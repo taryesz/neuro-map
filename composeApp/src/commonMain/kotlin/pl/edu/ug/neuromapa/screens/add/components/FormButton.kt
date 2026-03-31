@@ -1,7 +1,6 @@
 package pl.edu.ug.neuromapa.screens.add.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,7 +23,6 @@ fun FormButton(
     text: String,
     isPrimary: Boolean,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
 ) {
 
     // This is a blueprint of a button that is being used in AddScreen.kt
@@ -32,7 +30,6 @@ fun FormButton(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(cornerRadius))
-            .clickable(onClick = onClick)
             .background(if (isPrimary) Primary else SurfaceDim)
             .padding(vertical = mediumPadding, horizontal = widePadding),
         horizontalAlignment = Alignment.CenterHorizontally,

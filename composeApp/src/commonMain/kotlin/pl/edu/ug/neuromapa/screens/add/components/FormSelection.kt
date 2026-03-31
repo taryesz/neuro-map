@@ -53,7 +53,8 @@ fun FormSelection(
                     val iconToShow = if (isSelected) item.iconDark else item.iconLight
 
                     Box(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f)
+                        ,
                         contentAlignment = Alignment.TopCenter
                     ) {
                         SelectionItem(

@@ -1,10 +1,5 @@
 package pl.edu.ug.neuromapa.components.navigation_bar
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,12 +11,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
@@ -35,6 +27,8 @@ import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.logo_neuromap_no_text
 import neuromapa.composeapp.generated.resources.*
 import pl.edu.ug.neuromapa.enums.Screen
+import pl.edu.ug.neuromapa.ui.animations.animatedSelectionBackground
+import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 
 @Composable
@@ -101,24 +95,6 @@ fun NavigationBar(
                     // it's a little bigger and so the second and forth buttons have a little less space from it)
                     val buttonWeight = if (isMapScreen) navigationBarMapItemWeight else navigationBarItemWeight
 
-                    // Animation-related variables
-                    val interactionSource = remember { MutableInteractionSource() }
-                    val isPressed by interactionSource.collectIsPressedAsState()
-
-                    val scale by animateFloatAsState(
-                        targetValue =
-                            if (isPressed) navigationBarItemScaleAnimationPressedState
-                            else navigationBarItemScaleAnimationNotPressedState,
-                        label = "scale"
-                    )
-
-                    val backgroundAlpha by animateFloatAsState(
-                        targetValue =
-                            if (isSelected) navigationBarItemChooseAnimationSelectedState
-                            else navigationBarItemChooseAnimationNotSelectedState,
-                        label = "bgAlpha"
-                    )
-
                     // Button wrapper
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -126,12 +102,7 @@ fun NavigationBar(
                         modifier = Modifier
                             .weight(buttonWeight)
                             .clip(RoundedCornerShape(globalComponentCornerRadius))
-                            .scale(scale)
-                            .clickable(
-                                interactionSource = interactionSource,
-                                indication = null,
-                                onClick = { onScreenSelected(screen) }
-                            )
+                            .bounceClick(onClick = { onScreenSelected(screen) })
                     )
                     {
 
@@ -155,7 +126,10 @@ fun NavigationBar(
                                         modifier = Modifier
                                             .matchParentSize()
                                             .clip(RoundedCornerShape(globalComponentCornerRadius))
-                                            .background(Surface.copy(alpha = backgroundAlpha))
+                                            .animatedSelectionBackground(
+                                                isSelected = isSelected,
+                                                backgroundColor = Surface,
+                                            )
                                     )
                                 }
 

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import pl.edu.ug.neuromapa.components.Header
-// Pamiętaj o imporcie NativeMap!
 import pl.edu.ug.neuromapa.components.NativeMap
 import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.data.PlaceViewModel
@@ -47,6 +45,7 @@ import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_header
 import neuromapa.composeapp.generated.resources.map_screen_header_searchbar_placeholder
 import neuromapa.composeapp.generated.resources.map_screen_header_title
 import org.jetbrains.compose.resources.stringResource
+import pl.edu.ug.neuromapa.ui.animations.bounceClick
 
 @Composable
 fun MapScreen(
@@ -198,29 +197,37 @@ fun MapScreen(
                     horizontalArrangement = Arrangement.spacedBy(15.dp)
                 ) {
 
-                    // Button that clears the form (erases all the user input)
-                    FormButton(
-                        text = stringResource(Res.string.map_screen_filter_overlay_form_erase_button),
-                        modifier = Modifier.weight(1f),
-                        isPrimary = false,
-                        onClick = {
-                            focusManager.clearFocus()
-                            placeViewModel.selectedCategories.value = emptySet()
-                            placeViewModel.selectedProperties.value = emptySet()
-                            placeViewModel.selectedExcellences.value = emptySet()
-                        }
-                    )
+                    // Wrapper for ERASE BUTTON (needed for the animation to work)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .bounceClick {
+                                focusManager.clearFocus()
+                                placeViewModel.selectedCategories.value = emptySet()
+                                placeViewModel.selectedProperties.value = emptySet()
+                                placeViewModel.selectedExcellences.value = emptySet()
+                            }
+                    ) {
+                        FormButton(
+                            text = stringResource(Res.string.map_screen_filter_overlay_form_erase_button),
+                            isPrimary = false,
+                        )
+                    }
 
-                    // Button that applies the filters the user just input
-                    FormButton(
-                        text = stringResource(Res.string.map_screen_filter_overlay_form_submit_button),
-                        modifier = Modifier.weight(1f),
-                        isPrimary = true,
-                        onClick = {
-                            focusManager.clearFocus()
-                            isFilterVisible = false     // Hides the filter overlay
-                        }
-                    )
+                    // Wrapper for APPLY BUTTON (needed for the animation to work)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .bounceClick {
+                                focusManager.clearFocus()
+                                isFilterVisible = false     // Hides the filter overlay
+                            }
+                    ) {
+                        FormButton(
+                            text = stringResource(Res.string.map_screen_filter_overlay_form_submit_button),
+                            isPrimary = true,
+                        )
+                    }
 
                 }
             }
