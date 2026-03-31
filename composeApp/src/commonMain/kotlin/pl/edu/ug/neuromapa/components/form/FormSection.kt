@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.screens.add.components
+package pl.edu.ug.neuromapa.components.form
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,10 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import pl.edu.ug.neuromapa.screens.add.settings.cornerRadius
-import pl.edu.ug.neuromapa.screens.add.settings.narrowPadding
 import pl.edu.ug.neuromapa.ui.getAppTypography
+import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
+import pl.edu.ug.neuromapa.ui.settings.globalComponentNarrowPadding
 
 @Composable
 fun FormSection(
@@ -44,7 +43,7 @@ fun FormSection(
         // Field wrapper
         Row(
             modifier = Modifier
-                .padding(vertical = narrowPadding)
+                .padding(vertical = globalComponentNarrowPadding)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -54,8 +53,8 @@ fun FormSection(
             // Field
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(cornerRadius))
-                    .padding(vertical = narrowPadding)
+                    .clip(RoundedCornerShape(globalComponentCornerRadius))
+                    .padding(vertical = globalComponentNarrowPadding)
                     .weight(1f),
                 contentAlignment = Alignment.CenterStart
             )

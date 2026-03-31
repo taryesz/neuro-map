@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,6 +36,7 @@ fun FavoritesScreen(
     userProfileImage: DrawableResource,
     onPlaceClick: (Place) -> Unit,
     onProfileClick: () -> Unit,
+    listState: LazyListState = rememberLazyListState()
 ) {
 
     // This is a list of all saved places
@@ -84,6 +87,7 @@ fun FavoritesScreen(
                 // Wrapper of the saved places (or as I call them: "cards")
                 // The LazyColumn allows to have a scrollable PART of the screen, not the whole screen
                 LazyColumn(
+                    state = listState,
                     verticalArrangement = Arrangement.spacedBy(mediumSpacing)
                 ) {
 

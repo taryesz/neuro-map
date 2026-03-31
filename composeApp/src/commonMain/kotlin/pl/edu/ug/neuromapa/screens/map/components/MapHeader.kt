@@ -1,7 +1,6 @@
 package pl.edu.ug.neuromapa.screens.map.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -22,6 +21,7 @@ import pl.edu.ug.neuromapa.screens.map.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
 import pl.edu.ug.neuromapa.ui.Background
+import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 
 @Composable
@@ -82,9 +82,9 @@ fun MapHeader(
         Box(
             modifier = Modifier
                 .size(userProfileIconSize)
-                .clickable {
-                    onFilterClick()
-                },
+                .bounceClick(
+                    onClick = onFilterClick,
+                ),
             contentAlignment = Alignment.Center
         )
         {

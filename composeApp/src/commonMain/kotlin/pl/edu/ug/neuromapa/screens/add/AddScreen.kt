@@ -1,5 +1,6 @@
 package pl.edu.ug.neuromapa.screens.add
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,9 +28,9 @@ import pl.edu.ug.neuromapa.components.Header
 import pl.edu.ug.neuromapa.data.getCategories
 import pl.edu.ug.neuromapa.data.getExcellenceMarks
 import pl.edu.ug.neuromapa.data.getSensoryProperties
-import pl.edu.ug.neuromapa.screens.add.components.FormButton
-import pl.edu.ug.neuromapa.screens.add.components.FormSection
-import pl.edu.ug.neuromapa.screens.add.components.FormSelection
+import pl.edu.ug.neuromapa.components.form.FormButton
+import pl.edu.ug.neuromapa.components.form.FormSection
+import pl.edu.ug.neuromapa.components.form.FormSelection
 import pl.edu.ug.neuromapa.screens.add.settings.widePadding
 import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
 import pl.edu.ug.neuromapa.ui.Background
@@ -61,6 +62,7 @@ import pl.edu.ug.neuromapa.ui.animations.bounceClick
 fun AddScreen(
     userProfileImage: DrawableResource,
     onProfileClick: () -> Unit,
+    scrollState: ScrollState = rememberScrollState()
 ) {
 
     // This is used to hide the keyboard whenever the user clicks somewhere NOT in the form field
@@ -95,7 +97,7 @@ fun AddScreen(
                     focusManager.clearFocus()   // If the user clicked somewhere in the screen but not a form field,
                                                 // the keyboard hides ("focus is lost")
                 }
-                .verticalScroll(rememberScrollState())  // Make the screen scrollable
+                .verticalScroll(scrollState)  // Make the screen scrollable
         ) {
 
             // Header (turquoise panel at the very top)

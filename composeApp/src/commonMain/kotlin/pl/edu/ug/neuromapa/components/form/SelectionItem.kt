@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.screens.add.components
+package pl.edu.ug.neuromapa.components.form
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,17 +24,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import pl.edu.ug.neuromapa.screens.add.settings.categoryItemIconSize
-import pl.edu.ug.neuromapa.screens.add.settings.categoryItemVerticalPadding
-import pl.edu.ug.neuromapa.screens.add.settings.mediumPadding
-import pl.edu.ug.neuromapa.screens.add.settings.cornerRadius
+import pl.edu.ug.neuromapa.components.form.settings.formSelectableItemIconSize
+import pl.edu.ug.neuromapa.components.form.settings.formSelectableItemVerticalPadding
+import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
+import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
 
 @Composable
 fun SelectionItem(
     icon: DrawableResource,
     iconDescription: String,
     name: String,
-    onClick: () -> Unit
 ) {
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -42,14 +41,9 @@ fun SelectionItem(
     // This is a blueprint of a button used in FormSelection.kt
     Column(
         modifier = Modifier
-            .clip(RoundedCornerShape(cornerRadius))
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            )
-            .padding(horizontal = mediumPadding),
-        verticalArrangement = Arrangement.spacedBy(categoryItemVerticalPadding),
+            .clip(RoundedCornerShape(globalComponentCornerRadius))
+            .padding(horizontal = globalComponentMediumPadding),
+        verticalArrangement = Arrangement.spacedBy(formSelectableItemVerticalPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
@@ -60,7 +54,7 @@ fun SelectionItem(
             contentDescription = iconDescription,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(categoryItemIconSize)
+                .size(formSelectableItemIconSize)
                 .clip(CircleShape)
         )
 

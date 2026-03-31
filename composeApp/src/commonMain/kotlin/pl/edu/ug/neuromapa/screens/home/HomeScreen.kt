@@ -1,6 +1,7 @@
 package pl.edu.ug.neuromapa.screens.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -81,6 +82,7 @@ fun HomeScreen(
     userFirstName: String,
     userProfileImage: DrawableResource,
     onProfileClick: () -> Unit,
+    scrollState: ScrollState = rememberScrollState()
 ) {
 
     // Create a ViewModel which immediately starts fetching the places data
@@ -161,7 +163,7 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())  // Make the screen scrollable
+                .verticalScroll(scrollState)  // Make the screen scrollable
         ) {
 
             // Header (turquoise panel at the very top) - CUSTOM VERSION

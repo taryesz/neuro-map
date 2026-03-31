@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.user_pfp_example
 import pl.edu.ug.neuromapa.enums.Screen
@@ -45,12 +48,32 @@ fun App() {
             (dataState as? PlaceDataState.Success)?.mapPoints ?: emptyList()
         }
 
+        // This will allow us to know where the user left the screen and
+        // when coming back to that screen, go to the exact place where they left
+        val homeScrollState = rememberScrollState()
+        val addScrollState = rememberScrollState()
+        val mapFilterScrollState = rememberScrollState()
+        val favoritesListState = rememberLazyListState()
+        val coroutineScope = rememberCoroutineScope()
+
         Scaffold(
             bottomBar = {
                 NavigationBar(
                     currentScreen = currentScreen,
                     onScreenSelected = { newScreen ->
-                        currentScreen = newScreen
+                        if (currentScreen == newScreen) {
+                            coroutineScope.launch {
+                                when (newScreen) {
+                                    Screen.Home -> homeScrollState.animateScrollTo(0)
+                                    Screen.Add -> addScrollState.animateScrollTo(0)
+                                    Screen.Map -> mapFilterScrollState.animateScrollTo(0)
+                                    Screen.Favorites -> favoritesListState.animateScrollToItem(0)
+                                    else -> {}
+                                }
+                            }
+                        } else {
+                            currentScreen = newScreen
+                        }
                     }
                 )
             },
@@ -102,7 +125,8 @@ fun App() {
                                     }
 
                                 },
-                                onProfileClick = { currentScreen = Screen.Login }
+                                onProfileClick = { currentScreen = Screen.Login },
+                                filterScrollState = mapFilterScrollState
                             )
 
                             else -> {
@@ -114,12 +138,14 @@ fun App() {
                                         Screen.Home -> HomeScreen(
                                             userFirstName = "User", // TODO: change accordingly
                                             userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
-                                            onProfileClick = { currentScreen = Screen.Login }
+                                            onProfileClick = { currentScreen = Screen.Login },
+                                            scrollState = homeScrollState
                                         )
 
                                         Screen.Add -> AddScreen(
                                             userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
-                                            onProfileClick = { currentScreen = Screen.Login }
+                                            onProfileClick = { currentScreen = Screen.Login },
+                                            scrollState = addScrollState
                                         )
 
                                         Screen.Favorites -> FavoritesScreen(
@@ -128,7 +154,8 @@ fun App() {
                                                 // TODO: clicking on a saved place shows its details
                                                 println("Kliknięto w ulubione: ${place.name}")
                                             },
-                                            onProfileClick = { currentScreen = Screen.Login }
+                                            onProfileClick = { currentScreen = Screen.Login },
+                                            listState = favoritesListState
                                         )
 
                                         Screen.Place -> {

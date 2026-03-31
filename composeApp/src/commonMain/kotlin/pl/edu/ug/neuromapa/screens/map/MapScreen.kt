@@ -1,5 +1,6 @@
 package pl.edu.ug.neuromapa.screens.map
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,8 +24,8 @@ import pl.edu.ug.neuromapa.components.Header
 import pl.edu.ug.neuromapa.components.NativeMap
 import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.data.PlaceViewModel
-import pl.edu.ug.neuromapa.screens.add.components.FormButton
-import pl.edu.ug.neuromapa.screens.add.components.FormSelection
+import pl.edu.ug.neuromapa.components.form.FormButton
+import pl.edu.ug.neuromapa.components.form.FormSelection
 import pl.edu.ug.neuromapa.screens.map.components.MapHeader
 import pl.edu.ug.neuromapa.screens.map.settings.mediumSpacing
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
@@ -55,6 +56,7 @@ fun MapScreen(
     bottomPadding: Dp = 0.dp,
     placeViewModel: PlaceViewModel,
     onProfileClick: () -> Unit,
+    filterScrollState: ScrollState = rememberScrollState()
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -161,7 +163,7 @@ fun MapScreen(
                     ) {
                         focusManager.clearFocus()
                     }
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(filterScrollState)
                     .padding(widePadding)
                     .padding(bottom = bottomPadding),
                 verticalArrangement = Arrangement.spacedBy(mediumSpacing)

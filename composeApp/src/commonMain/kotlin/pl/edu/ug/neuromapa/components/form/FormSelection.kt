@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.screens.add.components
+package pl.edu.ug.neuromapa.components.form
 
 import pl.edu.ug.neuromapa.screens.add.data.SelectionItem
 import androidx.compose.foundation.layout.*
@@ -7,9 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import pl.edu.ug.neuromapa.screens.add.settings.mediumPadding
-import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
+import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.getAppTypography
+import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
+import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumSpacing
 
 @Composable
 fun FormSelection(
@@ -28,7 +29,7 @@ fun FormSelection(
     // Wrapper
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(mediumSpacing),
+        verticalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing),
     )
     {
 
@@ -43,8 +44,8 @@ fun FormSelection(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = mediumPadding),   // Padding between rows
-                horizontalArrangement = Arrangement.spacedBy(mediumSpacing)
+                    .padding(bottom = globalComponentMediumPadding),   // Padding between rows
+                horizontalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
             ) {
 
                 for (item in rowItems) {
@@ -53,15 +54,9 @@ fun FormSelection(
                     val iconToShow = if (isSelected) item.iconDark else item.iconLight
 
                     Box(
-                        modifier = Modifier.weight(1f)
-                        ,
-                        contentAlignment = Alignment.TopCenter
-                    ) {
-                        SelectionItem(
-                            icon = iconToShow,
-                            iconDescription = item.description,
-                            name = item.name,
-                            onClick = {
+                        modifier = Modifier
+                            .weight(1f)
+                            .bounceClick(onClick = {
                                 val newSelection = if (isSingleSelection) {
 
                                     // Only one option can be clicked and chosen at a time
@@ -80,7 +75,13 @@ fun FormSelection(
                                     }
                                 }
                                 onSelectionChange(newSelection)
-                            }
+                            }),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        SelectionItem(
+                            icon = iconToShow,
+                            iconDescription = item.description,
+                            name = item.name,
                         )
                     }
                 }

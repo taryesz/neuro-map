@@ -1,4 +1,4 @@
-package pl.edu.ug.neuromapa.screens.add.components
+package pl.edu.ug.neuromapa.components.form
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -10,13 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import pl.edu.ug.neuromapa.screens.add.settings.cornerRadius
-import pl.edu.ug.neuromapa.screens.add.settings.mediumPadding
-import pl.edu.ug.neuromapa.screens.add.settings.widePadding
 import pl.edu.ug.neuromapa.ui.Primary
 import pl.edu.ug.neuromapa.ui.SurfaceDim
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.ui.onPrimary
+import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
+import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
+import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 
 @Composable
 fun FormButton(
@@ -29,9 +29,9 @@ fun FormButton(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(cornerRadius))
+            .clip(RoundedCornerShape(globalComponentCornerRadius))
             .background(if (isPrimary) Primary else SurfaceDim)
-            .padding(vertical = mediumPadding, horizontal = widePadding),
+            .padding(vertical = globalComponentMediumPadding, horizontal = globalComponentWidePadding),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(

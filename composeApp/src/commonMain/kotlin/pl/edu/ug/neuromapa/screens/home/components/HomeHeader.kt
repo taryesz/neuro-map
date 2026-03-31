@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import org.jetbrains.compose.resources.DrawableResource
 import pl.edu.ug.neuromapa.components.Header
 import pl.edu.ug.neuromapa.screens.home.settings.buttonTextFontSize
@@ -67,7 +68,10 @@ fun HomeHeader(
                 // Button panel
                 Box(
                     modifier = Modifier
-                        .bounceClick(onClick = onButtonClick)
+                        .bounceClick(
+                            onClick = onButtonClick,
+                            hapticType = HapticFeedbackType.LongPress,
+                        )
                         .fillMaxWidth()
                         .background(
                             color = SurfaceVariant,     // Light green color

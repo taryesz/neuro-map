@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.ui.Background
@@ -26,6 +27,13 @@ import pl.edu.ug.neuromapa.ui.Surface
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.logo_neuromap_no_text
 import neuromapa.composeapp.generated.resources.*
+import pl.edu.ug.neuromapa.components.navigation_bar.settings.navigationBarItemContainerSize
+import pl.edu.ug.neuromapa.components.navigation_bar.settings.navigationBarItemIconSize
+import pl.edu.ug.neuromapa.components.navigation_bar.settings.navigationBarItemLabelSpacing
+import pl.edu.ug.neuromapa.components.navigation_bar.settings.navigationBarItemWeight
+import pl.edu.ug.neuromapa.components.navigation_bar.settings.navigationBarMapItemContainerSize
+import pl.edu.ug.neuromapa.components.navigation_bar.settings.navigationBarMapItemIconSize
+import pl.edu.ug.neuromapa.components.navigation_bar.settings.navigationBarMapItemWeight
 import pl.edu.ug.neuromapa.enums.Screen
 import pl.edu.ug.neuromapa.ui.animations.animatedSelectionBackground
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
@@ -102,7 +110,10 @@ fun NavigationBar(
                         modifier = Modifier
                             .weight(buttonWeight)
                             .clip(RoundedCornerShape(globalComponentCornerRadius))
-                            .bounceClick(onClick = { onScreenSelected(screen) })
+                            .bounceClick(
+                                onClick = { onScreenSelected(screen) },
+                                hapticType = HapticFeedbackType.LongPress
+                            )
                     )
                     {
 
@@ -120,18 +131,15 @@ fun NavigationBar(
                                     .aspectRatio(1f)         // Lock the ratio to be a square
                             ) {
 
-                                // If a button is clicked, add background, round corners
-                                if (isSelected) {
-                                    Box(
-                                        modifier = Modifier
-                                            .matchParentSize()
-                                            .clip(RoundedCornerShape(globalComponentCornerRadius))
-                                            .animatedSelectionBackground(
-                                                isSelected = isSelected,
-                                                backgroundColor = Surface,
-                                            )
-                                    )
-                                }
+                                Box(
+                                    modifier = Modifier
+                                        .matchParentSize()
+                                        .clip(RoundedCornerShape(globalComponentCornerRadius))
+                                        .animatedSelectionBackground(
+                                            isSelected = isSelected,
+                                            backgroundColor = Surface,
+                                        )
+                                )
 
                                 Icon(
                                     painter = iconPainter,

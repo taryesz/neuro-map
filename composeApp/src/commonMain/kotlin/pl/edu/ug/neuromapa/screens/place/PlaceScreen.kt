@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.*
@@ -33,6 +34,7 @@ import pl.edu.ug.neuromapa.screens.place.settings.*
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.screens.place.helpers.*
 import pl.edu.ug.neuromapa.ui.SurfaceVariant
+import pl.edu.ug.neuromapa.ui.animations.bounceClick
 
 @Composable
 fun PlaceScreen(
@@ -133,9 +135,12 @@ fun PlaceScreen(
                     Column(
                         modifier = Modifier
                             .padding(top = mediumPadding)
-                            .clickable {
-                                mapNavigator.navigateTo(mapPoint.latitude, mapPoint.longitude, mapPoint.name)
-                            }
+                            .bounceClick(
+                                onClick = {
+                                    mapNavigator.navigateTo(mapPoint.latitude, mapPoint.longitude, mapPoint.name)
+                                },
+                                hapticType = HapticFeedbackType.LongPress
+                            )
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(cornerRadius))
                             .background(SurfaceVariant)

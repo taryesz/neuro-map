@@ -4,10 +4,5 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>NeuroMapa potrzebuje Twojej lokalizacji, aby pokazać Ci najbliższe miejsca na mapie.</string>
-<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-<string>NeuroMapa potrzebuje Twojej lokalizacji, aby pokazać Ci najbliższe miejsca na mapie.</string>
-
 </dict>
 </plist>

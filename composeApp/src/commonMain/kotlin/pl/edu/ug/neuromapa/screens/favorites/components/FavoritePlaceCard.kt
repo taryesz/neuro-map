@@ -2,7 +2,6 @@ package pl.edu.ug.neuromapa.screens.favorites.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -14,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
@@ -23,8 +23,10 @@ import pl.edu.ug.neuromapa.screens.favorites.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.favorites.settings.placeCardDeletionStateColor
 import pl.edu.ug.neuromapa.screens.favorites.settings.placeCardNavigationStateColor
 import pl.edu.ug.neuromapa.screens.favorites.settings.widePadding
+import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.ui.onPrimary
+import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,52 +62,64 @@ fun FavoritePlaceCard(
         }
     )
 
-    // This is a blueprint of a card which contains a place information in a shortened form in FavoritesScreen.kt
-    // Here SwipeToDismissBox is used to inherit all the animations of the swipes
-    SwipeToDismissBox(
-        state = dismissState,                   // Assign the card's state (detect the swipe and save it here)
-        backgroundContent = {
-            DismissBackground(dismissState)     // Lower layer (what can be seen under the card when the card is moved)
-        },
-        content = {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(globalComponentCornerRadius))
+            .bounceClick(
+                onClick = onClick,  // TODO: when clicked -> show PlaceScreen.kt
+                hapticType = HapticFeedbackType.LongPress
+            )
+    )
+    {
 
-            // Card
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .clip(RoundedCornerShape(cornerRadius))
-                    .clickable { onClick() }    // TODO: when clicked -> show PlaceScreen.kt
-            ) {
+        // This is a blueprint of a card which contains a place information in a shortened form in FavoritesScreen.kt
+        // Here SwipeToDismissBox is used to inherit all the animations of the swipes
+        SwipeToDismissBox(
+            state = dismissState,                   // Assign the card's state (detect the swipe and save it here)
+            backgroundContent = {
+                DismissBackground(dismissState)     // Lower layer (what can be seen under the card when the card is moved)
+            },
+            content = {
 
-                // Background Image
-                Image(
-                    painter = painterResource(background),
-                    contentDescription = title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.matchParentSize()
-                )
-
-                // Text panel
+                // Card
                 Box(
                     modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .fillMaxWidth(0.66f)
-                        .fillMaxHeight()
-                        .background(Color.Black.copy(alpha = 0.5f))
-                        .padding(vertical = mediumPadding, horizontal = widePadding),
-                    contentAlignment = Alignment.CenterStart
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min)
+                        .clip(RoundedCornerShape(cornerRadius))
                 ) {
-                    Text(
-                        text = title,
-                        style = getAppTypography().titleMedium,
-                        color = onPrimary
-                    )
-                }
 
+                    // Background Image
+                    Image(
+                        painter = painterResource(background),
+                        contentDescription = title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.matchParentSize()
+                    )
+
+                    // Text panel
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .fillMaxWidth(0.66f)
+                            .fillMaxHeight()
+                            .background(Color.Black.copy(alpha = 0.5f))
+                            .padding(vertical = mediumPadding, horizontal = widePadding),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(
+                            text = title,
+                            style = getAppTypography().titleMedium,
+                            color = onPrimary
+                        )
+                    }
+
+                }
             }
-        }
-    )
+        )
+
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
