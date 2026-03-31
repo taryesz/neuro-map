@@ -20,7 +20,7 @@ import pl.edu.ug.neuromapa.ui.settings.globalComponentNarrowPadding
 
 @Composable
 fun FormSection(
-    title: String,
+    title: String? = null,
     placeholder: String,
     value: String,
     onValueChange: (String) -> Unit
@@ -35,10 +35,12 @@ fun FormSection(
     {
 
         // Field title
-        Text(
-            text = title,
-            style = getAppTypography().titleMedium,
-        )
+        if (title != null) {
+            Text(
+                text = title,
+                style = getAppTypography().titleMedium,
+            )
+        }
 
         // Field wrapper
         Row(
@@ -53,7 +55,6 @@ fun FormSection(
             // Field
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(globalComponentCornerRadius))
                     .padding(vertical = globalComponentNarrowPadding)
                     .weight(1f),
                 contentAlignment = Alignment.CenterStart
