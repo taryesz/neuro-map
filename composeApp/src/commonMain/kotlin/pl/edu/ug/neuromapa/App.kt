@@ -125,7 +125,7 @@ fun App() {
                                     }
 
                                 },
-                                onProfileClick = { currentScreen = Screen.Login },
+                                onProfileClick = { currentScreen = Screen.Profile },
                                 filterScrollState = mapFilterScrollState
                             )
 
@@ -138,13 +138,13 @@ fun App() {
                                         Screen.Home -> HomeScreen(
                                             userFirstName = "User", // TODO: change accordingly
                                             userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
-                                            onProfileClick = { currentScreen = Screen.Login },
+                                            onProfileClick = { currentScreen = Screen.Profile },
                                             scrollState = homeScrollState
                                         )
 
                                         Screen.Add -> AddScreen(
                                             userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
-                                            onProfileClick = { currentScreen = Screen.Login },
+                                            onProfileClick = { currentScreen = Screen.Profile },
                                             scrollState = addScrollState
                                         )
 
@@ -154,7 +154,7 @@ fun App() {
                                                 // TODO: clicking on a saved place shows its details
                                                 println("Kliknięto w ulubione: ${place.name}")
                                             },
-                                            onProfileClick = { currentScreen = Screen.Login },
+                                            onProfileClick = { currentScreen = Screen.Profile },
                                             listState = favoritesListState
                                         )
 
@@ -164,7 +164,7 @@ fun App() {
                                             }
                                         }
 
-                                        Screen.Login -> LoginScreen()
+                                        Screen.Profile -> LoginScreen()
 
                                         else -> {}
 

@@ -53,7 +53,7 @@ fun NavigationBar(
             Screen.Add -> painterResource(Res.drawable.navigation_bar_add)
             Screen.Map -> painterResource(Res.drawable.logo_neuromap_no_text)
             Screen.Favorites -> painterResource(Res.drawable.navigation_bar_favorites)
-            Screen.Survey -> painterResource(Res.drawable.navigation_bar_survey)
+            Screen.Profile -> painterResource(Res.drawable.navigation_bar_profile)
             else -> painterResource(Res.drawable.navigation_bar_home)
         }
     }
@@ -79,8 +79,7 @@ fun NavigationBar(
         ) {
 
             Screen.entries
-                .filter { it.label != "Lokalizacja" && it.label != "Logowanie" }    // Exclude these screens from
-                                                                                    // the navigation bar
+                .filter { it.label != "Lokalizacja"}    // Exclude this screen from the navigation bar
                 .forEach { screen ->
 
                     // Check if the screen is selected and select an icon accordingly

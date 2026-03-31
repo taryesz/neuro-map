@@ -12,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -32,6 +34,8 @@ fun Header(
     modifier: Modifier = Modifier,
     additionalContent: @Composable () -> Unit = {}
 ) {
+
+    val haptic = LocalHapticFeedback.current
 
     // Header panel
     Column(
@@ -83,7 +87,10 @@ fun Header(
                     .size(userProfileIconSize)
                     .clip(CircleShape)
                     .background(ProfileIcon) // placeholder for when there is no profile picture
-                    .clickable { onProfileClick() }
+                    .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onProfileClick()
+                    }
 
                 // There is a proifile picture to show...
                 if (userProfileImage != null) {
