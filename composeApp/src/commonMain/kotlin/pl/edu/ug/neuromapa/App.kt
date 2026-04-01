@@ -30,7 +30,8 @@ import pl.edu.ug.neuromapa.ui.NeuroMapTheme
 import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.data.PlaceDataState
 import pl.edu.ug.neuromapa.data.PlaceViewModel
-import pl.edu.ug.neuromapa.screens.login.LoginScreen
+import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
+import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
 
 @Composable
 @Preview
@@ -164,7 +165,26 @@ fun App() {
                                             }
                                         }
 
-                                        Screen.Profile -> LoginScreen()
+                                        /*
+                                        TODO:
+                                         check if the user is already signed in:
+                                         yes? -> show DashboardScreen()
+                                         no? -> show SignInScreen()
+
+                                         Right now it's always SignInScreen() because there is no auth system yet
+
+                                        */
+                                        Screen.Profile -> SignInScreen(
+                                            onNavigateToSignUp = { currentScreen = Screen.SignUp }
+                                        )
+
+                                        Screen.SignIn -> SignInScreen(
+                                            onNavigateToSignUp = { currentScreen = Screen.SignUp }
+                                        )
+
+                                        Screen.SignUp -> SignUpScreen(
+                                            onNavigateToSignIn = { currentScreen = Screen.SignIn }
+                                        )
 
                                         else -> {}
 

@@ -20,4 +20,3 @@ const val superTextOpacity = 0.8f
 val superTextNumberWidth = 16.dp
 
 val logoSpacing = 24.dp
-val logoHeight = 80.dp

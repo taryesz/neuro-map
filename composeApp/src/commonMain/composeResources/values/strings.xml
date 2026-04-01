@@ -131,4 +131,20 @@
             <!-- Filter button alternative text -->
             <string name="map_screen_filter_overlay_filter_button_alttext">Filtruj wyniki</string>
 
+    <!-- AUTH SCREEN -->
+
+        <!-- LOGIN -->
+        <string name="sign_in_screen_title">Zaloguj się</string>
+        <string name="sign_in_screen_submit_button_text">Zaloguj się</string>
+        <string name="sign_in_screen_alternative_sign_in_methods_title">- Lub zaloguj się za pomocą -</string>
+        <string name="sign_in_screen_offer_to_sign_up_text">Nie masz konta? </string>
+        <string name="sign_in_screen_offer_to_sign_up_link_text">Zarejestruj się.</string>
+
+        <!-- REGISTRATION -->
+        <string name="sign_up_screen_title">Zarejestruj się</string>
+        <string name="sign_up_screen_submit_button_text">Zarejestruj się</string>
+        <string name="sign_up_screen_alternative_sign_up_methods_title">- Lub zarejestruj się za pomocą -</string>
+        <string name="sign_up_screen_offer_to_sign_in_text">Masz już konto? </string>
+        <string name="sign_up_screen_offer_to_sign_in_link_text">Zaloguj się.</string>
+
 </resources>

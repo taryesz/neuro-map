@@ -9,6 +9,8 @@ val globalComponentNarrowPadding = 7.5.dp
 
 val globalComponentMediumSpacing = 15.dp
 
+val globalComponentLogoImageHeight = 80.dp
+
 // Animation-related
 const val globalButtonScaleWhenPressed = 0.9f
 const val globalButtonScaleWhenNotPressed = 1f

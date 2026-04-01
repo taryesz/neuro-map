@@ -79,11 +79,28 @@ fun NavigationBar(
         ) {
 
             Screen.entries
-                .filter { it.label != "Lokalizacja"}    // Exclude this screen from the navigation bar
+                // Exclude these screens from the navigation bar
+                .filter { it.label != "Lokalizacja" && it.label != "Logowanie" && it.label != "Rejestracja" }
                 .forEach { screen ->
 
                     // Check if the screen is selected and select an icon accordingly
-                    val isSelected = currentScreen == screen
+                    val isSelected =
+
+                        when (screen) {
+                            // Profile icon will be selected even when SignIn or SignUp screens are active
+                            Screen.Profile -> {
+                                currentScreen == Screen.Profile || currentScreen == Screen.SignIn ||
+                                        currentScreen == Screen.SignUp
+                            }
+                            // Map icon will be selected even when Place screens is active
+                            Screen.Map -> {
+                                currentScreen == Screen.Map || currentScreen == Screen.Place
+                            }
+                            else -> {
+                                currentScreen == screen
+                            }
+                        }
+
                     val iconPainter = getIconPainter(screen)
 
                     // Check if the current screen is the Map screen

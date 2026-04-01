@@ -165,7 +165,7 @@ fun PlaceScreen(
                             LinkType.Website,
                             mapPoint.website,
                             stringResource(
-                                Res.string.place_screen_place__description_instagram_link_label
+                                Res.string.place_screen_place__description_website_link_label
                             )
                         )
                     )
@@ -187,7 +187,7 @@ fun PlaceScreen(
                             LinkType.Instagram,
                             mapPoint.instagram,
                             stringResource(
-                                Res.string.place_screen_place__description_website_link_label
+                                Res.string.place_screen_place__description_instagram_link_label
                             )
                         )
                     )

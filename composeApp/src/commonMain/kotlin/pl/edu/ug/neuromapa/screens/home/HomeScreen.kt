@@ -65,7 +65,6 @@ import pl.edu.ug.neuromapa.screens.home.components.HomeHeader
 import pl.edu.ug.neuromapa.screens.home.data.affiliationsData
 import pl.edu.ug.neuromapa.screens.home.data.teamMembersData
 import pl.edu.ug.neuromapa.screens.home.settings.bulletPointHorizontalSpacing
-import pl.edu.ug.neuromapa.screens.home.settings.logoHeight
 import pl.edu.ug.neuromapa.screens.home.settings.logoSpacing
 import pl.edu.ug.neuromapa.screens.home.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.home.settings.narrowPadding
@@ -76,6 +75,7 @@ import pl.edu.ug.neuromapa.screens.home.settings.superTextOpacity
 import pl.edu.ug.neuromapa.screens.home.settings.widePadding
 import pl.edu.ug.neuromapa.screens.home.settings.wideSpacing
 import pl.edu.ug.neuromapa.ui.getAppTypography
+import pl.edu.ug.neuromapa.ui.settings.globalComponentLogoImageHeight
 
 @Composable
 fun HomeScreen(
@@ -420,7 +420,7 @@ fun HomeScreen(
                             contentDescription = contentDescription,
                             contentScale = ContentScale.Fit,
                             modifier = Modifier
-                                .height(logoHeight)
+                                .height(globalComponentLogoImageHeight)
                                 .fillMaxWidth()
                         )
                     }
