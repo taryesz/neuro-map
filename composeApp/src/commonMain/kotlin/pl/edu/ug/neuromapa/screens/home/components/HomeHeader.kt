@@ -37,7 +37,7 @@ fun HomeHeader(
     Header(
         title = title,
         userProfileImage = userProfileImage,
-        showProfile = showProfile,
+        showProfileTopRightCorner = showProfile,
         roundBottomCorners = true,
         onProfileClick = onProfileClick,
         modifier = Modifier,

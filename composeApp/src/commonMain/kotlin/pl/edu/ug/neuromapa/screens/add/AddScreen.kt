@@ -104,7 +104,7 @@ fun AddScreen(
             Header(
                 title = stringResource(Res.string.add_screen_header_title),
                 userProfileImage = userProfileImage,
-                showProfile = true,
+                showProfileTopRightCorner = true,
                 roundBottomCorners = true,
                 onProfileClick = onProfileClick,
             )

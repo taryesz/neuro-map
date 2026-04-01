@@ -145,7 +145,7 @@ fun MapScreen(
                 if (isFilterVisible) stringResource(Res.string.map_screen_filter_overlay_header_title)
                 else stringResource(Res.string.map_screen_header_title),
             userProfileImage = userProfileImage,
-            showProfile = true,
+            showProfileTopRightCorner = true,
             roundBottomCorners = isFilterVisible,
             onProfileClick = onProfileClick,
         )

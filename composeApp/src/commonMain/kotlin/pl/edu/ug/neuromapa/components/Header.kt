@@ -28,7 +28,7 @@ import pl.edu.ug.neuromapa.ui.ProfileIcon
 fun Header(
     title: String,
     userProfileImage: DrawableResource? = null,
-    showProfile: Boolean = true,
+    showProfileTopRightCorner: Boolean = true,
     roundBottomCorners: Boolean = true,
     onProfileClick: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -82,7 +82,7 @@ fun Header(
             }
 
             // Profile picture panel : contains user photo. Showed optionally
-            if (showProfile) {
+            if (showProfileTopRightCorner) {
                 val modifier = Modifier
                     .size(userProfileIconSize)
                     .clip(CircleShape)

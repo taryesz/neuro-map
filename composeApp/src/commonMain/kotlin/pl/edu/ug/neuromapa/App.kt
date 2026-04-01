@@ -17,7 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import neuromapa.composeapp.generated.resources.Res
+import neuromapa.composeapp.generated.resources.home_screen_header_title
 import neuromapa.composeapp.generated.resources.user_pfp_example
+import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.enums.Screen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import pl.edu.ug.neuromapa.components.navigation_bar.NavigationBar
@@ -32,6 +34,7 @@ import pl.edu.ug.neuromapa.data.PlaceDataState
 import pl.edu.ug.neuromapa.data.PlaceViewModel
 import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
 import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
+import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
 
 @Composable
 @Preview
@@ -55,6 +58,7 @@ fun App() {
         val addScrollState = rememberScrollState()
         val mapFilterScrollState = rememberScrollState()
         val favoritesListState = rememberLazyListState()
+        val profileScrollState = rememberScrollState()
         val coroutineScope = rememberCoroutineScope()
 
         Scaffold(
@@ -166,7 +170,7 @@ fun App() {
                                         }
 
                                         /*
-                                        TODO:
+                                        TODO: !!! VLAD !!!
                                          check if the user is already signed in:
                                          yes? -> show DashboardScreen()
                                          no? -> show SignInScreen()
@@ -177,6 +181,20 @@ fun App() {
                                         Screen.Profile -> SignInScreen(
                                             onNavigateToSignUp = { currentScreen = Screen.SignUp }
                                         )
+
+                                        /*
+                                         TODO: !!! VLAD !!!
+
+                                            Screen.Profile -> DashboardScreen(
+                                                headerTitle = stringResource(   // "Witaj, $userFirstName!"
+                                                    Res.string.home_screen_header_title,
+                                                    "User"  // TODO: change accordingly
+                                                ),
+                                                userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
+                                                scrollState = profileScrollState
+                                            )
+
+                                        */
 
                                         Screen.SignIn -> SignInScreen(
                                             onNavigateToSignUp = { currentScreen = Screen.SignUp }

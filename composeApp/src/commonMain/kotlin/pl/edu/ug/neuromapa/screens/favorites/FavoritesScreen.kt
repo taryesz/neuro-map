@@ -64,7 +64,7 @@ fun FavoritesScreen(
             Header(
                 userProfileImage = userProfileImage,
                 title = stringResource(Res.string.favorites_screen_header_title),
-                showProfile = true,
+                showProfileTopRightCorner = true,
                 onProfileClick = onProfileClick,
                 modifier = Modifier
             )
