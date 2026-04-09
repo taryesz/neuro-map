@@ -5,11 +5,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,20 +26,21 @@ import pl.edu.ug.neuromapa.screens.home.settings.wideSpacing
 fun DashboardScreen(
     headerTitle: String,
     userProfileImage: DrawableResource,
+    userEmail: String,
+    userId: String,
+    onSignOut: () -> Unit,
     scrollState: ScrollState = rememberScrollState()
 ) {
 
-    // Wrapper of the whole screen
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
     ) {
 
-        // One more wrapper...
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)  // Make the screen scrollable
+                .verticalScroll(scrollState)
         ) {
 
             Header(
@@ -46,7 +51,6 @@ fun DashboardScreen(
                 modifier = Modifier,
             )
 
-            // Body (main content)
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -54,35 +58,31 @@ fun DashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(wideSpacing)
             ) {
 
-                /*
-                 TODO:
-                  Here go the other UI elements such as:
-                  - user's pfp (
-                            for new users (by default) show a no-pfp picture.
-                            + button to edit.
-                            )
-                  - user's name (
-                            for new users (by default) generate something like "User*****" where ***** = some id used in Supabase?
-                            + button to edit.
-                            )
-                  - user's age (
-                            by default should be empty.
-                            + button to edit.
-                            )
-                  - "settings" button
+                // --- TEST DATA (Vlad's task: verify auth works) ---
 
-                  TODO:
-                   !!! VLAD !!!
-                   Your task here will be to just add some simple Text() here and check if the
-                   user data is shown correctly. You should NOT be doing fancy UI here - it's TARAS's job. Instead, add
-                   very simple buttons and texts just to check if the sign in/up works correctly.
-                   To be more sure of whether you did everything correctly, you can contact TARAS and/or ARTEM
-                   and ask to quickly fix the favorites screen which will allows us to
-                   see if we can see only this specific user's favorites or somebody else's too.
-                   By the same logic TARAS can quickly then finish crowdsourcing form and check WHO is sending the
-                   form.
+                Text(
+                    text = "Email: $userEmail",
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
-                */
+                Text(
+                    text = "ID: $userId",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Button(
+                    onClick = onSignOut,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Wyloguj się")
+                }
+
+                // --- END TEST DATA ---
+                // TODO (Taras): add fancy profile UI here
 
             }
 

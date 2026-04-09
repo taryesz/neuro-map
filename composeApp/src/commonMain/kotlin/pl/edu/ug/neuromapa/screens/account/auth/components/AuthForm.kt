@@ -14,51 +14,36 @@ import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 
 @Composable
 fun AuthForm(
-    mode: AuthFormType,  // TODO: Use this to determine if we need to log the user in or register them
+    mode: AuthFormType,
     submitButtonText: String,
     email: String,
     onEmailChange: (String) -> Unit,
     password: String,
     onPasswordChange: (String) -> Unit,
-//    TODO: use these two variables if the third field (repeat password) is required
-//    confirmPassword: String? = null,
-//    onConfirmPasswordChange: ((String) -> Unit)? = null,
+    onSubmit: (email: String, password: String) -> Unit,
 ) {
 
     Column(
-    modifier = Modifier.fillMaxWidth(),
-    verticalArrangement = Arrangement.spacedBy(globalComponentWidePadding),
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(globalComponentWidePadding),
     ) {
 
-        // Let the user INPUT their email
         FormSection(
             placeholder = "Email",
             value = email,
             onValueChange = onEmailChange
         )
 
-        // Let the user INPUT their password
         FormSection(
             placeholder = "Hasło",
             value = password,
             onValueChange = onPasswordChange
         )
 
-//        TODO: Decide if this field is needed. Does Supabase demand it?
-//        // Let the user INPUT their password AGAIN
-//        if (confirmPassword != null && onConfirmPasswordChange != null) {
-//            FormSection(
-//                placeholder = "Powtórz hasło",
-//                value = confirmPassword,
-//                onValueChange = onConfirmPasswordChange
-//            )
-//        }
-
-        // "Sign in" or "Sign up" button
         Box(
             modifier = Modifier
                 .bounceClick {
-                    // TODO: send the information to Supabase... log in (or sign up) the user
+                    onSubmit(email, password)
                 }
         ) {
             FormButton(

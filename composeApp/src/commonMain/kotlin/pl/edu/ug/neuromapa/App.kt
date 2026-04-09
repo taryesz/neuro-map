@@ -32,6 +32,8 @@ import pl.edu.ug.neuromapa.ui.NeuroMapTheme
 import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.data.PlaceDataState
 import pl.edu.ug.neuromapa.data.PlaceViewModel
+import pl.edu.ug.neuromapa.data.AuthViewModel
+import pl.edu.ug.neuromapa.data.AuthState
 import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
 import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
 import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
@@ -43,7 +45,10 @@ fun App() {
     NeuroMapTheme {
 
         val placeViewModel = viewModel { PlaceViewModel() }
+        val authViewModel = viewModel { AuthViewModel() }
+
         val dataState by placeViewModel.dataState.collectAsState()
+        val authState by authViewModel.authState.collectAsState()
 
         var currentScreen by remember { mutableStateOf(Screen.Home) }
         var selectedMapPoint by remember { mutableStateOf<MapPoint?>(null) }
@@ -52,8 +57,14 @@ fun App() {
             (dataState as? PlaceDataState.Success)?.mapPoints ?: emptyList()
         }
 
-        // This will allow us to know where the user left the screen and
-        // when coming back to that screen, go to the exact place where they left
+        // When auth state changes to SignedIn, navigate away from auth screens
+        LaunchedEffect(authState) {
+            if (authState is AuthState.SignedIn &&
+                (currentScreen == Screen.SignIn || currentScreen == Screen.SignUp)) {
+                currentScreen = Screen.Profile
+            }
+        }
+
         val homeScrollState = rememberScrollState()
         val addScrollState = rememberScrollState()
         val mapFilterScrollState = rememberScrollState()
@@ -90,14 +101,12 @@ fun App() {
 
                 when (dataState) {
 
-                    // Show a loading screen when the place data is being fetched from the NeuroMapa website
                     is PlaceDataState.Loading -> {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator()
                         }
                     }
 
-                    // Show an error in case one happends
                     is PlaceDataState.Error -> {
                         val message = (dataState as PlaceDataState.Error).message
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -108,27 +117,21 @@ fun App() {
                         }
                     }
 
-                    // Show the application in case the data is fetched completely and successfully
                     is PlaceDataState.Success -> {
 
                         when (currentScreen) {
 
                             Screen.Map -> MapScreen(
-                                userProfileImage = Res.drawable.user_pfp_example,   // TODO: change accordingly
+                                userProfileImage = Res.drawable.user_pfp_example,
                                 mapPoints = mapPoints,
                                 bottomPadding = paddingValues.calculateBottomPadding(),
                                 placeViewModel = placeViewModel,
                                 onPlaceClick = { clickedId ->
-
-                                    // Find a point by id
                                     val point = mapPoints.find { it.id.toLong() == clickedId }
-
-                                    // Go to the place details (Place Screen)
                                     if (point != null) {
                                         selectedMapPoint = point
                                         currentScreen = Screen.Place
                                     }
-
                                 },
                                 onProfileClick = { currentScreen = Screen.Profile },
                                 filterScrollState = mapFilterScrollState
@@ -141,22 +144,23 @@ fun App() {
                                     when (currentScreen) {
 
                                         Screen.Home -> HomeScreen(
-                                            userFirstName = "User", // TODO: change accordingly
-                                            userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
+                                            userFirstName = if (authState is AuthState.SignedIn)
+                                                (authState as AuthState.SignedIn).email.substringBefore("@")
+                                            else "User",
+                                            userProfileImage = Res.drawable.user_pfp_example,
                                             onProfileClick = { currentScreen = Screen.Profile },
                                             scrollState = homeScrollState
                                         )
 
                                         Screen.Add -> AddScreen(
-                                            userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
+                                            userProfileImage = Res.drawable.user_pfp_example,
                                             onProfileClick = { currentScreen = Screen.Profile },
                                             scrollState = addScrollState
                                         )
 
                                         Screen.Favorites -> FavoritesScreen(
-                                            userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
+                                            userProfileImage = Res.drawable.user_pfp_example,
                                             onPlaceClick = { place ->
-                                                // TODO: clicking on a saved place shows its details
                                                 println("Kliknięto w ulubione: ${place.name}")
                                             },
                                             onProfileClick = { currentScreen = Screen.Profile },
@@ -169,38 +173,43 @@ fun App() {
                                             }
                                         }
 
-                                        /*
-                                        TODO: !!! VLAD !!!
-                                         check if the user is already signed in:
-                                         yes? -> show DashboardScreen()
-                                         no? -> show SignInScreen()
-
-                                         Right now it's always SignInScreen() because there is no auth system yet
-
-                                        */
-                                        Screen.Profile -> SignInScreen(
-                                            onNavigateToSignUp = { currentScreen = Screen.SignUp }
-                                        )
-
-                                        /*
-                                         TODO: !!! VLAD !!!
-
-                                            Screen.Profile -> DashboardScreen(
-                                                headerTitle = stringResource(   // "Witaj, $userFirstName!"
-                                                    Res.string.home_screen_header_title,
-                                                    "User"  // TODO: change accordingly
-                                                ),
-                                                userProfileImage = Res.drawable.user_pfp_example,// TODO: change accordingly
-                                                scrollState = profileScrollState
-                                            )
-
-                                        */
+                                        Screen.Profile -> {
+                                            when (authState) {
+                                                is AuthState.Checking -> {
+                                                    Box(
+                                                        modifier = Modifier.fillMaxSize(),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        CircularProgressIndicator()
+                                                    }
+                                                }
+                                                is AuthState.SignedIn -> {
+                                                    val signedIn = authState as AuthState.SignedIn
+                                                    DashboardScreen(
+                                                        headerTitle = "Cześć, ${signedIn.email.substringBefore("@")}!",
+                                                        userProfileImage = Res.drawable.user_pfp_example,
+                                                        userEmail = signedIn.email,
+                                                        userId = signedIn.userId,
+                                                        onSignOut = { authViewModel.signOut() },
+                                                        scrollState = profileScrollState
+                                                    )
+                                                }
+                                                else -> {
+                                                    SignInScreen(
+                                                        authViewModel = authViewModel,
+                                                        onNavigateToSignUp = { currentScreen = Screen.SignUp }
+                                                    )
+                                                }
+                                            }
+                                        }
 
                                         Screen.SignIn -> SignInScreen(
+                                            authViewModel = authViewModel,
                                             onNavigateToSignUp = { currentScreen = Screen.SignUp }
                                         )
 
                                         Screen.SignUp -> SignUpScreen(
+                                            authViewModel = authViewModel,
                                             onNavigateToSignIn = { currentScreen = Screen.SignIn }
                                         )
 

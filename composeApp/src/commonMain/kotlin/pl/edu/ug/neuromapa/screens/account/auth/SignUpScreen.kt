@@ -10,13 +10,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
@@ -27,6 +31,8 @@ import neuromapa.composeapp.generated.resources.sign_up_screen_offer_to_sign_in_
 import neuromapa.composeapp.generated.resources.sign_up_screen_submit_button_text
 import neuromapa.composeapp.generated.resources.sign_up_screen_title
 import org.jetbrains.compose.resources.stringResource
+import pl.edu.ug.neuromapa.data.AuthState
+import pl.edu.ug.neuromapa.data.AuthViewModel
 import pl.edu.ug.neuromapa.screens.account.auth.components.AlternativeAuthForm
 import pl.edu.ug.neuromapa.screens.account.auth.components.AuthSwitch
 import pl.edu.ug.neuromapa.screens.account.auth.components.AuthForm
@@ -36,12 +42,13 @@ import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 
 @Composable
 fun SignUpScreen(
+    authViewModel: AuthViewModel,
     onNavigateToSignIn: () -> Unit
 ) {
 
     val focusManager = LocalFocusManager.current
+    val authState by authViewModel.authState.collectAsState()
 
-    // Wrapper of the whole screen
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
@@ -50,10 +57,6 @@ fun SignUpScreen(
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
 
-//        TODO: use this variable if the third field (repeat password) is required
-//        var confirmPassword by remember { mutableStateOf("") }
-
-        // One more wrapper...
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -66,7 +69,6 @@ fun SignUpScreen(
                 }
         ) {
 
-            // Body (main content)
             Column(
                 modifier = Modifier.fillMaxSize().weight(1f).padding(globalComponentWidePadding),
             ) {
@@ -75,18 +77,38 @@ fun SignUpScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Sign up form
-                AuthForm(
-                    mode = AuthFormType.SignUp,
-                    submitButtonText = stringResource(Res.string.sign_up_screen_submit_button_text),
-                    email = email,
-                    onEmailChange = { newEmail -> email = newEmail },
-                    password = password,
-                    onPasswordChange = { newPassword -> password = newPassword },
-//                    TODO: use these two variables if the third field is required
-//                    confirmPassword = confirmPassword,
-//                    onConfirmPasswordChange = { newPassword -> confirmPassword = newPassword }
-                )
+                when (authState) {
+                    is AuthState.Checking -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+                    is AuthState.Error -> {
+                        Text(
+                            text = (authState as AuthState.Error).message,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        AuthForm(
+                            mode = AuthFormType.SignUp,
+                            submitButtonText = stringResource(Res.string.sign_up_screen_submit_button_text),
+                            email = email,
+                            onEmailChange = { email = it },
+                            password = password,
+                            onPasswordChange = { password = it },
+                            onSubmit = { e, p -> authViewModel.signUp(e, p) }
+                        )
+                    }
+                    else -> {
+                        AuthForm(
+                            mode = AuthFormType.SignUp,
+                            submitButtonText = stringResource(Res.string.sign_up_screen_submit_button_text),
+                            email = email,
+                            onEmailChange = { email = it },
+                            password = password,
+                            onPasswordChange = { password = it },
+                            onSubmit = { e, p -> authViewModel.signUp(e, p) }
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
 
@@ -95,12 +117,10 @@ fun SignUpScreen(
                     verticalArrangement = Arrangement.spacedBy(globalComponentWidePadding)
                 ) {
 
-                    // Alternative sign up methods
                     AlternativeAuthForm(
                         formTitle = stringResource(Res.string.sign_up_screen_alternative_sign_up_methods_title),
                     )
 
-                    // Offer to sign in at the bottom of the screen
                     AuthSwitch(
                         text = stringResource(Res.string.sign_up_screen_offer_to_sign_in_text),
                         linkText = stringResource(Res.string.sign_up_screen_offer_to_sign_in_link_text),
@@ -114,6 +134,5 @@ fun SignUpScreen(
         }
 
     }
-
 
 }
