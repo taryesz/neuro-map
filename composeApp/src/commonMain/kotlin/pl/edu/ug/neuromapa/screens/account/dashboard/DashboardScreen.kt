@@ -61,22 +61,9 @@ fun DashboardScreen(
 
                 // --- TEST DATA (Vlad's task: verify auth works) ---
 
-                if (displayName.isNotBlank()) {
-                    Text(
-                        text = "Imię i nazwisko: $displayName",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-
                 Text(
-                    text = "Email: $userEmail",
+                    text = "Cześć${if (displayName.isNotBlank()) " $displayName" else ""}!",
                     style = MaterialTheme.typography.bodyLarge
-                )
-
-                Text(
-                    text = "ID: $userId",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Button(
