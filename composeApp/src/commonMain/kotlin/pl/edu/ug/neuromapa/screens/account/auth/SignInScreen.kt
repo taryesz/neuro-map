@@ -119,6 +119,8 @@ fun SignInScreen(
 
                     AlternativeAuthForm(
                         formTitle = stringResource(Res.string.sign_in_screen_alternative_sign_in_methods_title),
+                        onGoogleClick = { authViewModel.signInWithOAuth("google") },
+                        onAppleClick = { authViewModel.signInWithOAuth("apple") },
                     )
 
                     AuthSwitch(

@@ -5,6 +5,7 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.request.get
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.SerialName
@@ -91,5 +92,14 @@ object SupabaseAuth {
             header("apikey", SUPABASE_ANON_KEY)
             header(HttpHeaders.Authorization, "Bearer $accessToken")
         }
+    }
+
+    suspend fun getUser(accessToken: String): AuthUser? {
+        return try {
+            supabaseHttpClient.get("$SUPABASE_URL/auth/v1/user") {
+                header("apikey", SUPABASE_ANON_KEY)
+                header(HttpHeaders.Authorization, "Bearer $accessToken")
+            }.body()
+        } catch (_: Exception) { null }
     }
 }

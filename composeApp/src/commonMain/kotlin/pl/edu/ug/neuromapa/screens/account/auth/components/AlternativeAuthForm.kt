@@ -22,6 +22,8 @@ import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 @Composable
 fun AlternativeAuthForm(
     formTitle: String,
+    onGoogleClick: () -> Unit = {},
+    onAppleClick: () -> Unit = {},
 ) {
 
     Column(
@@ -48,9 +50,7 @@ fun AlternativeAuthForm(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .bounceClick {
-                        // TODO: send the information to Supabase... log in the user WITH GOOGLE
-                    }
+                    .bounceClick { onGoogleClick() }
             ) {
                 FormButton(
                     icon = Res.drawable.sign_in_google_light,
@@ -62,9 +62,7 @@ fun AlternativeAuthForm(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .bounceClick {
-                        // TODO: send the information to Supabase... log in the user WITH APPLE
-                    }
+                    .bounceClick { onAppleClick() }
             ) {
                 FormButton(
                     icon = Res.drawable.sign_in_apple,

@@ -25,6 +25,7 @@ class AuthViewModel : ViewModel() {
 
     init {
         restoreSession()
+        OAuthResultHandler.handle = { accessToken -> handleOAuthCallback(accessToken) }
     }
 
     private fun restoreSession() {
@@ -108,6 +109,33 @@ class AuthViewModel : ViewModel() {
             }
             SessionStorage.clear?.invoke()
             _authState.value = AuthState.SignedOut
+        }
+    }
+
+    fun signInWithOAuth(provider: String) {
+        OAuthLauncher.launch?.invoke(provider)
+    }
+
+    fun handleOAuthCallback(accessToken: String) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Checking
+            try {
+                val user = SupabaseAuth.getUser(accessToken)
+                if (user != null) {
+                    val displayName = user.displayName
+                    SessionStorage.save?.invoke(accessToken, user.email ?: "", user.id, displayName)
+                    _authState.value = AuthState.SignedIn(
+                        email = user.email ?: "",
+                        userId = user.id,
+                        accessToken = accessToken,
+                        displayName = displayName
+                    )
+                } else {
+                    _authState.value = AuthState.Error("Nie udało się zalogować przez OAuth.")
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error("Błąd logowania. Sprawdź połączenie z internetem.")
+            }
         }
     }
 
