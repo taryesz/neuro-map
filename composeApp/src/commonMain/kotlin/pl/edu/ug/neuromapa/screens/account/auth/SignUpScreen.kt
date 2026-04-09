@@ -56,6 +56,8 @@ fun SignUpScreen(
 
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
+        var firstName by remember { mutableStateOf("") }
+        var lastName by remember { mutableStateOf("") }
 
         Column(
             modifier = Modifier
@@ -64,9 +66,7 @@ fun SignUpScreen(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null
-                ) {
-                    focusManager.clearFocus()
-                }
+                ) { focusManager.clearFocus() }
         ) {
 
             Column(
@@ -90,22 +90,22 @@ fun SignUpScreen(
                         AuthForm(
                             mode = AuthFormType.SignUp,
                             submitButtonText = stringResource(Res.string.sign_up_screen_submit_button_text),
-                            email = email,
-                            onEmailChange = { email = it },
-                            password = password,
-                            onPasswordChange = { password = it },
-                            onSubmit = { e, p -> authViewModel.signUp(e, p) }
+                            email = email, onEmailChange = { email = it },
+                            password = password, onPasswordChange = { password = it },
+                            firstName = firstName, onFirstNameChange = { firstName = it },
+                            lastName = lastName, onLastNameChange = { lastName = it },
+                            onSubmit = { e, p, fn, ln -> authViewModel.signUp(e, p, fn, ln) }
                         )
                     }
                     else -> {
                         AuthForm(
                             mode = AuthFormType.SignUp,
                             submitButtonText = stringResource(Res.string.sign_up_screen_submit_button_text),
-                            email = email,
-                            onEmailChange = { email = it },
-                            password = password,
-                            onPasswordChange = { password = it },
-                            onSubmit = { e, p -> authViewModel.signUp(e, p) }
+                            email = email, onEmailChange = { email = it },
+                            password = password, onPasswordChange = { password = it },
+                            firstName = firstName, onFirstNameChange = { firstName = it },
+                            lastName = lastName, onLastNameChange = { lastName = it },
+                            onSubmit = { e, p, fn, ln -> authViewModel.signUp(e, p, fn, ln) }
                         )
                     }
                 }
@@ -116,23 +116,16 @@ fun SignUpScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(globalComponentWidePadding)
                 ) {
-
                     AlternativeAuthForm(
                         formTitle = stringResource(Res.string.sign_up_screen_alternative_sign_up_methods_title),
                     )
-
                     AuthSwitch(
                         text = stringResource(Res.string.sign_up_screen_offer_to_sign_in_text),
                         linkText = stringResource(Res.string.sign_up_screen_offer_to_sign_in_link_text),
                         onLinkClick = onNavigateToSignIn
                     )
-
                 }
-
             }
-
         }
-
     }
-
 }

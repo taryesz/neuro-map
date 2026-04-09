@@ -186,10 +186,11 @@ fun App() {
                                                 is AuthState.SignedIn -> {
                                                     val signedIn = authState as AuthState.SignedIn
                                                     DashboardScreen(
-                                                        headerTitle = "Cześć, ${signedIn.email.substringBefore("@")}!",
+                                                        headerTitle = "Cześć, ${signedIn.displayName.ifBlank { signedIn.email.substringBefore("@") }}!",
                                                         userProfileImage = Res.drawable.user_pfp_example,
                                                         userEmail = signedIn.email,
                                                         userId = signedIn.userId,
+                                                        displayName = signedIn.displayName,
                                                         onSignOut = { authViewModel.signOut() },
                                                         scrollState = profileScrollState
                                                     )

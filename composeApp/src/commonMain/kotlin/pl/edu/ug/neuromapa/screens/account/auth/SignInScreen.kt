@@ -94,7 +94,7 @@ fun SignInScreen(
                             onEmailChange = { email = it },
                             password = password,
                             onPasswordChange = { password = it },
-                            onSubmit = { e, p -> authViewModel.signIn(e, p) }
+                            onSubmit = { e, p, _, _ -> authViewModel.signIn(e, p) }
                         )
                     }
                     else -> {
@@ -105,7 +105,7 @@ fun SignInScreen(
                             onEmailChange = { email = it },
                             password = password,
                             onPasswordChange = { password = it },
-                            onSubmit = { e, p -> authViewModel.signIn(e, p) }
+                            onSubmit = { e, p, _, _ -> authViewModel.signIn(e, p) }
                         )
                     }
                 }

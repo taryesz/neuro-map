@@ -20,7 +20,11 @@ fun AuthForm(
     onEmailChange: (String) -> Unit,
     password: String,
     onPasswordChange: (String) -> Unit,
-    onSubmit: (email: String, password: String) -> Unit,
+    firstName: String = "",
+    onFirstNameChange: (String) -> Unit = {},
+    lastName: String = "",
+    onLastNameChange: (String) -> Unit = {},
+    onSubmit: (email: String, password: String, firstName: String, lastName: String) -> Unit,
 ) {
 
     Column(
@@ -28,30 +32,42 @@ fun AuthForm(
         verticalArrangement = Arrangement.spacedBy(globalComponentWidePadding),
     ) {
 
+        if (mode == AuthFormType.SignUp) {
+            FormSection(
+                placeholder = "Imię",
+                value = firstName,
+                onValueChange = onFirstNameChange,
+            )
+            FormSection(
+                placeholder = "Nazwisko",
+                value = lastName,
+                onValueChange = onLastNameChange,
+            )
+        }
+
         FormSection(
             placeholder = "Email",
             value = email,
-            onValueChange = onEmailChange
+            onValueChange = onEmailChange,
+            isEmail = true,
         )
 
         FormSection(
             placeholder = "Hasło",
             value = password,
-            onValueChange = onPasswordChange
+            onValueChange = onPasswordChange,
+            isPassword = true,
         )
 
         Box(
-            modifier = Modifier
-                .bounceClick {
-                    onSubmit(email, password)
-                }
+            modifier = Modifier.bounceClick {
+                onSubmit(email, password, firstName, lastName)
+            }
         ) {
             FormButton(
                 text = submitButtonText,
                 isPrimary = true
             )
         }
-
     }
-
 }
