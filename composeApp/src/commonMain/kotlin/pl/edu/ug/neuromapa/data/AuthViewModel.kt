@@ -138,7 +138,15 @@ class AuthViewModel : ViewModel() {
             "password" in msg && ("short" in msg || "weak" in msg || "length" in msg) ->
                 "Hasło musi mieć co najmniej 6 znaków"
             "invalid" in msg && "email" in msg -> "Nieprawidłowy format email"
-            else -> "Błąd rejestracji. Spróbuj ponownie."
+            else -> buildString {
+                append("Błąd: ")
+                if (response.errorCode != null) append("[${response.errorCode}] ")
+                if (response.error != null) append("${response.error} ")
+                if (response.message != null) append(response.message)
+                if (response.errorDescription != null) append(" / ${response.errorDescription}")
+                if (response.code != null) append(" (${response.code})")
+                if (length <= "Błąd: ".length) append("Spróbuj ponownie.")
+            }
         }
     }
 }
