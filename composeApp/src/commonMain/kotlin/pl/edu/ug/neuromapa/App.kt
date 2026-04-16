@@ -17,9 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.home_screen_header_title
 import neuromapa.composeapp.generated.resources.user_pfp_example
-import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.enums.Screen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import pl.edu.ug.neuromapa.components.navigation_bar.NavigationBar
@@ -32,8 +30,8 @@ import pl.edu.ug.neuromapa.ui.NeuroMapTheme
 import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.data.PlaceDataState
 import pl.edu.ug.neuromapa.data.PlaceViewModel
-import pl.edu.ug.neuromapa.data.AuthViewModel
-import pl.edu.ug.neuromapa.data.AuthState
+import pl.edu.ug.neuromapa.data.auth.AuthViewModel
+import pl.edu.ug.neuromapa.data.auth.AuthState
 import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
 import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
 import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
@@ -46,6 +44,10 @@ fun App() {
 
         val placeViewModel = viewModel { PlaceViewModel() }
         val authViewModel = viewModel { AuthViewModel() }
+
+        LaunchedEffect(Unit) {
+            authViewModel.restoreSession()
+        }
 
         val dataState by placeViewModel.dataState.collectAsState()
         val authState by authViewModel.authState.collectAsState()
@@ -144,9 +146,12 @@ fun App() {
                                     when (currentScreen) {
 
                                         Screen.Home -> HomeScreen(
-                                            userFirstName = if (authState is AuthState.SignedIn)
-                                                (authState as AuthState.SignedIn).email.substringBefore("@")
-                                            else "User",
+                                            userFirstName =
+                                                if (authState is AuthState.SignedIn)
+                                                    // TODO: REPLACE WITH THE ACTUAL USER'S FIRST NAME (IF THEY GAVE ONE)
+                                                    ", " + (authState as AuthState.SignedIn).email.substringBefore("@") + "!"
+                                                else
+                                                    "!",
                                             userProfileImage = Res.drawable.user_pfp_example,
                                             onProfileClick = { currentScreen = Screen.Profile },
                                             scrollState = homeScrollState
@@ -186,11 +191,11 @@ fun App() {
                                                 is AuthState.SignedIn -> {
                                                     val signedIn = authState as AuthState.SignedIn
                                                     DashboardScreen(
-                                                        headerTitle = "Cześć, ${signedIn.displayName.ifBlank { signedIn.email.substringBefore("@") }}!",
+                                                        // TODO: REPLACE WITH THE USER'S ACTUAL NAME IF THEY SET ONE IN THE PROFILE SETTINGS
+                                                        headerTitle = "Witaj, ${signedIn.email.substringBefore("@")}!",
                                                         userProfileImage = Res.drawable.user_pfp_example,
                                                         userEmail = signedIn.email,
                                                         userId = signedIn.userId,
-                                                        displayName = signedIn.displayName,
                                                         onSignOut = { authViewModel.signOut() },
                                                         scrollState = profileScrollState
                                                     )

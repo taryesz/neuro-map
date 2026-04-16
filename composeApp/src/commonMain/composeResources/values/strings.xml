@@ -3,7 +3,7 @@
     <!-- HOME SCREEN -->
 
         <!-- Screen title -->
-        <string name="home_screen_header_title">Witaj, %1$s!</string>
+        <string name="home_screen_header_title">Witaj%1$s</string>
 
         <!-- Screen motto -->
         <string name="home_screen_header_motto">Znajdź miejsca przyjazne Twoim potrzebom.</string>
@@ -146,5 +146,11 @@
         <string name="sign_up_screen_alternative_sign_up_methods_title">- Lub zarejestruj się za pomocą -</string>
         <string name="sign_up_screen_offer_to_sign_in_text">Masz już konto? </string>
         <string name="sign_up_screen_offer_to_sign_in_link_text">Zaloguj się.</string>
+
+        <!-- ERROR ALERT DIALOGS -->
+        <string name="sign_in_screen_system_alert_dialog_title">Błąd logowania</string>
+        <string name="sign_up_screen_system_alert_dialog_title">Błąd rejestracji</string>
+
+        <string name="auth_system_alert_dialog_no_internet">Sprawdź połączenie z internetem i spróbuj jeszcze raz.</string>
 
 </resources>

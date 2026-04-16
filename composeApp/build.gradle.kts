@@ -6,6 +6,19 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     kotlin("plugin.serialization") version "1.9.21"
+    id("com.github.gmazzo.buildconfig") version "4.1.2"
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
+buildConfig {
+    packageName("pl.edu.ug.neuromapa")
+    val supabaseKey = localProperties.getProperty("SUPABASE_API_KEY") ?: ""
+    buildConfigField("String", "SUPABASE_API_KEY", "\"$supabaseKey\"")
 }
 
 kotlin {
@@ -84,12 +97,6 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
-
-        val localProperties = Properties()
-        val localPropertiesFile = rootProject.file("local.properties")
-        if (localPropertiesFile.exists()) {
-            localPropertiesFile.inputStream().use { localProperties.load(it) }
-        }
 
         val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey

@@ -9,10 +9,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import pl.edu.ug.neuromapa.data.OAuthLauncher
-import pl.edu.ug.neuromapa.data.OAuthResultHandler
-import pl.edu.ug.neuromapa.data.SessionStorage
-import pl.edu.ug.neuromapa.data.StoredSession
+import pl.edu.ug.neuromapa.data.auth.OAuthLauncher
+import pl.edu.ug.neuromapa.data.auth.OAuthResultHandler
+import pl.edu.ug.neuromapa.data.auth.SessionStorage
+import pl.edu.ug.neuromapa.data.auth.StoredSession
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,21 +21,19 @@ class MainActivity : ComponentActivity() {
 
         val prefs = getSharedPreferences("neuromapa_auth", Context.MODE_PRIVATE)
 
-        SessionStorage.save = { token, email, userId, displayName ->
+        SessionStorage.save = { token, email, userId ->
             prefs.edit()
                 .putString("token", token)
                 .putString("email", email)
                 .putString("userId", userId)
-                .putString("displayName", displayName)
                 .apply()
         }
         SessionStorage.load = {
             val token = prefs.getString("token", null)
             val email = prefs.getString("email", null)
             val userId = prefs.getString("userId", null)
-            val displayName = prefs.getString("displayName", "") ?: ""
             if (token != null && email != null && userId != null)
-                StoredSession(token, email, userId, displayName)
+                StoredSession(token, email, userId)
             else null
         }
         SessionStorage.clear = {
@@ -63,7 +61,7 @@ class MainActivity : ComponentActivity() {
                 if (parts.size == 2) parts[0] to parts[1] else parts[0] to ""
             }
             val accessToken = params["access_token"] ?: return
-            OAuthResultHandler.handle?.invoke(accessToken)
+            OAuthResultHandler.handle?.invoke(accessToken, null)
         }
     }
 }

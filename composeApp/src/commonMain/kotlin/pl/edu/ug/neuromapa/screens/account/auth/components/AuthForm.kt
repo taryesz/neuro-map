@@ -8,42 +8,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import pl.edu.ug.neuromapa.components.form.FormButton
 import pl.edu.ug.neuromapa.components.form.FormSection
-import pl.edu.ug.neuromapa.screens.account.auth.enum.AuthFormType
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 
 @Composable
 fun AuthForm(
-    mode: AuthFormType,
     submitButtonText: String,
     email: String,
     onEmailChange: (String) -> Unit,
     password: String,
     onPasswordChange: (String) -> Unit,
-    firstName: String = "",
-    onFirstNameChange: (String) -> Unit = {},
-    lastName: String = "",
-    onLastNameChange: (String) -> Unit = {},
-    onSubmit: (email: String, password: String, firstName: String, lastName: String) -> Unit,
+    onSubmit: (email: String, password: String) -> Unit,
 ) {
 
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(globalComponentWidePadding),
     ) {
-
-        if (mode == AuthFormType.SignUp) {
-            FormSection(
-                placeholder = "Imię",
-                value = firstName,
-                onValueChange = onFirstNameChange,
-            )
-            FormSection(
-                placeholder = "Nazwisko",
-                value = lastName,
-                onValueChange = onLastNameChange,
-            )
-        }
 
         FormSection(
             placeholder = "Email",
@@ -61,7 +42,7 @@ fun AuthForm(
 
         Box(
             modifier = Modifier.bounceClick {
-                onSubmit(email, password, firstName, lastName)
+                onSubmit(email, password)
             }
         ) {
             FormButton(

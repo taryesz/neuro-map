@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,14 +29,15 @@ import neuromapa.composeapp.generated.resources.sign_in_screen_title
 import neuromapa.composeapp.generated.resources.sign_in_screen_alternative_sign_in_methods_title
 import neuromapa.composeapp.generated.resources.sign_in_screen_offer_to_sign_up_link_text
 import neuromapa.composeapp.generated.resources.sign_in_screen_offer_to_sign_up_text
+import neuromapa.composeapp.generated.resources.sign_in_screen_system_alert_dialog_title
 import org.jetbrains.compose.resources.stringResource
-import pl.edu.ug.neuromapa.data.AuthState
-import pl.edu.ug.neuromapa.data.AuthViewModel
+import pl.edu.ug.neuromapa.data.auth.AuthState
+import pl.edu.ug.neuromapa.data.auth.AuthViewModel
+import pl.edu.ug.neuromapa.platform.SystemAlertDialog
 import pl.edu.ug.neuromapa.screens.account.auth.components.AlternativeAuthForm
 import pl.edu.ug.neuromapa.screens.account.auth.components.AuthSwitch
 import pl.edu.ug.neuromapa.screens.account.auth.components.AuthForm
 import pl.edu.ug.neuromapa.screens.account.auth.components.AuthFormHeader
-import pl.edu.ug.neuromapa.screens.account.auth.enum.AuthFormType
 import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 
 @Composable
@@ -78,37 +78,29 @@ fun SignInScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 when (authState) {
+
                     is AuthState.Checking -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
                     is AuthState.Error -> {
-                        Text(
-                            text = (authState as AuthState.Error).message,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        AuthForm(
-                            mode = AuthFormType.SignIn,
-                            submitButtonText = stringResource(Res.string.sign_in_screen_submit_button_text),
-                            email = email,
-                            onEmailChange = { email = it },
-                            password = password,
-                            onPasswordChange = { password = it },
-                            onSubmit = { e, p, _, _ -> authViewModel.signIn(e, p) }
+                        SystemAlertDialog(
+                            title = stringResource(Res.string.sign_in_screen_system_alert_dialog_title),
+                            message = (authState as AuthState.Error).message,
+                            onDismiss = { authViewModel.clearError() }
                         )
                     }
-                    else -> {
-                        AuthForm(
-                            mode = AuthFormType.SignIn,
-                            submitButtonText = stringResource(Res.string.sign_in_screen_submit_button_text),
-                            email = email,
-                            onEmailChange = { email = it },
-                            password = password,
-                            onPasswordChange = { password = it },
-                            onSubmit = { e, p, _, _ -> authViewModel.signIn(e, p) }
-                        )
-                    }
+                    else -> {}
+
                 }
+
+                AuthForm(
+                    submitButtonText = stringResource(Res.string.sign_in_screen_submit_button_text),
+                    email = email,
+                    onEmailChange = { email = it },
+                    password = password,
+                    onPasswordChange = { password = it },
+                    onSubmit = { e, p -> authViewModel.signIn(e, p) }
+                )
 
                 Spacer(modifier = Modifier.weight(1f))
 
