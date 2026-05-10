@@ -11,6 +11,10 @@ sealed class AuthState {
         val email: String,
         val userId: String,
         val accessToken: String,
+        val refreshToken: String? = null,
+        val name: String? = null,
+        val birthDate: String? = null,
+        val photoUrl: String? = null,
     ) : AuthState()
 
     data class Error(val message: String) : AuthState()

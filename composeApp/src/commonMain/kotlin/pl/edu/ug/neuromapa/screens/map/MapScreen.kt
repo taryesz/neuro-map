@@ -55,6 +55,7 @@ fun MapScreen(
     onPlaceClick: (Long) -> Unit,
     bottomPadding: Dp = 0.dp,
     placeViewModel: PlaceViewModel,
+    profilePhotoUrl: String? = null,
     onProfileClick: () -> Unit,
     filterScrollState: ScrollState = rememberScrollState()
 ) {
@@ -147,6 +148,7 @@ fun MapScreen(
             userProfileImage = userProfileImage,
             showProfileTopRightCorner = true,
             roundBottomCorners = isFilterVisible,
+            profilePhotoUrl = profilePhotoUrl,
             onProfileClick = onProfileClick,
         )
 

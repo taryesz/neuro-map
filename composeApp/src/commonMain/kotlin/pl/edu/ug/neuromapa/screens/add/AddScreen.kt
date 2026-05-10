@@ -62,6 +62,7 @@ import pl.edu.ug.neuromapa.ui.animations.bounceClick
 fun AddScreen(
     userProfileImage: DrawableResource,
     onProfileClick: () -> Unit,
+    profilePhotoUrl: String? = null,
     scrollState: ScrollState = rememberScrollState()
 ) {
 
@@ -104,6 +105,7 @@ fun AddScreen(
             Header(
                 title = stringResource(Res.string.add_screen_header_title),
                 userProfileImage = userProfileImage,
+                profilePhotoUrl = profilePhotoUrl,
                 showProfileTopRightCorner = true,
                 roundBottomCorners = true,
                 onProfileClick = onProfileClick,

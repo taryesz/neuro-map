@@ -28,6 +28,7 @@ fun HomeHeader(
     motto: String,
     buttonText: String,
     userProfileImage: DrawableResource,
+    profilePhotoUrl: String? = null,
     showProfile: Boolean,
     onProfileClick: () -> Unit,
     onButtonClick: () -> Unit
@@ -38,6 +39,7 @@ fun HomeHeader(
         title = title,
         userProfileImage = userProfileImage,
         showProfileTopRightCorner = showProfile,
+        profilePhotoUrl = profilePhotoUrl,
         roundBottomCorners = true,
         onProfileClick = onProfileClick,
         modifier = Modifier,

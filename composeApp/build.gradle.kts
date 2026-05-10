@@ -62,9 +62,11 @@ kotlin {
             implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
             implementation("com.google.android.gms:play-services-location:21.0.1")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
             implementation(libs.maps.compose.utils)
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
+            implementation("media.kamel:kamel-image:0.9.4")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

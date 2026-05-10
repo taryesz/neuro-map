@@ -36,6 +36,7 @@ fun FavoritesScreen(
     userProfileImage: DrawableResource,
     onPlaceClick: (Place) -> Unit,
     onProfileClick: () -> Unit,
+    profilePhotoUrl: String? = null,
     listState: LazyListState = rememberLazyListState()
 ) {
 
@@ -64,6 +65,7 @@ fun FavoritesScreen(
             Header(
                 userProfileImage = userProfileImage,
                 title = stringResource(Res.string.favorites_screen_header_title),
+                profilePhotoUrl = profilePhotoUrl,
                 showProfileTopRightCorner = true,
                 onProfileClick = onProfileClick,
                 modifier = Modifier

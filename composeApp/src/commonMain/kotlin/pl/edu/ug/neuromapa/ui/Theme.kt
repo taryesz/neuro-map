@@ -5,14 +5,13 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun NeuroMapTheme(
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-
-    val colorScheme = LightColors
+    val colorScheme = if (darkTheme) DarkColors else LightColors
 
     MaterialTheme(
         colorScheme = colorScheme,
         content = content
     )
-
 }

@@ -16,18 +16,21 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import io.kamel.image.KamelImage
+import io.kamel.image.asyncPainterResource
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
+import pl.edu.ug.neuromapa.ui.ProfileIcon
+import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
-import pl.edu.ug.neuromapa.ui.getAppTypography
-import pl.edu.ug.neuromapa.ui.ProfileIcon
 
 @Composable
 fun Header(
     title: String,
     userProfileImage: DrawableResource? = null,
+    profilePhotoUrl: String? = null,
     showProfileTopRightCorner: Boolean = true,
     roundBottomCorners: Boolean = true,
     onProfileClick: () -> Unit = {},
@@ -83,29 +86,36 @@ fun Header(
 
             // Profile picture panel : contains user photo. Showed optionally
             if (showProfileTopRightCorner) {
-                val modifier = Modifier
+                val baseModifier = Modifier
                     .size(userProfileIconSize)
                     .clip(CircleShape)
-                    .background(ProfileIcon) // placeholder for when there is no profile picture
+                    .background(ProfileIcon)
                     .clickable {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onProfileClick()
                     }
 
-                // There is a proifile picture to show...
-                if (userProfileImage != null) {
-                    Image(
-                        painter = painterResource(userProfileImage),
-                        contentDescription = "Zdjęcie profilowe użytkownika",
-                        contentScale = ContentScale.Crop,
-                        modifier = modifier
-                    )
+                when {
+                    !profilePhotoUrl.isNullOrBlank() -> {
+                        KamelImage(
+                            resource = asyncPainterResource(profilePhotoUrl),
+                            contentDescription = "Zdjęcie profilowe użytkownika",
+                            contentScale = ContentScale.Crop,
+                            modifier = baseModifier,
+                            onLoading = { Box(modifier = baseModifier) },
+                            onFailure = { Box(modifier = baseModifier) }
+                        )
+                    }
+                    userProfileImage != null -> {
+                        Image(
+                            painter = painterResource(userProfileImage),
+                            contentDescription = "Zdjęcie profilowe użytkownika",
+                            contentScale = ContentScale.Crop,
+                            modifier = baseModifier
+                        )
+                    }
+                    else -> Box(modifier = baseModifier)
                 }
-                // Or no profile picture - then show juz a beige shape
-                else {
-                    Box(modifier = modifier)
-                }
-
             }
         }
 

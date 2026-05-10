@@ -81,6 +81,7 @@ import pl.edu.ug.neuromapa.ui.settings.globalComponentLogoImageHeight
 fun HomeScreen(
     userFirstName: String,
     userProfileImage: DrawableResource,
+    profilePhotoUrl: String? = null,
     onProfileClick: () -> Unit,
     scrollState: ScrollState = rememberScrollState()
 ) {
@@ -175,6 +176,7 @@ fun HomeScreen(
                 motto = stringResource(Res.string.home_screen_header_motto),
                 buttonText = stringResource(Res.string.home_screen_header_need_quiet_button_name),
                 userProfileImage = userProfileImage,
+                profilePhotoUrl = profilePhotoUrl,
                 showProfile = true,
                 onProfileClick = onProfileClick,
                 onButtonClick = { locationManager.requestLocation() }

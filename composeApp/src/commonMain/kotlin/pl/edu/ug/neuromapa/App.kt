@@ -32,6 +32,7 @@ import pl.edu.ug.neuromapa.data.PlaceDataState
 import pl.edu.ug.neuromapa.data.PlaceViewModel
 import pl.edu.ug.neuromapa.data.auth.AuthViewModel
 import pl.edu.ug.neuromapa.data.auth.AuthState
+import pl.edu.ug.neuromapa.data.auth.ProfilePhotoPicker
 import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
 import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
 import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
@@ -40,7 +41,13 @@ import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
 @Preview
 fun App() {
 
-    NeuroMapTheme {
+    var isDarkTheme by remember { mutableStateOf(false) }
+    var editableName by remember { mutableStateOf("") }
+    var editableBirthDate by remember { mutableStateOf("") }
+    var saveStatusMessage by remember { mutableStateOf<String?>(null) }
+    var displayNameOverride by remember { mutableStateOf<String?>(null) }
+
+    NeuroMapTheme(darkTheme = isDarkTheme) {
 
         val placeViewModel = viewModel { PlaceViewModel() }
         val authViewModel = viewModel { AuthViewModel() }
@@ -59,11 +66,42 @@ fun App() {
             (dataState as? PlaceDataState.Success)?.mapPoints ?: emptyList()
         }
 
-        // When auth state changes to SignedIn, navigate away from auth screens
         LaunchedEffect(authState) {
             if (authState is AuthState.SignedIn &&
                 (currentScreen == Screen.SignIn || currentScreen == Screen.SignUp)) {
                 currentScreen = Screen.Profile
+            }
+        }
+
+        val signedInState = authState as? AuthState.SignedIn
+
+        val displayName = when {
+            !displayNameOverride.isNullOrBlank() -> displayNameOverride.orEmpty()
+            !signedInState?.name.isNullOrBlank() -> signedInState?.name.orEmpty()
+            signedInState != null -> signedInState.email.substringBefore("@")
+            else -> "Użytkownik"
+        }
+
+        LaunchedEffect(signedInState?.name, signedInState?.userId) {
+            editableName = signedInState?.name.orEmpty()
+            editableBirthDate = signedInState?.birthDate.orEmpty()
+            displayNameOverride = null
+        }
+
+        LaunchedEffect(authViewModel) {
+            ProfilePhotoPicker.onResult = { imageBytes, errorMessage ->
+                if (!errorMessage.isNullOrBlank()) {
+                    saveStatusMessage = errorMessage
+                } else if (imageBytes == null) {
+                    saveStatusMessage = "Nie wybrano zdjęcia."
+                } else {
+                    saveStatusMessage = "Przesyłamy zdjęcie profilowe..."
+                    authViewModel.uploadProfilePhoto(
+                        imageBytes = imageBytes,
+                        onError = { message -> saveStatusMessage = message },
+                        onSuccess = { saveStatusMessage = "Zdjęcie profilowe zostało zapisane." }
+                    )
+                }
             }
         }
 
@@ -113,21 +151,20 @@ fun App() {
                         val message = (dataState as PlaceDataState.Error).message
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text(
-                                text = "Error: $message. Check the network connection and try again",
+                                text = "Błąd: $message. Sprawdź połączenie z internetem i spróbuj ponownie.",
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
                     }
 
                     is PlaceDataState.Success -> {
-
                         when (currentScreen) {
-
                             Screen.Map -> MapScreen(
                                 userProfileImage = Res.drawable.user_pfp_example,
                                 mapPoints = mapPoints,
                                 bottomPadding = paddingValues.calculateBottomPadding(),
                                 placeViewModel = placeViewModel,
+                                profilePhotoUrl = signedInState?.photoUrl,
                                 onPlaceClick = { clickedId ->
                                     val point = mapPoints.find { it.id.toLong() == clickedId }
                                     if (point != null) {
@@ -138,28 +175,26 @@ fun App() {
                                 onProfileClick = { currentScreen = Screen.Profile },
                                 filterScrollState = mapFilterScrollState
                             )
-
                             else -> {
-
                                 Box(modifier = Modifier.padding(paddingValues)) {
-
                                     when (currentScreen) {
 
                                         Screen.Home -> HomeScreen(
                                             userFirstName =
-                                                if (authState is AuthState.SignedIn)
-                                                    // TODO: REPLACE WITH THE ACTUAL USER'S FIRST NAME (IF THEY GAVE ONE)
-                                                    ", " + (authState as AuthState.SignedIn).email.substringBefore("@") + "!"
+                                                if (displayName.isNotBlank())
+                                                    ", $displayName!"
                                                 else
                                                     "!",
                                             userProfileImage = Res.drawable.user_pfp_example,
                                             onProfileClick = { currentScreen = Screen.Profile },
+                                            profilePhotoUrl = signedInState?.photoUrl,
                                             scrollState = homeScrollState
                                         )
 
                                         Screen.Add -> AddScreen(
                                             userProfileImage = Res.drawable.user_pfp_example,
                                             onProfileClick = { currentScreen = Screen.Profile },
+                                            profilePhotoUrl = signedInState?.photoUrl,
                                             scrollState = addScrollState
                                         )
 
@@ -169,6 +204,7 @@ fun App() {
                                                 println("Kliknięto w ulubione: ${place.name}")
                                             },
                                             onProfileClick = { currentScreen = Screen.Profile },
+                                            profilePhotoUrl = signedInState?.photoUrl,
                                             listState = favoritesListState
                                         )
 
@@ -191,12 +227,48 @@ fun App() {
                                                 is AuthState.SignedIn -> {
                                                     val signedIn = authState as AuthState.SignedIn
                                                     DashboardScreen(
-                                                        // TODO: REPLACE WITH THE USER'S ACTUAL NAME IF THEY SET ONE IN THE PROFILE SETTINGS
-                                                        headerTitle = "Witaj, ${signedIn.email.substringBefore("@")}!",
+                                                        headerTitle = "Witaj, $displayName!",
                                                         userProfileImage = Res.drawable.user_pfp_example,
                                                         userEmail = signedIn.email,
-                                                        userId = signedIn.userId,
+                                                        displayName = displayName,
                                                         onSignOut = { authViewModel.signOut() },
+                                                        currentName = editableName,
+                                                        onNameChange = { editableName = it },
+                                                        onSaveName = {
+                                                            val normalizedName = editableName.trim()
+                                                            if (normalizedName.isNotEmpty()) {
+                                                                displayNameOverride = normalizedName
+                                                                saveStatusMessage = "Zapisujemy imię w Supabase..."
+                                                            }
+                                                            authViewModel.updateName(
+                                                                newName = editableName,
+                                                                onError = { message ->
+                                                                    displayNameOverride = null
+                                                                    saveStatusMessage = message
+                                                                },
+                                                                onSuccess = {
+                                                                    saveStatusMessage = "Imię zostało pomyślnie zapisane."
+                                                                }
+                                                            )
+                                                        },
+                                                        currentBirthDate = editableBirthDate,
+                                                        onBirthDateChange = { editableBirthDate = it },
+                                                        onSaveBirthDate = {
+                                                            saveStatusMessage = "Zapisujemy datę urodzenia..."
+                                                            authViewModel.updateBirthDate(
+                                                                newBirthDate = editableBirthDate,
+                                                                onError = { message -> saveStatusMessage = message },
+                                                                onSuccess = { saveStatusMessage = "Data urodzenia została zapisana." }
+                                                            )
+                                                        },
+                                                        onPickProfilePhoto = {
+                                                            ProfilePhotoPicker.launch?.invoke()
+                                                                ?: run { saveStatusMessage = "Wybór zdjęcia nie jest dostępny na tej platformie." }
+                                                        },
+                                                        profilePhotoUrl = signedIn.photoUrl,
+                                                        saveStatusMessage = saveStatusMessage,
+                                                        isDarkTheme = isDarkTheme,
+                                                        onThemeChange = { isDarkTheme = it },
                                                         scrollState = profileScrollState
                                                     )
                                                 }

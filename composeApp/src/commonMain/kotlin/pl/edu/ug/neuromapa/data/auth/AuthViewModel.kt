@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.auth_system_alert_dialog_no_internet
 import org.jetbrains.compose.resources.getString
+import kotlin.time.Clock
 
 class AuthViewModel : ViewModel() {
 
@@ -31,12 +32,15 @@ class AuthViewModel : ViewModel() {
                 email = stored.email,
                 userId = stored.userId,
                 accessToken = stored.token,
+                refreshToken = stored.refreshToken,
+                name = stored.name,
             )
         }
         else {
             AuthState.SignedOut
         }
 
+        loadProfileForCurrentUser()
     }
 
     fun signIn(email: String, password: String) {
@@ -49,17 +53,20 @@ class AuthViewModel : ViewModel() {
 
                 val response = SupabaseAuth.signIn(email, password)
                 val token = response.accessToken
+                val refreshToken = response.refreshToken
                 val user = response.user
 
                 // If the signing in was successful, change the AuthState to SignedIn
                 if (token != null && user != null) {
 
-                    SessionStorage.save?.invoke(token, user.email ?: email, user.id)
+                    SessionStorage.save?.invoke(token, refreshToken, user.email ?: email, user.id, null, null, null)
                     _authState.value = AuthState.SignedIn(
                         email = user.email ?: email,
                         userId = user.id,
                         accessToken = token,
+                        refreshToken = refreshToken,
                     )
+                    loadProfileForCurrentUser()
 
                 }
 
@@ -88,6 +95,7 @@ class AuthViewModel : ViewModel() {
 
                 val response = SupabaseAuth.signUp(email, password)
                 val token = response.accessToken
+                val refreshToken = response.refreshToken
 
                 val user = response.user ?: if (response.id != null) {
                     AuthUser(
@@ -101,12 +109,14 @@ class AuthViewModel : ViewModel() {
                 // If the signing up was successful, change the AuthState to SignedIn
                 if (user != null && token != null) {
 
-                    SessionStorage.save?.invoke(token, user.email ?: email, user.id)
+                    SessionStorage.save?.invoke(token, refreshToken, user.email ?: email, user.id, null, null, null)
                     _authState.value = AuthState.SignedIn(
                         email = user.email ?: email,
                         userId = user.id,
                         accessToken = token,
+                        refreshToken = refreshToken,
                     )
+                    loadProfileForCurrentUser()
 
                 }
 
@@ -170,12 +180,14 @@ class AuthViewModel : ViewModel() {
                 val user = SupabaseAuth.getUser(accessToken)
 
                 if (user != null) {
-                    SessionStorage.save?.invoke(accessToken, user.email ?: "", user.id)
+                    SessionStorage.save?.invoke(accessToken, null, user.email ?: "", user.id, null, null, null)
                     _authState.value = AuthState.SignedIn(
                         email = user.email ?: "",
                         userId = user.id,
-                        accessToken = accessToken
+                        accessToken = accessToken,
+                        refreshToken = null,
                     )
+                    loadProfileForCurrentUser()
                 }
                 else {
                     _authState.value = AuthState.Error(translateOAuthError("invalid_session", provider))
@@ -192,6 +204,211 @@ class AuthViewModel : ViewModel() {
     fun clearError() {
         // If the popup was dismissed, return to the SignedOut state
         _authState.value = AuthState.SignedOut
+    }
+
+    fun updateName(
+        newName: String,
+        onError: ((String) -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        val normalizedName = newName.trim()
+        if (normalizedName.isEmpty()) {
+            onError?.invoke("Imię nie może być puste.")
+            return
+        }
+
+        val current = _authState.value as? AuthState.SignedIn ?: return
+
+        viewModelScope.launch {
+            try {
+                val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
+                SupabaseAuth.updateName(
+                    accessToken = validSession.accessToken,
+                    userId = validSession.userId,
+                    name = normalizedName
+                )
+                val updatedState = validSession.copy(name = normalizedName)
+                _authState.value = updatedState
+                SessionStorage.save?.invoke(
+                    updatedState.accessToken,
+                    updatedState.refreshToken,
+                    updatedState.email,
+                    updatedState.userId,
+                    updatedState.name,
+                    updatedState.birthDate,
+                    updatedState.photoUrl
+                )
+                onSuccess?.invoke()
+            } catch (_: Exception) {
+                onError?.invoke("Nie udało się zapisać imienia. Spróbuj ponownie.")
+            }
+        }
+    }
+
+    fun updateBirthDate(
+        newBirthDate: String,
+        onError: ((String) -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        val normalizedBirthDate = newBirthDate.trim()
+        if (!isValidIsoDate(normalizedBirthDate)) {
+            onError?.invoke("Data urodzenia musi mieć format RRRR-MM-DD.")
+            return
+        }
+
+        val current = _authState.value as? AuthState.SignedIn ?: return
+
+        viewModelScope.launch {
+            try {
+                val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
+                SupabaseAuth.updateBirthDate(
+                    accessToken = validSession.accessToken,
+                    userId = validSession.userId,
+                    birthDate = normalizedBirthDate
+                )
+                _authState.value = validSession.copy(birthDate = normalizedBirthDate)
+                onSuccess?.invoke()
+            } catch (e: Exception) {
+                val details = e.message?.take(220).orEmpty()
+                onError?.invoke(
+                    if (details.isNotBlank()) "Nie udało się zapisać daty urodzenia: $details"
+                    else "Nie udało się zapisać daty urodzenia."
+                )
+            }
+        }
+    }
+
+    private fun isValidIsoDate(date: String): Boolean {
+        val parts = date.split("-")
+        if (parts.size != 3) return false
+
+        val year = parts[0].toIntOrNull() ?: return false
+        val month = parts[1].toIntOrNull() ?: return false
+        val day = parts[2].toIntOrNull() ?: return false
+
+        if (year < 1900 || year > 2100) return false
+        if (month !in 1..12) return false
+        if (day !in 1..31) return false
+
+        val maxDay = when (month) {
+            4, 6, 9, 11 -> 30
+            2 -> if (isLeapYear(year)) 29 else 28
+            else -> 31
+        }
+        return day <= maxDay
+    }
+
+    private fun isLeapYear(year: Int): Boolean {
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+    }
+
+    fun uploadProfilePhoto(
+        imageBytes: ByteArray,
+        onError: ((String) -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        val current = _authState.value as? AuthState.SignedIn ?: return
+
+        viewModelScope.launch {
+            try {
+                val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
+                val photoUrl = SupabaseAuth.uploadProfilePhoto(
+                    accessToken = validSession.accessToken,
+                    userId = validSession.userId,
+                    imageBytes = imageBytes
+                )
+                _authState.value = validSession.copy(photoUrl = photoUrl)
+                onSuccess?.invoke()
+            } catch (_: Exception) {
+                onError?.invoke("Nie udało się zapisać zdjęcia profilowego.")
+            }
+        }
+    }
+
+    private fun loadProfileForCurrentUser() {
+        val current = _authState.value as? AuthState.SignedIn ?: return
+
+        viewModelScope.launch {
+            try {
+                val validSession = getValidSession(current) ?: throw IllegalStateException("Session is invalid")
+                val name = SupabaseAuth.getName(
+                    accessToken = validSession.accessToken,
+                    userId = validSession.userId
+                )
+                val profile = SupabaseAuth.getUserDataProfile(
+                    accessToken = validSession.accessToken,
+                    userId = validSession.userId
+                )
+                _authState.value = validSession.copy(
+                    name = name,
+                    birthDate = profile.birthDate,
+                    photoUrl = profile.photoUrl
+                )
+                val updated = _authState.value as? AuthState.SignedIn
+                if (updated != null) {
+                    SessionStorage.save?.invoke(
+                        updated.accessToken,
+                        updated.refreshToken,
+                        updated.email,
+                        updated.userId,
+                        updated.name,
+                        updated.birthDate,
+                        updated.photoUrl
+                    )
+                }
+            } catch (_: Exception) {
+                // keep user signed in even if profile endpoint fails
+            }
+        }
+    }
+
+    private suspend fun getValidSession(current: AuthState.SignedIn): AuthState.SignedIn? {
+        return if (isTokenExpired(current.accessToken)) {
+            refreshSession(current)
+        } else {
+            current
+        }
+    }
+
+    @OptIn(kotlin.io.encoding.ExperimentalEncodingApi::class, kotlin.time.ExperimentalTime::class)
+    private fun isTokenExpired(token: String): Boolean {
+        return try {
+            val payload = token.split(".").getOrNull(1) ?: return true
+            val decoded = kotlin.io.encoding.Base64.UrlSafe.decode(payload).decodeToString()
+            val exp = Regex("\"exp\":(\\d+)").find(decoded)
+                ?.groupValues?.get(1)?.toLong() ?: return true
+            val nowSeconds = Clock.System.now().toEpochMilliseconds() / 1000
+            exp < nowSeconds + 60 
+        } catch (_: Exception) {
+            true
+        }
+    }
+
+    private suspend fun refreshSession(current: AuthState.SignedIn): AuthState.SignedIn? {
+        val refreshToken = current.refreshToken ?: return null
+        val refreshResponse = SupabaseAuth.refreshSession(refreshToken)
+        val newAccessToken = refreshResponse.accessToken ?: return null
+        val newRefreshToken = refreshResponse.refreshToken ?: refreshToken
+        val user = refreshResponse.user ?: SupabaseAuth.getUser(newAccessToken) ?: return null
+
+        val updated = current.copy(
+            email = user.email ?: current.email,
+            userId = user.id,
+            accessToken = newAccessToken,
+            refreshToken = newRefreshToken
+        )
+
+        SessionStorage.save?.invoke(
+            newAccessToken,
+            newRefreshToken,
+            updated.email,
+            updated.userId,
+            updated.name,
+            updated.birthDate,
+            updated.photoUrl
+        )
+        _authState.value = updated
+        return updated
     }
 
     private fun translateAuthError(response: AuthResponse): String {
