@@ -5,6 +5,7 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.SerialName
@@ -46,6 +47,12 @@ data class AuthResponse(
     val code: Int? = null
 )
 
+@Serializable
+data class FavoriteRequestResponse(
+    @SerialName("user_id") val userId: String? = null,
+    @SerialName("place_id") val placeId: Int
+)
+
 object SupabaseAuth {
 
     private val SUPABASE_ANON_KEY = BuildConfig.SUPABASE_API_KEY
@@ -82,9 +89,66 @@ object SupabaseAuth {
 
     suspend fun getUser(accessToken: String): AuthUser? {
         return supabaseHttpClient.get("$SUPABASE_URL/auth/v1/user") {
-                header("apikey", SUPABASE_ANON_KEY)
-                header(HttpHeaders.Authorization, "Bearer $accessToken")
-            }.body()
+            header("apikey", SUPABASE_ANON_KEY)
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+        }.body()
+    }
+}
+
+
+object SupabaseDatabase {
+    private val SUPABASE_ANON_KEY = BuildConfig.SUPABASE_API_KEY
+    private const val USER_SCHEMA = "user_information"
+
+    suspend fun addFavoritePlace(userId: String, placeId: Int, accessToken: String): Boolean {
+        val response = SupabaseAuth.supabaseHttpClient.post("$SUPABASE_URL/rest/v1/favorite_places") {
+            header("apikey", SUPABASE_ANON_KEY)
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            header("Content-Type", "application/json")
+
+            header("Content-Profile", USER_SCHEMA)
+            header("Accept-Profile", USER_SCHEMA)
+
+            setBody(FavoriteRequestResponse(userId, placeId))
+        }
+        if (!response.status.isSuccess()) {
+            println("DB ERROR BODY: ${response.bodyAsText()}")
+        }
+        return response.status.isSuccess()
     }
 
+    suspend fun removeFavoritePlace(userId: String, placeId: Int, accessToken: String): Boolean {
+        val response = SupabaseAuth.supabaseHttpClient.delete("$SUPABASE_URL/rest/v1/favorite_places") {
+            header("apikey", SUPABASE_ANON_KEY)
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+
+            header("Accept-Profile", USER_SCHEMA)
+            header("Content-Profile", USER_SCHEMA)
+
+            parameter("user_id", "eq.$userId")
+            parameter("place_id", "eq.$placeId")
+        }
+        return response.status.isSuccess()
+    }
+
+    suspend fun fetchFavoritePlaces(userId: String, accessToken: String): List<Int> {
+        val response = SupabaseAuth.supabaseHttpClient.get("$SUPABASE_URL/rest/v1/favorite_places") {
+            header("apikey", SUPABASE_ANON_KEY)
+
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            header("Accept-Profile", "user_information")
+
+            header("Content-Profile", USER_SCHEMA)
+            parameter("select", "place_id")
+            parameter("user_id", "eq.$userId")
+        }
+        println("RAW RESPONSE: ${response.bodyAsText()}")
+
+        return if (response.status.isSuccess()) {
+            val favorites: List<FavoriteRequestResponse> = response.body()
+            favorites.map { it.placeId }
+        } else {
+            emptyList()
+        }
+    }
 }
