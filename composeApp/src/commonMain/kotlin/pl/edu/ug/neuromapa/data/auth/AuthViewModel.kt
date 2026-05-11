@@ -222,7 +222,7 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
-                SupabaseAuth.updateName(
+                SupabaseDatabase.updateName(
                     accessToken = validSession.accessToken,
                     userId = validSession.userId,
                     name = normalizedName
@@ -261,7 +261,7 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
-                SupabaseAuth.updateBirthDate(
+                SupabaseDatabase.updateBirthDate(
                     accessToken = validSession.accessToken,
                     userId = validSession.userId,
                     birthDate = normalizedBirthDate
@@ -312,7 +312,7 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
-                val photoUrl = SupabaseAuth.uploadProfilePhoto(
+                val photoUrl = SupabaseDatabase.uploadProfilePhoto(
                     accessToken = validSession.accessToken,
                     userId = validSession.userId,
                     imageBytes = imageBytes
@@ -331,11 +331,11 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val validSession = getValidSession(current) ?: throw IllegalStateException("Session is invalid")
-                val name = SupabaseAuth.getName(
+                val name = SupabaseDatabase.getName(
                     accessToken = validSession.accessToken,
                     userId = validSession.userId
                 )
-                val profile = SupabaseAuth.getUserDataProfile(
+                val profile = SupabaseDatabase.getUserDataProfile(
                     accessToken = validSession.accessToken,
                     userId = validSession.userId
                 )
