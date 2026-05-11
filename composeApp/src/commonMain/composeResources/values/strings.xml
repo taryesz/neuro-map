@@ -67,6 +67,8 @@
         <string name="place_screen_place__description_facebook_link_label">Facebook</string>
         <string name="place_screen_place__description_website_link_label">Strona internetowa</string>
 
+        <string name="place_screen_system_alert_dialog_log_in">Aby móc zapisać to miejsce do ulubionych, musisz się zalogować.</string>
+
     <!-- ADD SCREEN -->
 
         <!-- Screen title -->
@@ -158,5 +160,22 @@
         <string name="sign_up_screen_system_alert_dialog_title">Błąd rejestracji</string>
 
         <string name="auth_system_alert_dialog_no_internet">Sprawdź połączenie z internetem i spróbuj jeszcze raz.</string>
+
+    <!-- PROFILE SCREEN -->
+
+        <string name="profile_screen_title">Ustawienia</string>
+
+        <string name="profile_screen_name_field_title">Twoje imię</string>
+        <string name="profile_screen_name_placeholder">Jak masz na imię?</string>
+
+        <string name="profile_screen_birthday_field_title">Data urodzenia</string>
+        <string name="profile_screen_birthday_playholder">Kiedy się urodził*ś?</string>
+
+        <string name="profile_screen_save_changes_button_text">Zapisz zmiany</string>
+        <string name="profile_screen_log_out_button_text">Wyloguj się</string>
+
+        <string name="profile_screen_system_alert_dialog_title">Informacja</string>
+
+        <string name="profile_screen_pick_profile_picture_button_text">Wybierz zdjęcie profilowe</string>
 
 </resources>

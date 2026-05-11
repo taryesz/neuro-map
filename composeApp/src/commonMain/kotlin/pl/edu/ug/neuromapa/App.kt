@@ -46,7 +46,8 @@ fun App() {
     var editableName by remember { mutableStateOf("") }
     var editableBirthDate by remember { mutableStateOf("") }
     var saveStatusMessage by remember { mutableStateOf<String?>(null) }
-    var displayNameOverride by remember { mutableStateOf<String?>(null) }
+
+    var confirmedUserName by remember { mutableStateOf<String?>(null) }
 
     NeuroMapTheme(darkTheme = isDarkTheme) {
 
@@ -82,17 +83,26 @@ fun App() {
 
         val signedInState = authState as? AuthState.SignedIn
 
-        val displayName = when {
-            !displayNameOverride.isNullOrBlank() -> displayNameOverride.orEmpty()
-            !signedInState?.name.isNullOrBlank() -> signedInState?.name.orEmpty()
-            signedInState != null -> signedInState.email.substringBefore("@")
-            else -> "Użytkownik"
+        LaunchedEffect(signedInState) {
+            if (signedInState != null) {
+                if (confirmedUserName == null && !signedInState.name.isNullOrBlank()) {
+                    confirmedUserName = signedInState.name
+                    editableName = signedInState.name
+                }
+                if (editableBirthDate.isBlank() && !signedInState.birthDate.isNullOrBlank()) {
+                    editableBirthDate = signedInState.birthDate
+                }
+            } else {
+                confirmedUserName = null
+                editableName = ""
+                editableBirthDate = ""
+            }
         }
 
-        LaunchedEffect(signedInState?.name, signedInState?.userId) {
-            editableName = signedInState?.name.orEmpty()
-            editableBirthDate = signedInState?.birthDate.orEmpty()
-            displayNameOverride = null
+        val displayName = when {
+            !confirmedUserName.isNullOrBlank() -> confirmedUserName.orEmpty()
+            signedInState != null -> signedInState.email.substringBefore("@")
+            else -> "Użytkownik"
         }
 
         LaunchedEffect(authViewModel) {
@@ -102,7 +112,6 @@ fun App() {
                 } else if (imageBytes == null) {
                     saveStatusMessage = "Nie wybrano zdjęcia."
                 } else {
-                    saveStatusMessage = "Przesyłamy zdjęcie profilowe..."
                     authViewModel.uploadProfilePhoto(
                         imageBytes = imageBytes,
                         onError = { message -> saveStatusMessage = message },
@@ -243,26 +252,19 @@ fun App() {
                                                 is AuthState.SignedIn -> {
                                                     val signedIn = authState as AuthState.SignedIn
                                                     DashboardScreen(
-                                                        headerTitle = "Witaj, $displayName!",
                                                         userProfileImage = Res.drawable.user_pfp_example,
-                                                        userEmail = signedIn.email,
-                                                        displayName = displayName,
                                                         onSignOut = { authViewModel.signOut() },
                                                         currentName = editableName,
                                                         onNameChange = { editableName = it },
                                                         onSaveName = {
                                                             val normalizedName = editableName.trim()
-                                                            if (normalizedName.isNotEmpty()) {
-                                                                displayNameOverride = normalizedName
-                                                                saveStatusMessage = "Zapisujemy imię w Supabase..."
-                                                            }
                                                             authViewModel.updateName(
                                                                 newName = editableName,
                                                                 onError = { message ->
-                                                                    displayNameOverride = null
                                                                     saveStatusMessage = message
                                                                 },
                                                                 onSuccess = {
+                                                                    confirmedUserName = normalizedName
                                                                     saveStatusMessage = "Imię zostało pomyślnie zapisane."
                                                                 }
                                                             )
@@ -270,7 +272,6 @@ fun App() {
                                                         currentBirthDate = editableBirthDate,
                                                         onBirthDateChange = { editableBirthDate = it },
                                                         onSaveBirthDate = {
-                                                            saveStatusMessage = "Zapisujemy datę urodzenia..."
                                                             authViewModel.updateBirthDate(
                                                                 newBirthDate = editableBirthDate,
                                                                 onError = { message -> saveStatusMessage = message },
@@ -283,6 +284,7 @@ fun App() {
                                                         },
                                                         profilePhotoUrl = signedIn.photoUrl,
                                                         saveStatusMessage = saveStatusMessage,
+                                                        onClearStatusMessage = { saveStatusMessage = null },
                                                         isDarkTheme = isDarkTheme,
                                                         onThemeChange = { isDarkTheme = it },
                                                         scrollState = profileScrollState

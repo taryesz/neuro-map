@@ -27,22 +27,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.favorite_place_red_filled_heart
 import neuromapa.composeapp.generated.resources.navigation_bar_favorites
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.screens.place.settings.cornerRadius
-import pl.edu.ug.neuromapa.ui.getAppTypography
-import pl.edu.ug.neuromapa.screens.place.settings.widePadding
-import pl.edu.ug.neuromapa.screens.place.settings.wideSpacing
+import pl.edu.ug.neuromapa.screens.place.settings.headerCategoryIconSize
 import pl.edu.ug.neuromapa.screens.place.settings.headerHeight
 import pl.edu.ug.neuromapa.screens.place.settings.headerScrimOffset
 import pl.edu.ug.neuromapa.screens.place.settings.headerScrimOpacity
-import pl.edu.ug.neuromapa.screens.place.settings.headerCategoryIconSize
-import androidx.compose.ui.unit.Dp
-import pl.edu.ug.neuromapa.ui.animations.bounceClick
+import pl.edu.ug.neuromapa.screens.place.settings.widePadding
+import pl.edu.ug.neuromapa.screens.place.settings.wideSpacing
+import pl.edu.ug.neuromapa.ui.getAppTypography
 
 @Composable
 fun PlaceHeader(
@@ -77,11 +76,12 @@ fun PlaceHeader(
             isInteractive = (onCardClick == null)
         )
 
+        // Scrim-box 
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .then(
-                    if (onCardClick != null) Modifier.bounceClick(onClick = onCardClick) else Modifier
+                    if (onCardClick != null) Modifier.clickable { onCardClick() } else Modifier
                 )
         ) {
 

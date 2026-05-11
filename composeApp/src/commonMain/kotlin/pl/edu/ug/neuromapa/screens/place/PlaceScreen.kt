@@ -81,7 +81,7 @@ fun PlaceScreen(
             if (showDialog) {
                 SystemAlertDialog(
                     title = stringResource(Res.string.sign_up_screen_offer_to_sign_in_link_text),
-                    message = "You must log in for adding to favorites",
+                    message = stringResource(Res.string.place_screen_system_alert_dialog_log_in),
                     onDismiss = { favoritesViewModel.dismissLoginAlert() }
                 )
             }

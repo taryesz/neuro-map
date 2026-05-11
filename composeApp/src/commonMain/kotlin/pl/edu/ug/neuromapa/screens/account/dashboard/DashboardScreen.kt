@@ -2,6 +2,7 @@ package pl.edu.ug.neuromapa.screens.account.dashboard
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -23,17 +23,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import neuromapa.composeapp.generated.resources.Res
+import neuromapa.composeapp.generated.resources.favorites_screen_go_to_map_button_text
+import neuromapa.composeapp.generated.resources.profile_screen_birthday_field_title
+import neuromapa.composeapp.generated.resources.profile_screen_birthday_playholder
+import neuromapa.composeapp.generated.resources.profile_screen_log_out_button_text
+import neuromapa.composeapp.generated.resources.profile_screen_name_field_title
+import neuromapa.composeapp.generated.resources.profile_screen_name_placeholder
+import neuromapa.composeapp.generated.resources.profile_screen_pick_profile_picture_button_text
+import neuromapa.composeapp.generated.resources.profile_screen_save_changes_button_text
+import neuromapa.composeapp.generated.resources.profile_screen_system_alert_dialog_title
+import neuromapa.composeapp.generated.resources.profile_screen_title
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.components.Header
+import pl.edu.ug.neuromapa.components.form.FormButton
+import pl.edu.ug.neuromapa.components.form.FormSection
+import pl.edu.ug.neuromapa.platform.SystemAlertDialog
 import pl.edu.ug.neuromapa.screens.home.settings.widePadding
-import pl.edu.ug.neuromapa.screens.home.settings.wideSpacing
+import pl.edu.ug.neuromapa.ui.animations.bounceClick
+import pl.edu.ug.neuromapa.ui.getAppTypography
+import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
 
 @Composable
 fun DashboardScreen(
-    headerTitle: String,
     userProfileImage: DrawableResource,
-    userEmail: String,
-    displayName: String,
     onSignOut: () -> Unit,
     currentName: String,
     onNameChange: (String) -> Unit,
@@ -44,6 +58,7 @@ fun DashboardScreen(
     onPickProfilePhoto: () -> Unit,
     profilePhotoUrl: String?,
     saveStatusMessage: String?,
+    onClearStatusMessage: () -> Unit,
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
     scrollState: ScrollState = rememberScrollState()
@@ -57,115 +72,100 @@ fun DashboardScreen(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
         ) {
+
             Header(
-                title = headerTitle,
+                title = stringResource(Res.string.profile_screen_title),
                 userProfileImage = userProfileImage,
-                showProfileTopRightCorner = false,
+                profilePhotoUrl = profilePhotoUrl,
+                showProfileTopRightCorner = true,
                 roundBottomCorners = true,
                 modifier = Modifier,
             )
 
-            Column(modifier = Modifier.padding(widePadding)) {
-                Text("Ustawienia profilu", style = MaterialTheme.typography.titleLarge)
+            Column(
+                modifier = Modifier.padding(widePadding),
+                verticalArrangement = Arrangement.spacedBy(globalComponentMediumPadding)
+            )
+            {
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
-                    value = currentName,
-                    onValueChange = onNameChange,
-                    label = { Text("Twoje imię") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
+                // Dark mode switch
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Ciemny motyw")
+                    Text(
+                        text = "Ciemny motyw",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = getAppTypography().bodySmall,
+                    )
                     Spacer(modifier = Modifier.weight(1f))
                     Switch(checked = isDarkTheme, onCheckedChange = onThemeChange)
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                // Name field
+                FormSection(
+                    title = stringResource(Res.string.profile_screen_name_field_title),
+                    placeholder = stringResource(Res.string.profile_screen_name_placeholder),
+                    value = currentName,
+                    onValueChange = { onNameChange(it) }
+                )
 
-                Button(
-                    onClick = onSaveName,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Zapisz imię")
-                }
-
-                if (!saveStatusMessage.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = saveStatusMessage,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedTextField(
+                // Birthday field
+                FormSection(
+                    title = stringResource(Res.string.profile_screen_birthday_field_title),
+                    placeholder = stringResource(Res.string.profile_screen_birthday_playholder),
                     value = currentBirthDate,
-                    onValueChange = onBirthDateChange,
-                    label = { Text("Data urodzenia (RRRR-MM-DD)") },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { onBirthDateChange(it) }
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Button(
-                    onClick = onSaveBirthDate,
-                    modifier = Modifier.fillMaxWidth()
+                // PFP picker
+                Box(
+                    modifier = Modifier.bounceClick {
+                        onPickProfilePhoto()
+                    }
                 ) {
-                    Text("Zapisz datę urodzenia")
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Button(
-                    onClick = onPickProfilePhoto,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Wybierz zdjęcie profilowe")
-                }
-
-                if (!profilePhotoUrl.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Zdjęcie zapisane",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground
+                    FormButton(
+                        text = stringResource(Res.string.profile_screen_pick_profile_picture_button_text),
+                        isPrimary = false
                     )
                 }
-            }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(widePadding),
-                verticalArrangement = Arrangement.spacedBy(wideSpacing)
-            ) {
-                Text(
-                    text = "Cześć${if (displayName.isNotBlank()) " $displayName" else ""}!",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                // Show error
+                if (!saveStatusMessage.isNullOrBlank()) {
+                    SystemAlertDialog(
+                        title = stringResource(Res.string.profile_screen_system_alert_dialog_title),
+                        message = saveStatusMessage,
+                        onDismiss = onClearStatusMessage
+                    )
+                }
 
-                Text(
-                    text = "E-mail: $userEmail",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                // Save button
+                Box(
+                    modifier = Modifier.bounceClick {
+                        onSaveName()
+                        onSaveBirthDate()
+                    }
+                ) {
+                    FormButton(
+                        text = stringResource(Res.string.profile_screen_save_changes_button_text),
+                        isPrimary = true
+                    )
+                }
 
-                Button(
-                    onClick = onSignOut,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Log out button
+                Box(
+                    modifier = Modifier.bounceClick {
+                        onSignOut()
+                    }
+                ) {
+                    FormButton(
+                        text = stringResource(Res.string.profile_screen_log_out_button_text),
+                        isPrimary = true,
                         containerColor = MaterialTheme.colorScheme.error
                     )
-                ) {
-                    Text("Wyloguj się")
                 }
+
             }
+
         }
     }
 }

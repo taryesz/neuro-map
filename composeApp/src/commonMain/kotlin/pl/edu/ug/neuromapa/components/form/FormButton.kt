@@ -32,6 +32,7 @@ fun FormButton(
     isPrimary: Boolean = true,
     modifier: Modifier = Modifier,
     icon: DrawableResource? = null,
+    containerColor: Color? = null
 ) {
 
     if (icon != null) {
@@ -56,11 +57,14 @@ fun FormButton(
         }
     }
     else if (text != null) {
+
+        val finalContainerColor = containerColor ?: if (isPrimary) Primary else SurfaceDim
+
         Row(
             modifier = modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(globalComponentCornerRadius))
-                .background(if (isPrimary) Primary else SurfaceDim)
+                .background(finalContainerColor)
                 .padding(vertical = globalComponentMediumPadding, horizontal = globalComponentWidePadding),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
