@@ -41,7 +41,7 @@ fun MapHeader(
                     bottomEnd = globalComponentCornerRadius
                 )
             )
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
             .padding(
                 vertical = mediumPadding,
                 horizontal = widePadding

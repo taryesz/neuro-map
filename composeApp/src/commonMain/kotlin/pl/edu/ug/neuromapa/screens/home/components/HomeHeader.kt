@@ -20,7 +20,6 @@ import pl.edu.ug.neuromapa.screens.home.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.mediumPadding
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.getAppTypography
-import pl.edu.ug.neuromapa.ui.onPrimary
 
 @Composable
 fun HomeHeader(
@@ -54,7 +53,7 @@ fun HomeHeader(
             ) {
                 Text(
                     text = motto,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     style = getAppTypography().titleSmall,
                 )
             }
@@ -84,7 +83,7 @@ fun HomeHeader(
                 ) {
                     Text(
                         text = buttonText,
-                        color = onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = buttonTextFontSize,
                         style = getAppTypography().titleMedium,
                     )

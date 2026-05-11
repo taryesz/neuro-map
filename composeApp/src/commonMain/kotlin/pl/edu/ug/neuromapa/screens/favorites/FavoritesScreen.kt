@@ -95,6 +95,7 @@ fun FavoritesScreen(
                     // Instruction of how to use the gestures at the top (right below the turquoise header)
                     Text(
                         text = stringResource(Res.string.favorites_screen_instruction),
+                        color = MaterialTheme.colorScheme.onBackground,
                         style = getAppTypography().bodySmall,
                     )
 

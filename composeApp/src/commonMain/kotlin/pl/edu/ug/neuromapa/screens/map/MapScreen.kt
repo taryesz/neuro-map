@@ -29,7 +29,6 @@ import pl.edu.ug.neuromapa.components.form.FormSelection
 import pl.edu.ug.neuromapa.screens.map.components.MapHeader
 import pl.edu.ug.neuromapa.screens.map.settings.mediumSpacing
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
-import pl.edu.ug.neuromapa.ui.Background
 import pl.edu.ug.neuromapa.data.getCategories
 import pl.edu.ug.neuromapa.data.getExcellenceMarks
 import pl.edu.ug.neuromapa.data.getSensoryProperties

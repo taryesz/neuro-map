@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,7 +14,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextDecoration
 import pl.edu.ug.neuromapa.ui.getAppTypography
-import pl.edu.ug.neuromapa.ui.onBackground
 
 @Composable
 fun AuthSwitch(
@@ -31,13 +31,13 @@ fun AuthSwitch(
 
         Text(
             text = text,
-            color = onBackground,
+            color = MaterialTheme.colorScheme.onBackground,
             style = getAppTypography().bodySmall,
         )
 
         Text(
             text = linkText,
-            color = onBackground,
+            color = MaterialTheme.colorScheme.onBackground,
             style = getAppTypography().bodySmall,
             modifier = Modifier
                 .clickable(

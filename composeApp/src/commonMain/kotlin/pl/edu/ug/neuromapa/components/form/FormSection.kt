@@ -37,6 +37,7 @@ fun FormSection(
         if (title != null) {
             Text(
                 text = title,
+                color = MaterialTheme.colorScheme.onBackground,
                 style = getAppTypography().titleMedium,
             )
         }

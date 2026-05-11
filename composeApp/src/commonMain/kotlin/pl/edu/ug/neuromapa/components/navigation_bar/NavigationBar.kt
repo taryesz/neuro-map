@@ -35,8 +35,6 @@ import pl.edu.ug.neuromapa.enums.Screen
 import pl.edu.ug.neuromapa.ui.animations.animatedSelectionBackground
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
-import pl.edu.ug.neuromapa.ui.Primary
-import pl.edu.ug.neuromapa.ui.Surface
 
 @Composable
 fun NavigationBar(
@@ -63,7 +61,7 @@ fun NavigationBar(
                 topStart=globalComponentCornerRadius,
                 topEnd=globalComponentCornerRadius)
             ),
-        color = MaterialTheme.colorScheme.surface
+        color = MaterialTheme.colorScheme.background
     ) {
         NavigationBar(
             containerColor = Transparent,
@@ -129,8 +127,7 @@ fun NavigationBar(
                                         .clip(RoundedCornerShape(globalComponentCornerRadius))
                                         .animatedSelectionBackground(
                                             isSelected = isSelected,
-                                            // Tło zaznaczenia to zawsze firmowa oliwka
-                                            backgroundColor = Surface,
+                                            backgroundColor = MaterialTheme.colorScheme.surface,
                                         )
                                 )
 
@@ -138,7 +135,7 @@ fun NavigationBar(
                                     painter = iconPainter,
                                     contentDescription = screen.label,
                                     modifier = Modifier.size(iconSize),
-                                    tint = if (isSelected) Primary else MaterialTheme.colorScheme.onSurface
+                                    tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                                 )
                             }
 
@@ -148,7 +145,7 @@ fun NavigationBar(
                                     text = screen.label,
                                     style = MaterialTheme.typography.labelSmall,
                                     modifier = Modifier.padding(top = navigationBarItemLabelSpacing),
-                                    color = MaterialTheme.colorScheme.onSurface,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                 )
                             }
                         }

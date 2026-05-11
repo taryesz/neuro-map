@@ -38,7 +38,6 @@ import pl.edu.ug.neuromapa.screens.place.enums.LinkType
 import pl.edu.ug.neuromapa.screens.place.settings.*
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.screens.place.helpers.*
-import pl.edu.ug.neuromapa.ui.SurfaceVariant
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 
 @Composable
@@ -166,7 +165,7 @@ fun PlaceScreen(
                             )
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(cornerRadius))
-                            .background(SurfaceVariant)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .padding(horizontal = widePadding, vertical = mediumPadding),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,

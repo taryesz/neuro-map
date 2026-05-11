@@ -19,8 +19,6 @@ import pl.edu.ug.neuromapa.screens.place.settings.cornerRadius
 import pl.edu.ug.neuromapa.screens.place.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.place.settings.mediumSpacing
 import pl.edu.ug.neuromapa.screens.place.settings.sensoryPropertyIconSize
-import pl.edu.ug.neuromapa.ui.Primary
-import pl.edu.ug.neuromapa.ui.Surface
 
 @Composable
 fun PlaceFeature(
@@ -33,7 +31,7 @@ fun PlaceFeature(
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(cornerRadius))
-            .background(Surface)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(mediumPadding),
         horizontalArrangement = Arrangement.spacedBy(mediumSpacing),
         verticalAlignment = Alignment.CenterVertically
@@ -51,7 +49,7 @@ fun PlaceFeature(
         Text(
             text = name,
             style = MaterialTheme.typography.titleSmall,
-            color = Primary
+            color = MaterialTheme.colorScheme.primary
         )
 
     }

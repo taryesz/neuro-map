@@ -114,7 +114,6 @@ fun AddScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    // ZMIANA: Zamiast "na sztywno" przypisywać beżowy z pliku Color.kt, używamy dynamicznego motywu
                     .background(MaterialTheme.colorScheme.background)
                     .padding(widePadding),
                 verticalArrangement = Arrangement.spacedBy(mediumSpacing)

@@ -2,6 +2,7 @@ package pl.edu.ug.neuromapa.components.form
 
 import pl.edu.ug.neuromapa.screens.add.data.SelectionItem
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -36,6 +37,7 @@ fun FormSelection(
         // Filed title
         Text(
             text = title,
+            color = MaterialTheme.colorScheme.onBackground,
             style = getAppTypography().titleMedium,
         )
 
@@ -100,6 +102,7 @@ fun FormSelection(
             if (description != null) {
                 Text(
                     text = description,
+                    color = MaterialTheme.colorScheme.onBackground,
                     style = getAppTypography().bodySmall
                 )
             }

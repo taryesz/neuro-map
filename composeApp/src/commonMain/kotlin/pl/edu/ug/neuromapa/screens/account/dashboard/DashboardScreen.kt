@@ -8,13 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -24,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.favorites_screen_go_to_map_button_text
 import neuromapa.composeapp.generated.resources.profile_screen_birthday_field_title
 import neuromapa.composeapp.generated.resources.profile_screen_birthday_playholder
 import neuromapa.composeapp.generated.resources.profile_screen_log_out_button_text
@@ -41,7 +36,6 @@ import pl.edu.ug.neuromapa.components.form.FormButton
 import pl.edu.ug.neuromapa.components.form.FormSection
 import pl.edu.ug.neuromapa.platform.SystemAlertDialog
 import pl.edu.ug.neuromapa.screens.home.settings.widePadding
-import pl.edu.ug.neuromapa.ui.Logout
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
@@ -92,7 +86,7 @@ fun DashboardScreen(
                 // Dark mode switch
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Ciemny motyw",
+                        text = "Tryb ciemny",
                         color = MaterialTheme.colorScheme.onBackground,
                         style = getAppTypography().bodySmall,
                     )
@@ -161,7 +155,7 @@ fun DashboardScreen(
                     FormButton(
                         text = stringResource(Res.string.profile_screen_log_out_button_text),
                         isPrimary = true,
-                        containerColor = Logout
+                        containerColor = MaterialTheme.colorScheme.surfaceTint,
                     )
                 }
 

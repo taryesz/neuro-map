@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,7 +16,6 @@ import neuromapa.composeapp.generated.resources.sign_in_google_light
 import pl.edu.ug.neuromapa.components.form.FormButton
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.getAppTypography
-import pl.edu.ug.neuromapa.ui.onBackground
 import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumSpacing
 import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 
@@ -34,7 +34,7 @@ fun AlternativeAuthForm(
         // Section title
         Text(
             text = formTitle,
-            color = onBackground,
+            color = MaterialTheme.colorScheme.onBackground,
             style = getAppTypography().bodySmall,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()

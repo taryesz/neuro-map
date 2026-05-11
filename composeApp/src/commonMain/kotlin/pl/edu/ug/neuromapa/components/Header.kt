@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -21,7 +22,6 @@ import io.kamel.image.asyncPainterResource
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
-import pl.edu.ug.neuromapa.ui.ProfileIcon
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
@@ -45,7 +45,7 @@ fun Header(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = MaterialTheme.colorScheme.primary,
                 shape = if (roundBottomCorners)
                     RoundedCornerShape(bottomStart = globalComponentCornerRadius, bottomEnd = globalComponentCornerRadius)
                 else RoundedCornerShape(0.dp)
@@ -75,8 +75,7 @@ fun Header(
                 ) {
                     Text(
                         text = title,
-                        // ZMIANA: Używamy onPrimaryContainer zamiast onPrimary
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         style = getAppTypography().titleLarge
                     )
                 }
@@ -87,7 +86,7 @@ fun Header(
                 val baseModifier = Modifier
                     .size(userProfileIconSize)
                     .clip(CircleShape)
-                    .background(ProfileIcon)
+                    .background(Color.White)
                     .clickable {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onProfileClick()
