@@ -1,5 +1,6 @@
 package pl.edu.ug.neuromapa.screens.favorites
 
+import EmptyFavorites
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -13,6 +14,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
@@ -23,30 +26,33 @@ import neuromapa.composeapp.generated.resources.favorites_screen_instruction
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.components.Header
+import pl.edu.ug.neuromapa.data.MapPoint
+import pl.edu.ug.neuromapa.data.auth.AuthViewModel
+import pl.edu.ug.neuromapa.platform.MapNavigator
+import pl.edu.ug.neuromapa.platform.rememberMapNavigator
 import pl.edu.ug.neuromapa.screens.favorites.components.FavoritePlaceCard
 import pl.edu.ug.neuromapa.screens.favorites.settings.mediumSpacing
 import pl.edu.ug.neuromapa.screens.favorites.settings.widePadding
 import pl.edu.ug.neuromapa.screens.favorites.settings.wideSpacing
-import pl.edu.ug.neuromapa.screens.place.data.mockPlaceKotkaCafe
-import pl.edu.ug.neuromapa.screens.place.data.Place
 import pl.edu.ug.neuromapa.ui.getAppTypography
 
 @Composable
 fun FavoritesScreen(
     userProfileImage: DrawableResource,
-    onPlaceClick: (Place) -> Unit,
+    favoritesViewModel: FavoritesViewModel,
+    authViewModel: AuthViewModel,
+    mapPoints: List<MapPoint>,
+    onPlaceClick: (MapPoint) -> Unit,
+    onGoToMap: () -> Unit,
     onProfileClick: () -> Unit,
     profilePhotoUrl: String? = null,
     listState: LazyListState = rememberLazyListState()
 ) {
-
-    // This is a list of all saved places
-    // As of now, it consists of one repeated place (mock)
-    // TODO: remove the mocks and fill with data fetched from db
-    val favoritePlaces = remember {
-        List(8) { index ->
-            mockPlaceKotkaCafe.copy(name = "Kotka Café #${index + 1}")
-        }.toMutableStateList()
+    val mapNavigator = rememberMapNavigator()
+    val authState by authViewModel.authState.collectAsState()
+    val favoriteIds by favoritesViewModel.favoritePlaceIds.collectAsState()
+    val favoritePlaces = remember(favoriteIds, mapPoints) {
+        mapPoints.filter { it.id in favoriteIds }
     }
 
     // Wrapper of the whole screen
@@ -80,43 +86,50 @@ fun FavoritesScreen(
                 verticalArrangement = Arrangement.spacedBy(wideSpacing)
             ) {
 
-                // Instruction of how to use the gestures at the top (right below the turquoise header)
-                Text(
-                    text = stringResource(Res.string.favorites_screen_instruction),
-                    style = getAppTypography().bodySmall,
-                )
 
-                // Wrapper of the saved places (or as I call them: "cards")
-                // The LazyColumn allows to have a scrollable PART of the screen, not the whole screen
-                LazyColumn(
-                    state = listState,
-                    verticalArrangement = Arrangement.spacedBy(mediumSpacing)
-                ) {
+                if (favoritePlaces.isEmpty()) {
+                    EmptyFavorites(
+                        onGoToMap = onGoToMap
+                    )
+                } else {
+                    // Instruction of how to use the gestures at the top (right below the turquoise header)
+                    Text(
+                        text = stringResource(Res.string.favorites_screen_instruction),
+                        style = getAppTypography().bodySmall,
+                    )
 
-                    // Define what this column will show
-                    items(
-                        items = favoritePlaces,
-                        key = { it.name }
-                    ) { place ->    // For each place create its own "card"
+                    // Wrapper of the saved places (or as I call them: "cards")
+                    // The LazyColumn allows to have a scrollable PART of the screen, not the whole screen
+                    LazyColumn(
+                        state = listState,
+                        verticalArrangement = Arrangement.spacedBy(mediumSpacing)
+                    ) {
 
-                        FavoritePlaceCard(
-                            title = place.name,
-                            background = place.photo,
-                            onClick = {
-                                onPlaceClick(place)     // Send the user to another screen with the place details
-                            },
-                            onDelete = {
-                                favoritePlaces.remove(place)
-                                println("Usunięto: ${place.name}")  // TODO: remove this line after full implementation
-                            },
-                            onNavigate = {
-                                println("Nawiguj do: ${place.name}")    // TODO: launch navigation to the place
-                            }
+                        // Define what this column will show
+                        items(
+                            items = favoritePlaces,
+                            key = { it.id }
+                        ) { place ->    // For each place create its own "card"
 
-                        )
+                            FavoritePlaceCard(
+                                title = place.name,
+                                background = place.photoUrl,
+                                onClick = {
+                                    onPlaceClick(place)     // Send the user to another screen with the place details
+                                },
+                                onDelete = {
+                                    favoritesViewModel.toggleFavorite(
+                                        place.id,
+                                        authState
+                                    )
+                                },
+                                onNavigate = {
+                                    mapNavigator.navigateTo(place.latitude, place.longitude, place.name)
+                                }
+                            )
+                        }
                     }
                 }
-
             }
 
         }

@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
+import neuromapa.composeapp.generated.resources.favorite_place_red_filled_heart
 import neuromapa.composeapp.generated.resources.navigation_bar_add
 import neuromapa.composeapp.generated.resources.navigation_bar_favorites
 import org.jetbrains.compose.resources.painterResource
@@ -96,8 +97,7 @@ fun PlaceHeader(
         {
             Image(
                 modifier = Modifier.size(40.dp),
-                // TODO: replace the icons (or at least an icon for when we want to remove the place)
-                painter = painterResource(if (!isFavorite) Res.drawable.navigation_bar_favorites else Res.drawable.navigation_bar_add),
+                painter = painterResource(if (!isFavorite) Res.drawable.navigation_bar_favorites else Res.drawable.favorite_place_red_filled_heart),
                 contentDescription = if (isFavorite) "Usuń z ulubionych." else "Dodaj do ulubionych.",
             )
         }

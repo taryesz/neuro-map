@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.screens.favorites.settings.cornerRadius
@@ -32,7 +33,7 @@ import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 @Composable
 fun FavoritePlaceCard(
     title: String,
-    background: DrawableResource,
+    background: String,
     onClick: () -> Unit = {},
     onDelete: () -> Unit,
     onNavigate: () -> Unit
@@ -67,7 +68,7 @@ fun FavoritePlaceCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(globalComponentCornerRadius))
             .bounceClick(
-                onClick = onClick,  // TODO: when clicked -> show PlaceScreen.kt
+                onClick = onClick,
                 hapticType = HapticFeedbackType.LongPress
             )
     )
@@ -91,12 +92,14 @@ fun FavoritePlaceCard(
                 ) {
 
                     // Background Image
-                    Image(
-                        painter = painterResource(background),
-                        contentDescription = title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.matchParentSize()
-                    )
+//                    AsyncImage(
+//                        model = background,
+//                        contentDescription = title,
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier.matchParentSize(),
+//                        // placeholder = painterResource(Res.drawable.placeholder),
+//                        // error = painterResource(Res.drawable.error_image)
+//                    )
 
                     // Text panel
                     Box(

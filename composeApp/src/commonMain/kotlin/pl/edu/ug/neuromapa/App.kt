@@ -36,6 +36,7 @@ import pl.edu.ug.neuromapa.data.auth.ProfilePhotoPicker
 import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
 import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
 import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
+import pl.edu.ug.neuromapa.screens.favorites.FavoritesViewModel
 
 @Composable
 @Preview
@@ -51,6 +52,7 @@ fun App() {
 
         val placeViewModel = viewModel { PlaceViewModel() }
         val authViewModel = viewModel { AuthViewModel() }
+        val favoritesViewModel = viewModel { FavoritesViewModel() }
 
         LaunchedEffect(Unit) {
             authViewModel.restoreSession()
@@ -67,9 +69,14 @@ fun App() {
         }
 
         LaunchedEffect(authState) {
-            if (authState is AuthState.SignedIn &&
-                (currentScreen == Screen.SignIn || currentScreen == Screen.SignUp)) {
-                currentScreen = Screen.Profile
+            if (authState is AuthState.SignedIn) {
+                favoritesViewModel.loadFavorites(authState)
+
+                if (currentScreen == Screen.SignIn || currentScreen == Screen.SignUp) {
+                    currentScreen = Screen.Profile
+                }
+            } else if (authState is AuthState.SignedOut) {
+                favoritesViewModel.clearFavorites()
             }
         }
 
@@ -200,17 +207,26 @@ fun App() {
 
                                         Screen.Favorites -> FavoritesScreen(
                                             userProfileImage = Res.drawable.user_pfp_example,
+                                            favoritesViewModel = favoritesViewModel,
+                                            mapPoints = mapPoints,
                                             onPlaceClick = { place ->
-                                                println("Kliknięto w ulubione: ${place.name}")
+                                                selectedMapPoint = place
+                                                currentScreen = Screen.Place
                                             },
                                             onProfileClick = { currentScreen = Screen.Profile },
                                             profilePhotoUrl = signedInState?.photoUrl,
-                                            listState = favoritesListState
+                                            onGoToMap = { currentScreen = Screen.Map },
+                                            listState = favoritesListState,
+                                            authViewModel = authViewModel
                                         )
 
                                         Screen.Place -> {
                                             if (selectedMapPoint != null) {
-                                                PlaceScreen(mapPoint = selectedMapPoint!!)
+                                                PlaceScreen(
+                                                    mapPoint = selectedMapPoint!!,
+                                                    authViewModel = authViewModel,
+                                                    favoritesViewModel = favoritesViewModel
+                                                )
                                             }
                                         }
 

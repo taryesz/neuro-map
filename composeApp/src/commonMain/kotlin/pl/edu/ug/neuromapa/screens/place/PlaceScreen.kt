@@ -13,6 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +26,10 @@ import neuromapa.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.data.MapPoint
+import pl.edu.ug.neuromapa.data.auth.AuthViewModel
+import pl.edu.ug.neuromapa.platform.SystemAlertDialog
 import pl.edu.ug.neuromapa.platform.rememberMapNavigator
+import pl.edu.ug.neuromapa.screens.favorites.FavoritesViewModel
 import pl.edu.ug.neuromapa.screens.home.settings.cornerRadius
 import pl.edu.ug.neuromapa.screens.place.components.PlaceHeader
 import pl.edu.ug.neuromapa.screens.place.components.PlaceFeature
@@ -39,9 +44,17 @@ import pl.edu.ug.neuromapa.ui.animations.bounceClick
 @Composable
 fun PlaceScreen(
     mapPoint: MapPoint,
+    authViewModel: AuthViewModel,
+    favoritesViewModel: FavoritesViewModel
 ) {
-
     val mapNavigator = rememberMapNavigator()
+    val authState by authViewModel.authState.collectAsState()
+    val showDialog by favoritesViewModel.showLoginFavoriteAlert.collectAsState()
+
+    val favoriteIds by favoritesViewModel.favoritePlaceIds.collectAsState()
+    val isFavoriteFromBase = remember(favoriteIds, mapPoint.id) {
+        favoriteIds.contains(mapPoint.id)
+    }
 
     val allFeatures = remember(mapPoint) {
         val features = mapPoint.sensoryFeatures.toMutableList()
@@ -65,13 +78,22 @@ fun PlaceScreen(
         )
         {
 
+            if (showDialog) {
+                SystemAlertDialog(
+                    title = stringResource(Res.string.sign_up_screen_offer_to_sign_in_link_text),
+                    message = "You must log in for adding to favorites",
+                    onDismiss = { favoritesViewModel.dismissLoginAlert() }
+                )
+            }
             // Custom Header (it has a snapshot of a map instead of the turquoise title)
             PlaceHeader(
                 name = mapPoint.name,
                 categoryIcon = getCategoryIconHelper(mapPoint.category),
                 categoryIconDescription = mapPoint.category,
-                isFavorite = false,
-                onFavoriteButtonClick = { },
+                isFavorite = isFavoriteFromBase,
+                onFavoriteButtonClick = {
+                    favoritesViewModel.toggleFavorite(mapPoint.id, authState)
+                },
                 latitude = mapPoint.latitude,
                 longitude = mapPoint.longitude,
             )
