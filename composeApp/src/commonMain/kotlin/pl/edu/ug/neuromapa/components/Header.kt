@@ -45,7 +45,7 @@ fun Header(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.primaryContainer,
                 shape = if (roundBottomCorners)
                     RoundedCornerShape(bottomStart = globalComponentCornerRadius, bottomEnd = globalComponentCornerRadius)
                 else RoundedCornerShape(0.dp)
@@ -58,27 +58,25 @@ fun Header(
         // Greeting & profile picture panels' wrapper
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,   // Space the two panels evenly
-            verticalAlignment = Alignment.Top                   // Keep the content of the two panels at the top
-                                                                // in case the text is longer and doesn't fit
-                                                                // in the row
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
         ) {
 
             // Greeting panel : contains the "Witaj, User!" text
             Box(
-                // Make the Greeting panel not push the Profile picture panel out and keep it in the Wrapper
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
 
                 // Greeting text wrapper
                 Row(
                     modifier = Modifier
-                        .align(Alignment.TopStart)  // Stick the text to the top of its wrapper
+                        .align(Alignment.TopStart)
                         .fillMaxWidth()
                 ) {
                     Text(
                         text = title,
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        // ZMIANA: Używamy onPrimaryContainer zamiast onPrimary
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = getAppTypography().titleLarge
                     )
                 }

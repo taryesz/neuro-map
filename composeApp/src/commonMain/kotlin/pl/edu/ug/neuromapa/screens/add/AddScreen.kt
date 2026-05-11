@@ -33,7 +33,6 @@ import pl.edu.ug.neuromapa.components.form.FormSection
 import pl.edu.ug.neuromapa.components.form.FormSelection
 import pl.edu.ug.neuromapa.screens.add.settings.widePadding
 import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
-import pl.edu.ug.neuromapa.ui.Background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -96,7 +95,7 @@ fun AddScreen(
                     indication = null                                               // This makes the clicks non-visible
                 ) {
                     focusManager.clearFocus()   // If the user clicked somewhere in the screen but not a form field,
-                                                // the keyboard hides ("focus is lost")
+                    // the keyboard hides ("focus is lost")
                 }
                 .verticalScroll(scrollState)  // Make the screen scrollable
         ) {
@@ -115,7 +114,8 @@ fun AddScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Background)
+                    // ZMIANA: Zamiast "na sztywno" przypisywać beżowy z pliku Color.kt, używamy dynamicznego motywu
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(widePadding),
                 verticalArrangement = Arrangement.spacedBy(mediumSpacing)
             )

@@ -35,6 +35,7 @@ import pl.edu.ug.neuromapa.data.getExcellenceMarks
 import pl.edu.ug.neuromapa.data.getSensoryProperties
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.platform.LocalFocusManager
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_form_erase_button
@@ -158,7 +159,7 @@ fun MapScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Background)
+                    .background(MaterialTheme.colorScheme.background)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null

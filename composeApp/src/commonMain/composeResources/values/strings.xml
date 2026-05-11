@@ -165,7 +165,7 @@
 
         <string name="profile_screen_title">Ustawienia</string>
 
-        <string name="profile_screen_name_field_title">Twoje imię</string>
+        <string name="profile_screen_name_field_title">Imię</string>
         <string name="profile_screen_name_placeholder">Jak masz na imię?</string>
 
         <string name="profile_screen_birthday_field_title">Data urodzenia</string>

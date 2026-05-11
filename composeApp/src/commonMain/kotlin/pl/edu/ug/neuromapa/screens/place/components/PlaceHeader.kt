@@ -156,7 +156,7 @@ fun PlaceHeader(
 
                         Text(
                             text = name,
-                            color = MaterialTheme.colorScheme.onPrimary,
+                            color = pl.edu.ug.neuromapa.ui.onPrimary,
                             style = getAppTypography().titleLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Visible,

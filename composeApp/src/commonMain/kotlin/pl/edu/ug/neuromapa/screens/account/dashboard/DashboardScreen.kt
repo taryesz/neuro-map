@@ -41,6 +41,7 @@ import pl.edu.ug.neuromapa.components.form.FormButton
 import pl.edu.ug.neuromapa.components.form.FormSection
 import pl.edu.ug.neuromapa.platform.SystemAlertDialog
 import pl.edu.ug.neuromapa.screens.home.settings.widePadding
+import pl.edu.ug.neuromapa.ui.Logout
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
@@ -160,7 +161,7 @@ fun DashboardScreen(
                     FormButton(
                         text = stringResource(Res.string.profile_screen_log_out_button_text),
                         isPrimary = true,
-                        containerColor = MaterialTheme.colorScheme.error
+                        containerColor = Logout
                     )
                 }
 
