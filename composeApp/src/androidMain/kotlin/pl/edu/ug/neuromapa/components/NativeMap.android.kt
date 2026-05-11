@@ -62,6 +62,7 @@ private fun getCategoryIcon(category: String): DrawableResource {
 actual fun NativeMap(
     points: List<MapPoint>,
     modifier: Modifier,
+    isInteractive: Boolean,
     onPointClick: (Long) -> Unit
 ) {
     val context = LocalContext.current
@@ -254,7 +255,11 @@ actual fun NativeMap(
         ),
         uiSettings = MapUiSettings(
             zoomControlsEnabled = false,
-            myLocationButtonEnabled = false
+            myLocationButtonEnabled = false,
+            scrollGesturesEnabled = isInteractive,
+            zoomGesturesEnabled = isInteractive,
+            tiltGesturesEnabled = isInteractive,
+            rotationGesturesEnabled = isInteractive
         )
     ) {
         Clustering(

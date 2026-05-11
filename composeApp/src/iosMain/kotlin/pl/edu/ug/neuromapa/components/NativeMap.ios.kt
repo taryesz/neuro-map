@@ -153,6 +153,7 @@ private class MapDelegate(
 actual fun NativeMap(
     points: List<MapPoint>,
     modifier: Modifier,
+    isInteractive: Boolean,
     onPointClick: (Long) -> Unit
 ) {
     val mkMapView = remember { MKMapView() }
@@ -174,6 +175,11 @@ actual fun NativeMap(
         },
         modifier = modifier,
         update = { view ->
+            view.scrollEnabled = isInteractive
+            view.zoomEnabled = isInteractive
+            view.pitchEnabled = isInteractive
+            view.rotateEnabled = isInteractive
+
             view.delegate = delegate
             view.removeAnnotations(view.annotations)
 

@@ -10,5 +10,7 @@ val mediumPadding = 15.dp
 val wideSpacing = 30.dp
 val mediumSpacing = 15.dp
 
+val cardHeight = 250.dp
+
 const val placeCardNavigationStateColor = 0xFF4CAF50
 const val placeCardDeletionStateColor = 0xFFE53935

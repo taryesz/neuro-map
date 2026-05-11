@@ -96,6 +96,7 @@ fun PlaceScreen(
                 },
                 latitude = mapPoint.latitude,
                 longitude = mapPoint.longitude,
+                showSaveButton = true
             )
 
             // Place description section (Wrapper)

@@ -8,5 +8,6 @@ import pl.edu.ug.neuromapa.data.MapPoint
 expect fun NativeMap(
     points: List<MapPoint>,
     modifier: Modifier = Modifier,
+    isInteractive: Boolean,
     onPointClick: (Long) -> Unit
 )

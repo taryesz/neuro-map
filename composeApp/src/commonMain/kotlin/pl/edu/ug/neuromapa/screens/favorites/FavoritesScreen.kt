@@ -111,9 +111,14 @@ fun FavoritesScreen(
                             key = { it.id }
                         ) { place ->    // For each place create its own "card"
 
+                            val isFavoriteFromBase = favoriteIds.contains(place.id)
+
                             FavoritePlaceCard(
-                                title = place.name,
-                                background = place.photoUrl,
+                                mapPoint = place,
+                                isFavorite = isFavoriteFromBase,
+                                onFavoriteClick = {
+                                    favoritesViewModel.toggleFavorite(place.id, authState)
+                                },
                                 onClick = {
                                     onPlaceClick(place)     // Send the user to another screen with the place details
                                 },

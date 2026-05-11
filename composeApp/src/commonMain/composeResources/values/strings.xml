@@ -106,6 +106,12 @@
         <!-- Instruction on how to use gestures on the cards -->
         <string name="favorites_screen_instruction">Stuknij kafelek, żeby zobaczyć szczegóły miejsca. Przesuń kafelek w lewo, żeby usunąć miejsce z listy ulubionych. Przesuń kafelek w prawo, żeby uruchomić tryb nawigacji.</string>
 
+        <string name="favorites_screen_empty_body_title">Tutaj jeszcze nic nie ma.</string>
+
+        <string name="favorites_screen_empty_body_text">Dodaj imponujące miejsca do ulubionych,\naby mieć je zawsze pod ręką!</string>
+
+        <string name="favorites_screen_go_to_map_button_text">Otwórz mapę</string>
+
     <!-- MAP SCREEN -->
 
         <!-- Screen title -->

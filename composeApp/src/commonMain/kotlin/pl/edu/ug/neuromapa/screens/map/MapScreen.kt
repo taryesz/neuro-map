@@ -254,7 +254,8 @@ fun MapScreen(
                 NativeMap(
                     points = filteredPoints,
                     modifier = Modifier.fillMaxSize(),
-                    onPointClick = onPlaceClick
+                    onPointClick = onPlaceClick,
+                    isInteractive = true
                 )
 
                 // Custom Header that has a search bar
