@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateOf
+import pl.edu.ug.neuromapa.screens.add.data.WpLocation
+import pl.edu.ug.neuromapa.screens.add.data.WpPlaceFields
+import pl.edu.ug.neuromapa.screens.add.data.WpPlaceRequest
 
 sealed class PlaceDataState {
     object Loading : PlaceDataState()
@@ -25,6 +28,8 @@ class PlaceViewModel : ViewModel() {
     var selectedExcellences = mutableStateOf<Set<String>>(emptySet())
 
     var searchQuery = mutableStateOf("")
+
+    val isSubmitting = mutableStateOf(false)
 
     init {
         fetchPlaces()
@@ -83,4 +88,60 @@ class PlaceViewModel : ViewModel() {
             }
         }
     }
+
+    fun submitPlace(
+        name: String, description: String, address: String,
+        category: String, properties: List<String>,
+        hasMedal: Boolean, hasHeart: Boolean,
+        facebook: String, instagram: String, website: String,
+        onSuccess: () -> Unit, onError: (String) -> Unit
+    ) {
+        if (name.isBlank() || address.isBlank() || category.isBlank()) {
+            onError("Nazwa, adres oraz kategoria są wymagane.")
+            return
+        }
+
+        isSubmitting.value = true
+
+        viewModelScope.launch {
+
+            val coords = api.getCoordinates(address)
+            if (coords == null) {
+                isSubmitting.value = false
+                onError("Nie udało się zlokalizować tego adresu.")
+                return@launch
+            }
+
+            val payload = WpPlaceRequest(
+                title = name,
+                content = description,
+                fields = WpPlaceFields(
+                    kategoria_miejsca = category,
+                    opis_miejsca = description,
+                    adres_miejsca = address,
+                    lokalizacja = WpLocation(lat = coords.first, lng = coords.second),
+                    cechy_sensoryczne = properties,
+                    wyroznienie_medal = hasMedal,
+                    wyroznienie_serduszko = hasHeart,
+                    facebook_url = facebook,
+                    instagram_url = instagram,
+                    www = website
+                )
+            )
+
+            // TODO: UG IT KEY
+            val authHeader = ""
+            val isSuccess = api.postPlace(payload, authHeader)
+
+            isSubmitting.value = false
+
+            if (isSuccess) {
+                onSuccess()
+            } else {
+                onError("Nie udało się wysłać zgłoszenia. Serwer odrzucił żądanie.")
+            }
+
+        }
+    }
+
 }

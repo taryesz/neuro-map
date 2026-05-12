@@ -211,7 +211,8 @@ fun App() {
                                             userProfileImage = Res.drawable.user_pfp_example,
                                             onProfileClick = { currentScreen = Screen.Profile },
                                             profilePhotoUrl = signedInState?.photoUrl,
-                                            scrollState = addScrollState
+                                            scrollState = addScrollState,
+                                            placeViewModel = placeViewModel
                                         )
 
                                         Screen.Favorites -> FavoritesScreen(
