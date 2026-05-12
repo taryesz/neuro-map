@@ -254,6 +254,7 @@ fun MapScreen(
                 NativeMap(
                     points = filteredPoints,
                     modifier = Modifier.fillMaxSize(),
+                    bottomPadding = bottomPadding,
                     onPointClick = onPlaceClick,
                     isInteractive = true
                 )

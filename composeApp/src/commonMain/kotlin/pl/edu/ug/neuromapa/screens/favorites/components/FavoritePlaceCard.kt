@@ -64,6 +64,7 @@ fun FavoritePlaceCard(
             },
             content = {
                 PlaceHeader(
+                    modifier = Modifier.bounceClick(isAnimated = false) { onClick() },
                     name = mapPoint.name,
                     categoryIcon = getCategoryIconHelper(mapPoint.category),
                     categoryIconDescription = mapPoint.category,

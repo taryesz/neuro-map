@@ -23,6 +23,7 @@ import pl.edu.ug.neuromapa.ui.settings.globalButtonScaleWhenPressed
 
 fun Modifier.bounceClick(
     hapticType: HapticFeedbackType = HapticFeedbackType.TextHandleMove,
+    isAnimated: Boolean = true,
     onClick: () -> Unit
 ): Modifier = composed {
 
@@ -43,9 +44,17 @@ fun Modifier.bounceClick(
             detectTapGestures(
                 onPress = {
                     haptic.performHapticFeedback(hapticType)
-                    scope.launch { scale.animateTo(globalButtonScaleWhenPressed) }
+
+                    if (isAnimated) {
+                        scope.launch { scale.animateTo(globalButtonScaleWhenPressed) }
+                    }
+
                     tryAwaitRelease()
-                    scope.launch { scale.animateTo(globalButtonScaleWhenNotPressed) }
+
+                    if (isAnimated) {
+                        scope.launch { scale.animateTo(globalButtonScaleWhenNotPressed) }
+                    }
+
                 },
                 onTap = {
                     currentOnClick()
