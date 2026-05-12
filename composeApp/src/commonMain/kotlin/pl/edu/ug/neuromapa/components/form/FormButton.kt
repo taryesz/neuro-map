@@ -68,7 +68,7 @@ fun FormButton(
         ) {
             Text(
                 text = text,
-                style = getAppTypography().titleSmall,
+                style = getAppTypography().bodyLarge,
                 color = MaterialTheme.colorScheme.onPrimary,
             )
         }

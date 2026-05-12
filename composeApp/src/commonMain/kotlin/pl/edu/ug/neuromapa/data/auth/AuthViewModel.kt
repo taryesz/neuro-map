@@ -206,14 +206,22 @@ class AuthViewModel : ViewModel() {
         _authState.value = AuthState.SignedOut
     }
 
-    fun updateName(
+    fun updateProfileData(
         newName: String,
+        newBirthDate: String,
         onError: ((String) -> Unit)? = null,
         onSuccess: (() -> Unit)? = null
     ) {
         val normalizedName = newName.trim()
+        val normalizedBirthDate = newBirthDate.trim()
+
         if (normalizedName.isEmpty()) {
             onError?.invoke("Imię nie może być puste.")
+            return
+        }
+
+        if (normalizedBirthDate.isNotEmpty() && !isValidIsoDate(normalizedBirthDate)) {
+            onError?.invoke("Data urodzenia musi mieć format RRRR-MM-DD.")
             return
         }
 
@@ -221,14 +229,30 @@ class AuthViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
+
                 val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
+
                 SupabaseDatabase.updateName(
                     accessToken = validSession.accessToken,
                     userId = validSession.userId,
                     name = normalizedName
                 )
-                val updatedState = validSession.copy(name = normalizedName)
+
+                if (normalizedBirthDate.isNotEmpty()) {
+                    SupabaseDatabase.updateBirthDate(
+                        accessToken = validSession.accessToken,
+                        userId = validSession.userId,
+                        birthDate = normalizedBirthDate
+                    )
+                }
+
+                val updatedState = validSession.copy(
+                    name = normalizedName,
+                    birthDate = normalizedBirthDate
+                )
+
                 _authState.value = updatedState
+
                 SessionStorage.save?.invoke(
                     updatedState.accessToken,
                     updatedState.refreshToken,
@@ -238,41 +262,14 @@ class AuthViewModel : ViewModel() {
                     updatedState.birthDate,
                     updatedState.photoUrl
                 )
+
                 onSuccess?.invoke()
-            } catch (_: Exception) {
-                onError?.invoke("Nie udało się zapisać imienia. Spróbuj ponownie.")
-            }
-        }
-    }
 
-    fun updateBirthDate(
-        newBirthDate: String,
-        onError: ((String) -> Unit)? = null,
-        onSuccess: (() -> Unit)? = null
-    ) {
-        val normalizedBirthDate = newBirthDate.trim()
-        if (!isValidIsoDate(normalizedBirthDate)) {
-            onError?.invoke("Data urodzenia musi mieć format RRRR-MM-DD.")
-            return
-        }
-
-        val current = _authState.value as? AuthState.SignedIn ?: return
-
-        viewModelScope.launch {
-            try {
-                val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
-                SupabaseDatabase.updateBirthDate(
-                    accessToken = validSession.accessToken,
-                    userId = validSession.userId,
-                    birthDate = normalizedBirthDate
-                )
-                _authState.value = validSession.copy(birthDate = normalizedBirthDate)
-                onSuccess?.invoke()
             } catch (e: Exception) {
                 val details = e.message?.take(220).orEmpty()
                 onError?.invoke(
-                    if (details.isNotBlank()) "Nie udało się zapisać daty urodzenia: $details"
-                    else "Nie udało się zapisać daty urodzenia."
+                    if (details.isNotBlank()) "Nie udało się zapisać zmian: $details"
+                    else "Nie udało się zapisać zmian. Spróbuj ponownie."
                 )
             }
         }

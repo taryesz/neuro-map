@@ -1,166 +1,208 @@
 package pl.edu.ug.neuromapa.screens.account.dashboard
 
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.profile_screen_birthday_field_title
-import neuromapa.composeapp.generated.resources.profile_screen_birthday_playholder
+import neuromapa.composeapp.generated.resources.profile_screen_account_setting_description
+import neuromapa.composeapp.generated.resources.profile_screen_account_setting_title
 import neuromapa.composeapp.generated.resources.profile_screen_log_out_button_text
-import neuromapa.composeapp.generated.resources.profile_screen_name_field_title
-import neuromapa.composeapp.generated.resources.profile_screen_name_placeholder
-import neuromapa.composeapp.generated.resources.profile_screen_pick_profile_picture_button_text
-import neuromapa.composeapp.generated.resources.profile_screen_save_changes_button_text
+import neuromapa.composeapp.generated.resources.profile_screen_motive_setting_description
+import neuromapa.composeapp.generated.resources.profile_screen_motive_setting_title
 import neuromapa.composeapp.generated.resources.profile_screen_system_alert_dialog_title
 import neuromapa.composeapp.generated.resources.profile_screen_title
+import neuromapa.composeapp.generated.resources.profile_screen_user_profile_picture_content_description
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.components.Header
 import pl.edu.ug.neuromapa.components.form.FormButton
-import pl.edu.ug.neuromapa.components.form.FormSection
 import pl.edu.ug.neuromapa.platform.SystemAlertDialog
-import pl.edu.ug.neuromapa.screens.home.settings.widePadding
+import pl.edu.ug.neuromapa.screens.account.settings.imageSizeProfilePicture
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.getAppTypography
+import pl.edu.ug.neuromapa.ui.settings.globalComponentExtraNarrowSpacing
 import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
+import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumSpacing
+import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
+import pl.edu.ug.neuromapa.ui.settings.globalComponentWideSpacing
 
 @Composable
 fun DashboardScreen(
     userProfileImage: DrawableResource,
     onSignOut: () -> Unit,
     currentName: String,
-    onNameChange: (String) -> Unit,
-    onSaveName: () -> Unit,
-    currentBirthDate: String,
-    onBirthDateChange: (String) -> Unit,
-    onSaveBirthDate: () -> Unit,
-    onPickProfilePhoto: () -> Unit,
     profilePhotoUrl: String?,
     saveStatusMessage: String?,
     onClearStatusMessage: () -> Unit,
-    isDarkTheme: Boolean,
-    onThemeChange: (Boolean) -> Unit,
-    scrollState: ScrollState = rememberScrollState()
+    onNavigateToProfileSettings: () -> Unit,
+    onNavigateToMotiveSettings: () -> Unit,
+    scrollState: ScrollState = rememberScrollState(),
+    currentEmail: String,
 ) {
+
+    // Available settings list
+    val settingsList = listOf(
+
+        SettingItemData(
+            icon = Icons.Outlined.AccountCircle,
+            title = stringResource(Res.string.profile_screen_account_setting_title),
+            subtitle = stringResource(Res.string.profile_screen_account_setting_description),
+            onClick = {
+                onNavigateToProfileSettings()
+            }
+        ),
+
+        SettingItemData(
+            icon = Icons.Outlined.Palette,
+            title = stringResource(Res.string.profile_screen_motive_setting_title),
+            subtitle = stringResource(Res.string.profile_screen_motive_setting_description),
+            onClick = {
+                onNavigateToMotiveSettings()
+            }
+        ),
+
+    )
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
-    ) {
+    ) { paddingValues ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)
+                .padding(paddingValues)
         ) {
 
             Header(
                 title = stringResource(Res.string.profile_screen_title),
-                userProfileImage = userProfileImage,
-                profilePhotoUrl = profilePhotoUrl,
-                showProfileTopRightCorner = true,
-                roundBottomCorners = true,
-                modifier = Modifier,
-            )
-
-            Column(
-                modifier = Modifier.padding(widePadding),
-                verticalArrangement = Arrangement.spacedBy(globalComponentMediumPadding)
+                showProfileTopRightCorner = false,
+                roundBottomCorners = true
             )
             {
 
-                // Dark mode switch
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Tryb ciemny",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = getAppTypography().bodySmall,
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Switch(checked = isDarkTheme, onCheckedChange = onThemeChange)
-                }
+                Spacer(modifier = Modifier.height(globalComponentWideSpacing))
 
-                // Name field
-                FormSection(
-                    title = stringResource(Res.string.profile_screen_name_field_title),
-                    placeholder = stringResource(Res.string.profile_screen_name_placeholder),
-                    value = currentName,
-                    onValueChange = { onNameChange(it) }
-                )
-
-                // Birthday field
-                FormSection(
-                    title = stringResource(Res.string.profile_screen_birthday_field_title),
-                    placeholder = stringResource(Res.string.profile_screen_birthday_playholder),
-                    value = currentBirthDate,
-                    onValueChange = { onBirthDateChange(it) }
-                )
-
-                // PFP picker
-                Box(
-                    modifier = Modifier.bounceClick {
-                        onPickProfilePhoto()
-                    }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    FormButton(
-                        text = stringResource(Res.string.profile_screen_pick_profile_picture_button_text),
-                        isPrimary = false
-                    )
-                }
 
-                // Show error
-                if (!saveStatusMessage.isNullOrBlank()) {
-                    SystemAlertDialog(
-                        title = stringResource(Res.string.profile_screen_system_alert_dialog_title),
-                        message = saveStatusMessage,
-                        onDismiss = onClearStatusMessage
-                    )
-                }
+                    val pfpModifier = Modifier
+                        .size(imageSizeProfilePicture)
+                        .clip(CircleShape)
+                        .background(Color.White)
 
-                // Save button
-                Box(
-                    modifier = Modifier.bounceClick {
-                        onSaveName()
-                        onSaveBirthDate()
+                    if (!profilePhotoUrl.isNullOrBlank()) {
+                        io.kamel.image.KamelImage(
+                            resource = io.kamel.image.asyncPainterResource(profilePhotoUrl),
+                            contentDescription = stringResource(Res.string.profile_screen_user_profile_picture_content_description),
+                            contentScale = ContentScale.Crop,
+                            modifier = pfpModifier,
+                            onLoading = { Box(modifier = pfpModifier) },
+                            onFailure = { Box(modifier = pfpModifier) }
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(userProfileImage),
+                            contentDescription = stringResource(Res.string.profile_screen_user_profile_picture_content_description),
+                            contentScale = ContentScale.Crop,
+                            modifier = pfpModifier
+                        )
                     }
-                ) {
-                    FormButton(
-                        text = stringResource(Res.string.profile_screen_save_changes_button_text),
-                        isPrimary = true
-                    )
-                }
 
-                Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.width(globalComponentWideSpacing))
 
-                // Log out button
-                Box(
-                    modifier = Modifier.bounceClick {
-                        onSignOut()
+                    // Dane uzytkownika (Imię + email)
+                    Column {
+                        Text(
+                            text = if (currentName.isNotBlank()) currentName else "Gość",
+                            style = getAppTypography().titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+
+                        Spacer(modifier = Modifier.height(globalComponentExtraNarrowSpacing))
+
+                        Text(
+                            text = currentEmail,
+                            style = getAppTypography().bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
                     }
-                ) {
-                    FormButton(
-                        text = stringResource(Res.string.profile_screen_log_out_button_text),
-                        isPrimary = true,
-                        containerColor = MaterialTheme.colorScheme.surfaceTint,
-                    )
                 }
-
             }
 
+            // Main body
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(top = globalComponentMediumPadding)
+                ) {
+
+                    // Show all available settings
+                    settingsList.forEach { settingItem ->
+
+                        // The Setting
+                        ProfileSettingListItem(item = settingItem)
+
+                        // Setting items divider
+                        HorizontalDivider(
+                            modifier = Modifier.padding(vertical = globalComponentMediumSpacing),
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
+                        )
+
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    // Logout button
+                    Box(
+                        modifier = Modifier
+                            .padding(globalComponentWidePadding)
+                            .bounceClick {
+                                onSignOut()
+                            }
+                    ) {
+                        FormButton(
+                            text = stringResource(Res.string.profile_screen_log_out_button_text),
+                            isPrimary = true,
+                            containerColor = MaterialTheme.colorScheme.surfaceTint,
+                        )
+                    }
+
+                }
+            }
         }
+
+        // Error UI response
+        if (!saveStatusMessage.isNullOrBlank()) {
+            SystemAlertDialog(
+                title = stringResource(Res.string.profile_screen_system_alert_dialog_title),
+                message = saveStatusMessage,
+                onDismiss = onClearStatusMessage
+            )
+        }
+
     }
 }

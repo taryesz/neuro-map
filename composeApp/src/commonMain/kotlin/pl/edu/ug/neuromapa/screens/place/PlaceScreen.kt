@@ -173,7 +173,7 @@ fun PlaceScreen(
                         Text(
                             text = stringResource(Res.string.navigate_button),
                             color = MaterialTheme.colorScheme.onPrimary,
-                            style = getAppTypography().titleSmall,
+                            style = getAppTypography().bodyLarge,
                         )
                     }
                 }

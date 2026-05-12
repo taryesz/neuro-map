@@ -36,6 +36,8 @@ import pl.edu.ug.neuromapa.data.auth.ProfilePhotoPicker
 import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
 import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
 import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
+import pl.edu.ug.neuromapa.screens.account.dashboard.MotiveSettings
+import pl.edu.ug.neuromapa.screens.account.dashboard.ProfileSettings
 import pl.edu.ug.neuromapa.screens.favorites.FavoritesViewModel
 
 @Composable
@@ -101,8 +103,8 @@ fun App() {
 
         val displayName = when {
             !confirmedUserName.isNullOrBlank() -> confirmedUserName.orEmpty()
-            signedInState != null -> signedInState.email.substringBefore("@")
-            else -> "Użytkownik"
+            // signedInState != null -> ""
+            else -> ""
         }
 
         LaunchedEffect(authViewModel) {
@@ -128,6 +130,8 @@ fun App() {
         val profileScrollState = rememberScrollState()
         val coroutineScope = rememberCoroutineScope()
 
+        var activeSettingsScreen by remember { mutableStateOf<String?>(null) }
+
         Scaffold(
             bottomBar = {
                 NavigationBar(
@@ -145,6 +149,9 @@ fun App() {
                             }
                         } else {
                             currentScreen = newScreen
+                            if (newScreen != Screen.Profile) {
+                                activeSettingsScreen = null
+                            }
                         }
                     }
                 )
@@ -251,45 +258,58 @@ fun App() {
                                                     }
                                                 }
                                                 is AuthState.SignedIn -> {
+
                                                     val signedIn = authState as AuthState.SignedIn
-                                                    DashboardScreen(
-                                                        userProfileImage = Res.drawable.user_pfp_example,
-                                                        onSignOut = { authViewModel.signOut() },
-                                                        currentName = editableName,
-                                                        onNameChange = { editableName = it },
-                                                        onSaveName = {
-                                                            val normalizedName = editableName.trim()
-                                                            authViewModel.updateName(
-                                                                newName = editableName,
-                                                                onError = { message ->
-                                                                    saveStatusMessage = message
+
+                                                    when (activeSettingsScreen) {
+                                                        "profile" -> {
+                                                            ProfileSettings(
+                                                                userProfileImage = Res.drawable.user_pfp_example,
+                                                                profilePhotoUrl = signedIn.photoUrl,
+                                                                currentName = editableName,
+                                                                onNameChange = { editableName = it },
+                                                                currentBirthDate = editableBirthDate,
+                                                                onBirthDateChange = { editableBirthDate = it },
+                                                                onSaveProfile = {
+                                                                    authViewModel.updateProfileData(
+                                                                        newName = editableName.trim(),
+                                                                        newBirthDate = editableBirthDate,
+                                                                        onError = { message -> saveStatusMessage = message },
+                                                                        onSuccess = {
+                                                                            confirmedUserName = editableName.trim()
+                                                                            saveStatusMessage = "Dane zostały pomyślnie zapisane."
+                                                                        }
+                                                                    )
                                                                 },
-                                                                onSuccess = {
-                                                                    confirmedUserName = normalizedName
-                                                                    saveStatusMessage = "Imię zostało pomyślnie zapisane."
-                                                                }
+                                                                onPickProfilePhoto = {
+                                                                    ProfilePhotoPicker.launch?.invoke()
+                                                                        ?: run { saveStatusMessage = "Wybór zdjęcia nie jest dostępny na tej platformie." }
+                                                                },
+                                                                saveStatusMessage = saveStatusMessage,
+                                                                onClearStatusMessage = { saveStatusMessage = null },
                                                             )
-                                                        },
-                                                        currentBirthDate = editableBirthDate,
-                                                        onBirthDateChange = { editableBirthDate = it },
-                                                        onSaveBirthDate = {
-                                                            authViewModel.updateBirthDate(
-                                                                newBirthDate = editableBirthDate,
-                                                                onError = { message -> saveStatusMessage = message },
-                                                                onSuccess = { saveStatusMessage = "Data urodzenia została zapisana." }
+                                                        }
+                                                        "motive" -> {
+                                                            MotiveSettings(
+                                                                isDarkTheme = isDarkTheme,
+                                                                onThemeChange = { isDarkTheme = it },
                                                             )
-                                                        },
-                                                        onPickProfilePhoto = {
-                                                            ProfilePhotoPicker.launch?.invoke()
-                                                                ?: run { saveStatusMessage = "Wybór zdjęcia nie jest dostępny na tej platformie." }
-                                                        },
-                                                        profilePhotoUrl = signedIn.photoUrl,
-                                                        saveStatusMessage = saveStatusMessage,
-                                                        onClearStatusMessage = { saveStatusMessage = null },
-                                                        isDarkTheme = isDarkTheme,
-                                                        onThemeChange = { isDarkTheme = it },
-                                                        scrollState = profileScrollState
-                                                    )
+                                                        }
+                                                        else -> {
+                                                            DashboardScreen(
+                                                                userProfileImage = Res.drawable.user_pfp_example,
+                                                                onSignOut = { authViewModel.signOut() },
+                                                                currentName = editableName,
+                                                                profilePhotoUrl = signedIn.photoUrl,
+                                                                saveStatusMessage = saveStatusMessage,
+                                                                onClearStatusMessage = { saveStatusMessage = null },
+                                                                onNavigateToProfileSettings = { activeSettingsScreen = "profile" },
+                                                                onNavigateToMotiveSettings = { activeSettingsScreen = "motive" },
+                                                                scrollState = profileScrollState,
+                                                                currentEmail = signedIn.email,
+                                                            )
+                                                        }
+                                                    }
                                                 }
                                                 else -> {
                                                     SignInScreen(
@@ -297,6 +317,7 @@ fun App() {
                                                         onNavigateToSignUp = { currentScreen = Screen.SignUp }
                                                     )
                                                 }
+
                                             }
                                         }
 

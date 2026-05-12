@@ -165,6 +165,16 @@
 
         <string name="profile_screen_title">Ustawienia</string>
 
+        <string name="profile_screen_account_setting_title">Konto</string>
+        <string name="profile_screen_account_setting_description">Edytuj profil (imię, data urodzenia).</string>
+
+        <string name="profile_screen_motive_setting_title">Wygląd</string>
+        <string name="profile_screen_motive_setting_description">Zmień motyw (jasny / ciemny).</string>
+
+        <string name="profile_screen_user_profile_picture_content_description">Zdjęcie profilowe.</string>
+
+        <string name="profile_screen_edit_profile_subscreen_title">Edytuj konto</string>
+
         <string name="profile_screen_name_field_title">Imię</string>
         <string name="profile_screen_name_placeholder">Jak masz na imię?</string>
 
@@ -172,7 +182,14 @@
         <string name="profile_screen_birthday_playholder">Kiedy się urodził*ś?</string>
 
         <string name="profile_screen_save_changes_button_text">Zapisz zmiany</string>
+
+        <string name="profile_screen_edit_motive_subscreen_title">Edytuj wygląd</string>
+
+        <string name="profile_screen_motive_field_title">Tryb ciemny</string>
+
         <string name="profile_screen_log_out_button_text">Wyloguj się</string>
+
+        <string name="profile_screen_edit_profile_subscreen_edit_pfp_button_description">Zmień zdjęcie.</string>
 
         <string name="profile_screen_system_alert_dialog_title">Informacja</string>
 

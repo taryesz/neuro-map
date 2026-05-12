@@ -54,7 +54,7 @@ fun HomeHeader(
                 Text(
                     text = motto,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    style = getAppTypography().titleSmall,
+                    style = getAppTypography().bodyLarge,
                 )
             }
 

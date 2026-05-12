@@ -22,11 +22,12 @@ import pl.edu.ug.neuromapa.ui.settings.globalComponentNarrowPadding
 @Composable
 fun FormSection(
     title: String? = null,
-    placeholder: String,
-    value: String,
-    onValueChange: (String) -> Unit,
+    placeholder: String = "",
+    value: String = "",
+    onValueChange: (String) -> Unit = {},
     isPassword: Boolean = false,
     isEmail: Boolean = false,
+    customContent: (@Composable () -> Unit)? = null
 ) {
 
     Column(
@@ -57,32 +58,38 @@ fun FormSection(
                 contentAlignment = Alignment.CenterStart
             ) {
 
-                if (value.isEmpty()) {
-                    Text(
-                        text = placeholder,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                        style = getAppTypography().bodySmall,
-                    )
-                }
+                if (customContent != null) {
+                    customContent()
+                } else {
 
-                BasicTextField(
-                    value = value,
-                    onValueChange = onValueChange,
-                    textStyle = getAppTypography().bodySmall.copy(
-                        color = MaterialTheme.colorScheme.onBackground
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = when {
-                            isPassword -> KeyboardType.Password
-                            isEmail -> KeyboardType.Email
-                            else -> KeyboardType.Text
-                        },
-                        autoCorrectEnabled = false
-                    ),
-                )
+                    if (value.isEmpty()) {
+                        Text(
+                            text = placeholder,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                            style = getAppTypography().bodySmall,
+                        )
+                    }
+
+                    BasicTextField(
+                        value = value,
+                        onValueChange = onValueChange,
+                        textStyle = getAppTypography().bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onBackground
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = when {
+                                isPassword -> KeyboardType.Password
+                                isEmail -> KeyboardType.Email
+                                else -> KeyboardType.Text
+                            },
+                            autoCorrectEnabled = false
+                        ),
+                    )
+
+                }
             }
         }
     }
