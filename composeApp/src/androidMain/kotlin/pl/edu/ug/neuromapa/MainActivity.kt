@@ -95,7 +95,8 @@ class MainActivity : ComponentActivity() {
                 if (parts.size == 2) parts[0] to parts[1] else parts[0] to ""
             }
             val accessToken = params["access_token"] ?: return
-            OAuthResultHandler.handle?.invoke(accessToken, null)
+            val refreshToken = params["refresh_token"]
+            OAuthResultHandler.handle?.invoke(accessToken, refreshToken, null)
         }
     }
 }

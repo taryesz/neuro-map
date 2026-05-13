@@ -65,7 +65,8 @@ data class AuthUserMetadataUpdateRequest(
 data class UserDataResponse(
     @SerialName("id") val id: String,
     @SerialName("year") val year: String? = null,
-    @SerialName("photo") val photo: String? = null
+    @SerialName("photo") val photo: String? = null,
+    @SerialName("theme") val theme: String? = null
 )
 
 @Serializable
@@ -81,13 +82,19 @@ data class UserDataBirthDatePatchRequest(
 )
 
 @Serializable
+data class UserDataThemePatchRequest(
+    @SerialName("theme") val theme: String
+)
+
+@Serializable
 data class UserDataPhotoPatchRequest(
     @SerialName("photo") val photo: String
 )
 
 data class UserDataProfile(
     val birthDate: String?,
-    val photoUrl: String?
+    val photoUrl: String?,
+    val theme: String
 )
 
 object SupabaseAuth {
@@ -176,13 +183,13 @@ object SupabaseAuth {
             header("apikey", SUPABASE_ANON_KEY)
             header(HttpHeaders.Authorization, "Bearer $accessToken")
             header("Accept-Profile", "user_information")
-            parameter("select", "id,year,photo")
+            parameter("select", "id,year,photo,theme")
             parameter("id", "eq.$userId")
             header("Accept", "application/json")
         }
 
         if (!response.status.isSuccess()) {
-            return UserDataProfile(birthDate = null, photoUrl = null)
+            return UserDataProfile(birthDate = null, photoUrl = null, theme = "light")
         }
 
         val rows = response.body<List<UserDataResponse>>()
@@ -190,8 +197,30 @@ object SupabaseAuth {
 
         return UserDataProfile(
             birthDate = first?.year?.trim().orEmpty().ifBlank { null },
-            photoUrl = first?.photo?.trim().orEmpty().ifBlank { null }
+            photoUrl = first?.photo?.trim().orEmpty().ifBlank { null },
+            theme = first?.theme?.trim().orEmpty().ifBlank { "light" }
         )
+    }
+    suspend fun updateTheme(accessToken: String, userId: String, theme: String) {
+        val patchResponse = supabaseHttpClient.patch("$SUPABASE_URL/rest/v1/user_data") {
+            contentType(ContentType.Application.Json)
+            header("apikey", SUPABASE_ANON_KEY)
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            header("Content-Profile", "user_information")
+            header("Prefer", "return=representation")
+            parameter("id", "eq.$userId")
+            setBody(UserDataThemePatchRequest(theme = theme))
+        }
+        val patchedRows = patchResponse.body<List<UserDataResponse>>()
+        if (patchedRows.isEmpty()) {
+            supabaseHttpClient.post("$SUPABASE_URL/rest/v1/user_data") {
+                contentType(ContentType.Application.Json)
+                header("apikey", SUPABASE_ANON_KEY)
+                header(HttpHeaders.Authorization, "Bearer $accessToken")
+                header("Content-Profile", "user_information")
+                setBody(listOf(UserDataUpsertRequest(id = userId)))
+            }
+        }
     }
 
     suspend fun updateBirthDate(accessToken: String, userId: String, birthDate: String) {

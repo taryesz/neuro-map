@@ -41,7 +41,11 @@ import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
 @Preview
 fun App() {
 
-    var isDarkTheme by remember { mutableStateOf(false) }
+    val authViewModel = viewModel { AuthViewModel() }
+    val authState by authViewModel.authState.collectAsState()
+    val signedInState = authState as? AuthState.SignedIn
+
+    val isDarkTheme = signedInState?.theme == "dark"
     var editableName by remember { mutableStateOf("") }
     var editableBirthDate by remember { mutableStateOf("") }
     var saveStatusMessage by remember { mutableStateOf<String?>(null) }
@@ -268,7 +272,9 @@ fun App() {
                                                         profilePhotoUrl = signedIn.photoUrl,
                                                         saveStatusMessage = saveStatusMessage,
                                                         isDarkTheme = isDarkTheme,
-                                                        onThemeChange = { isDarkTheme = it },
+                                                        onThemeChange = { isDark ->
+                                                            authViewModel.updateTheme(if (isDark) "dark" else "light")
+                                                        },
                                                         scrollState = profileScrollState
                                                     )
                                                 }

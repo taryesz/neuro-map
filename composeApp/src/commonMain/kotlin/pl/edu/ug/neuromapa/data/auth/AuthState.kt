@@ -15,6 +15,7 @@ sealed class AuthState {
         val name: String? = null,
         val birthDate: String? = null,
         val photoUrl: String? = null,
+        val theme: String = "light",
     ) : AuthState()
 
     data class Error(val message: String) : AuthState()

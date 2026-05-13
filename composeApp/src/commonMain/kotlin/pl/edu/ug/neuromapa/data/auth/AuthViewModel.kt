@@ -18,8 +18,8 @@ class AuthViewModel : ViewModel() {
     private var lastSelectedProvider: String? = null
 
     init {
-        OAuthResultHandler.handle = { accessToken, error ->
-            handleOAuthCallback(accessToken, error, lastSelectedProvider ?: "unknown")
+        OAuthResultHandler.handle = { accessToken, refreshToken, error ->
+            handleOAuthCallback(accessToken, refreshToken, error, lastSelectedProvider ?: "unknown")
         }
     }
 
@@ -164,7 +164,7 @@ class AuthViewModel : ViewModel() {
         OAuthLauncher.launch?.invoke(provider)
     }
 
-    fun handleOAuthCallback(accessToken: String?, externalError: String?, provider: String) {
+    fun handleOAuthCallback(accessToken: String?, refreshToken: String?, externalError: String?, provider: String) {
         viewModelScope.launch {
 
             _authState.value = AuthState.Checking
@@ -180,12 +180,12 @@ class AuthViewModel : ViewModel() {
                 val user = SupabaseAuth.getUser(accessToken)
 
                 if (user != null) {
-                    SessionStorage.save?.invoke(accessToken, null, user.email ?: "", user.id, null, null, null)
+                    SessionStorage.save?.invoke(accessToken, refreshToken, user.email ?: "", user.id, null, null, null)
                     _authState.value = AuthState.SignedIn(
                         email = user.email ?: "",
                         userId = user.id,
                         accessToken = accessToken,
-                        refreshToken = null,
+                        refreshToken = refreshToken,
                     )
                     loadProfileForCurrentUser()
                 }
@@ -198,6 +198,21 @@ class AuthViewModel : ViewModel() {
                 _authState.value = AuthState.Error(getString(Res.string.auth_system_alert_dialog_no_internet))
             }
 
+        }
+    }
+
+    fun updateTheme(theme: String) {
+        val current = _authState.value as? AuthState.SignedIn ?: return
+        viewModelScope.launch {
+            try {
+                val validSession = getValidSession(current) ?: return@launch
+                SupabaseAuth.updateTheme(
+                    accessToken = validSession.accessToken,
+                    userId = validSession.userId,
+                    theme = theme
+                )
+                _authState.value = validSession.copy(theme = theme)
+            } catch (_: Exception) { }
         }
     }
 
@@ -342,7 +357,8 @@ class AuthViewModel : ViewModel() {
                 _authState.value = validSession.copy(
                     name = name,
                     birthDate = profile.birthDate,
-                    photoUrl = profile.photoUrl
+                    photoUrl = profile.photoUrl,
+                    theme = profile.theme
                 )
                 val updated = _authState.value as? AuthState.SignedIn
                 if (updated != null) {

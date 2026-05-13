@@ -5,5 +5,5 @@ object OAuthLauncher {
 }
 
 object OAuthResultHandler {
-    var handle: ((accessToken: String, error: String?) -> Unit)? = null
+    var handle: ((accessToken: String?, refreshToken: String?, error: String?) -> Unit)? = null
 }
