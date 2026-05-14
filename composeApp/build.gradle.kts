@@ -17,8 +17,15 @@ if (localPropertiesFile.exists()) {
 
 buildConfig {
     packageName("pl.edu.ug.neuromapa")
+
     val supabaseKey = localProperties.getProperty("SUPABASE_API_KEY") ?: ""
     buildConfigField("String", "SUPABASE_API_KEY", "\"$supabaseKey\"")
+
+    val wpUsername = localProperties.getProperty("WP_USERNAME") ?: ""
+    buildConfigField("String", "WP_USERNAME", "\"$wpUsername\"")
+
+    val wpPassword = localProperties.getProperty("WP_APPLICATION_PASSWORD") ?: ""
+    buildConfigField("String", "WP_APPLICATION_PASSWORD", "\"$wpPassword\"")
 }
 
 kotlin {
@@ -69,6 +76,7 @@ kotlin {
             implementation("media.kamel:kamel-image:0.9.4")
             implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
             implementation("io.coil-kt.coil3:coil-network-ktor2:3.0.0-rc01")
+            implementation("io.ktor:ktor-client-auth:${ktorVersion}")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -14,7 +14,7 @@ data class WpPlaceRequest(
     val content: String,
     val status: String = "pending",
     val type: String = "miejsce",
-    val fields: WpPlaceFields
+    val acf: WpPlaceFields
 )
 
 @Serializable

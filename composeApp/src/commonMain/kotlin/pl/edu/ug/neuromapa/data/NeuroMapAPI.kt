@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 import io.ktor.client.request.post // DODANE
 import io.ktor.client.request.setBody // DODANE
 import io.ktor.client.request.header // DODANE
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType // DODANE
 import io.ktor.http.contentType // DODANE
 import io.ktor.http.isSuccess // DODANE
@@ -55,12 +56,18 @@ class NeuroMapApi {
         return try {
             val response = client.post("$baseUrl/miejsce") {
                 contentType(ContentType.Application.Json)
-                header("Authorization", authHeader)     // TODO: Auth data (contact UG IT department)
-                setBody(request)                        // JSON (body)
+                header("Authorization", authHeader)
+                setBody(request)
             }
 
-            println("API POST Status: ${response.status}")
-            response.status.isSuccess()
+            if (response.status.isSuccess()) {
+                return true
+            } else {
+                val errorBody = response.bodyAsText()
+                println("API POST Error Body: $errorBody")
+                return false
+            }
+
         } catch (e: Exception) {
             println("API POST Error: ${e.message}")
             e.printStackTrace()

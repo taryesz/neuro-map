@@ -58,6 +58,9 @@ import neuromapa.composeapp.generated.resources.add_screen_header_title
 import pl.edu.ug.neuromapa.data.PlaceViewModel
 import pl.edu.ug.neuromapa.platform.SystemAlertDialog
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import pl.edu.ug.neuromapa.BuildConfig
 
 @Composable
 fun AddScreen(
@@ -65,7 +68,9 @@ fun AddScreen(
     onProfileClick: () -> Unit,
     profilePhotoUrl: String? = null,
     scrollState: ScrollState = rememberScrollState(),
-    placeViewModel: PlaceViewModel
+    placeViewModel: PlaceViewModel,
+    currentName: String,
+    currentEmail: String
 ) {
 
     // This is used to hide the keyboard whenever the user clicks somewhere NOT in the form field
@@ -259,7 +264,17 @@ fun AddScreen(
                                 val hasMedal = selectedExcellences.any { it.contains("medal", true) }
                                 val hasHeart = selectedExcellences.any { it.contains("serduszko", true) }
                                 val wpPropertiesSlugs = selectedProperties.map { it.toWpSlug() }
-                                val category = selectedCategories.firstOrNull() ?: ""
+                                val category = selectedCategories.firstOrNull()?.toWpSlug() ?: ""
+
+                                val wpUsername = BuildConfig.WP_USERNAME
+                                val wpAppPassword = BuildConfig.WP_APPLICATION_PASSWORD
+
+                                val credentials = "$wpUsername:$wpAppPassword"
+
+                                @OptIn(ExperimentalEncodingApi::class)
+                                val base64Credentials = Base64.encode(credentials.encodeToByteArray())
+
+                                val authHeader = "Basic $base64Credentials"
 
                                 placeViewModel.submitPlace(
                                     name = name,
@@ -272,6 +287,9 @@ fun AddScreen(
                                     facebook = facebook,
                                     instagram = instagram,
                                     website = website,
+                                    authHeader = authHeader,
+                                    submitterName = currentName,
+                                    submitterEmail = currentEmail,
                                     onSuccess = {
                                         name = ""; description = ""; address = ""
                                         instagram = ""; facebook = ""; website = ""

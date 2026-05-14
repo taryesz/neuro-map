@@ -214,13 +214,20 @@ fun App() {
                                             scrollState = homeScrollState
                                         )
 
-                                        Screen.Add -> AddScreen(
-                                            userProfileImage = Res.drawable.user_pfp_example,
-                                            onProfileClick = { currentScreen = Screen.Profile },
-                                            profilePhotoUrl = signedInState?.photoUrl,
-                                            scrollState = addScrollState,
-                                            placeViewModel = placeViewModel
-                                        )
+                                        Screen.Add -> {
+
+                                            val currentUserEmail = signedInState?.email ?: "Nieznany e-mail"
+
+                                            AddScreen(
+                                                userProfileImage = Res.drawable.user_pfp_example,
+                                                onProfileClick = { currentScreen = Screen.Profile },
+                                                profilePhotoUrl = signedInState?.photoUrl,
+                                                scrollState = addScrollState,
+                                                placeViewModel = placeViewModel,
+                                                currentEmail = currentUserEmail,
+                                                currentName = editableName
+                                            )
+                                        }
 
                                         Screen.Favorites -> FavoritesScreen(
                                             userProfileImage = Res.drawable.user_pfp_example,

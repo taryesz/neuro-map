@@ -94,6 +94,9 @@ class PlaceViewModel : ViewModel() {
         category: String, properties: List<String>,
         hasMedal: Boolean, hasHeart: Boolean,
         facebook: String, instagram: String, website: String,
+        authHeader: String,
+        submitterName: String,
+        submitterEmail: String,
         onSuccess: () -> Unit, onError: (String) -> Unit
     ) {
         if (name.isBlank() || address.isBlank() || category.isBlank()) {
@@ -112,10 +115,18 @@ class PlaceViewModel : ViewModel() {
                 return@launch
             }
 
+            val displayName = if (submitterName.isNotBlank()) submitterName else "Anonim"
+
+            val fullContent = """
+                <p><strong>Zgłoszenie z aplikacji NeuroMapa:</strong><br>
+                Użytkownik: $displayName<br>
+                E-mail: <a href="mailto:$submitterEmail">$submitterEmail</a></p>
+            """.trimIndent()
+
             val payload = WpPlaceRequest(
                 title = name,
-                content = description,
-                fields = WpPlaceFields(
+                content = fullContent,
+                acf = WpPlaceFields(
                     kategoria_miejsca = category,
                     opis_miejsca = description,
                     adres_miejsca = address,
@@ -129,8 +140,6 @@ class PlaceViewModel : ViewModel() {
                 )
             )
 
-            // TODO: UG IT KEY
-            val authHeader = ""
             val isSuccess = api.postPlace(payload, authHeader)
 
             isSubmitting.value = false
@@ -138,7 +147,7 @@ class PlaceViewModel : ViewModel() {
             if (isSuccess) {
                 onSuccess()
             } else {
-                onError("Nie udało się wysłać zgłoszenia. Serwer odrzucił żądanie.")
+                onError("Nie udało się wysłać zgłoszenia. Serwer odrzucił żądanie. Upewnij się, że masz połączenie z Internetem i dane są poprawne.")
             }
 
         }
