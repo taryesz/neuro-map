@@ -10,7 +10,8 @@ fun MapSnapshot(
     latitude: Double,
     longitude: Double,
     category: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isInteractive: Boolean = true
 ) {
 
     // Unlike a normal map, this map only shows ONE place
@@ -34,6 +35,7 @@ fun MapSnapshot(
     NativeMap(
         points = listOf(singlePoint),
         modifier = modifier,
+        isInteractive = isInteractive,
         onPointClick = {}   // Do nothing because we are already in the place screen
     )
 

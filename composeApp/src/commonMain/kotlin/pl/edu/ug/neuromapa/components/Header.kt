@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -21,7 +22,6 @@ import io.kamel.image.asyncPainterResource
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
-import pl.edu.ug.neuromapa.ui.ProfileIcon
 import pl.edu.ug.neuromapa.ui.getAppTypography
 import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
@@ -58,22 +58,19 @@ fun Header(
         // Greeting & profile picture panels' wrapper
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,   // Space the two panels evenly
-            verticalAlignment = Alignment.Top                   // Keep the content of the two panels at the top
-                                                                // in case the text is longer and doesn't fit
-                                                                // in the row
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
         ) {
 
             // Greeting panel : contains the "Witaj, User!" text
             Box(
-                // Make the Greeting panel not push the Profile picture panel out and keep it in the Wrapper
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
 
                 // Greeting text wrapper
                 Row(
                     modifier = Modifier
-                        .align(Alignment.TopStart)  // Stick the text to the top of its wrapper
+                        .align(Alignment.TopStart)
                         .fillMaxWidth()
                 ) {
                     Text(
@@ -89,7 +86,7 @@ fun Header(
                 val baseModifier = Modifier
                     .size(userProfileIconSize)
                     .clip(CircleShape)
-                    .background(ProfileIcon)
+                    .background(Color.White)
                     .clickable {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onProfileClick()

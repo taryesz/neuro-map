@@ -1,6 +1,5 @@
 package pl.edu.ug.neuromapa.screens.favorites.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,50 +13,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.painterResource
+import pl.edu.ug.neuromapa.data.MapPoint
+import pl.edu.ug.neuromapa.screens.favorites.settings.cardHeight
 import pl.edu.ug.neuromapa.screens.favorites.settings.cornerRadius
 import pl.edu.ug.neuromapa.screens.favorites.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.favorites.settings.placeCardDeletionStateColor
 import pl.edu.ug.neuromapa.screens.favorites.settings.placeCardNavigationStateColor
-import pl.edu.ug.neuromapa.screens.favorites.settings.widePadding
+import pl.edu.ug.neuromapa.screens.place.components.PlaceHeader
+import pl.edu.ug.neuromapa.screens.place.helpers.getCategoryIconHelper
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
-import pl.edu.ug.neuromapa.ui.getAppTypography
-import pl.edu.ug.neuromapa.ui.onPrimary
 import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritePlaceCard(
-    title: String,
-    background: DrawableResource,
+    mapPoint: MapPoint,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
     onClick: () -> Unit = {},
     onDelete: () -> Unit,
     onNavigate: () -> Unit
 ) {
 
-    // This allows to track if the card is being swiped to left (which deleted the card)
-    // or to the right (which launcher navigation to the place)
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
             when (dismissValue) {
-
-                // Swipe left -> delete
                 SwipeToDismissBoxValue.EndToStart -> {
                     onDelete()
-                    true    // Deletes and removes the item both from a list and visually
+                    true
                 }
-
-                // Swipe right -> navigation
                 SwipeToDismissBoxValue.StartToEnd -> {
                     onNavigate()
-                    false   // Launches the navigation, but snaps the card back to its place
+                    false
                 }
-
                 else -> false
-
             }
         }
     )
@@ -66,59 +56,27 @@ fun FavoritePlaceCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(globalComponentCornerRadius))
-            .bounceClick(
-                onClick = onClick,  // TODO: when clicked -> show PlaceScreen.kt
-                hapticType = HapticFeedbackType.LongPress
-            )
-    )
-    {
-
-        // This is a blueprint of a card which contains a place information in a shortened form in FavoritesScreen.kt
-        // Here SwipeToDismissBox is used to inherit all the animations of the swipes
+    ) {
         SwipeToDismissBox(
-            state = dismissState,                   // Assign the card's state (detect the swipe and save it here)
+            state = dismissState,
             backgroundContent = {
-                DismissBackground(dismissState)     // Lower layer (what can be seen under the card when the card is moved)
+                DismissBackground(dismissState)
             },
             content = {
-
-                // Card
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min)
-                        .clip(RoundedCornerShape(cornerRadius))
-                ) {
-
-                    // Background Image
-                    Image(
-                        painter = painterResource(background),
-                        contentDescription = title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.matchParentSize()
-                    )
-
-                    // Text panel
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .fillMaxWidth(0.66f)
-                            .fillMaxHeight()
-                            .background(Color.Black.copy(alpha = 0.5f))
-                            .padding(vertical = mediumPadding, horizontal = widePadding),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Text(
-                            text = title,
-                            style = getAppTypography().titleMedium,
-                            color = onPrimary
-                        )
-                    }
-
-                }
+                PlaceHeader(
+                    modifier = Modifier.bounceClick(isAnimated = false) { onClick() },
+                    name = mapPoint.name,
+                    categoryIcon = getCategoryIconHelper(mapPoint.category),
+                    categoryIconDescription = mapPoint.category,
+                    isFavorite = isFavorite,
+                    onFavoriteButtonClick = onFavoriteClick,
+                    latitude = mapPoint.latitude,
+                    longitude = mapPoint.longitude,
+                    height = cardHeight,
+                    onCardClick = onClick
+                )
             }
         )
-
     }
 }
 

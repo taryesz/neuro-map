@@ -20,7 +20,6 @@ import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.screens.map.settings.mediumPadding
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
 import pl.edu.ug.neuromapa.screens.map.settings.userProfileIconSize
-import pl.edu.ug.neuromapa.ui.Background
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 
@@ -42,7 +41,7 @@ fun MapHeader(
                     bottomEnd = globalComponentCornerRadius
                 )
             )
-            .background(Background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(
                 vertical = mediumPadding,
                 horizontal = widePadding

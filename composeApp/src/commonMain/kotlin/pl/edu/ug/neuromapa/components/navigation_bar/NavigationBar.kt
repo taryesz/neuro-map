@@ -19,11 +19,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import pl.edu.ug.neuromapa.ui.Background
 import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
-import pl.edu.ug.neuromapa.ui.Primary
 import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
-import pl.edu.ug.neuromapa.ui.Surface
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.logo_neuromap_no_text
 import neuromapa.composeapp.generated.resources.*
@@ -45,7 +42,6 @@ fun NavigationBar(
     onScreenSelected: (Screen) -> Unit
 ) {
 
-    // This function find the according icon for each navigation button type
     @Composable
     fun getIconPainter(screen: Screen): Painter {
         return when (screen) {
@@ -65,7 +61,7 @@ fun NavigationBar(
                 topStart=globalComponentCornerRadius,
                 topEnd=globalComponentCornerRadius)
             ),
-        color = Background
+        color = MaterialTheme.colorScheme.background
     ) {
         NavigationBar(
             containerColor = Transparent,
@@ -79,47 +75,29 @@ fun NavigationBar(
         ) {
 
             Screen.entries
-                // Exclude these screens from the navigation bar
                 .filter { it.label != "Lokalizacja" && it.label != "Logowanie" && it.label != "Rejestracja" }
                 .forEach { screen ->
 
-                    // Check if the screen is selected and select an icon accordingly
-                    val isSelected =
-
-                        when (screen) {
-                            // Profile icon will be selected even when SignIn or SignUp screens are active
-                            Screen.Profile -> {
-                                currentScreen == Screen.Profile || currentScreen == Screen.SignIn ||
-                                        currentScreen == Screen.SignUp
-                            }
-                            // Map icon will be selected even when Place screens is active
-                            Screen.Map -> {
-                                currentScreen == Screen.Map || currentScreen == Screen.Place
-                            }
-                            else -> {
-                                currentScreen == screen
-                            }
+                    val isSelected = when (screen) {
+                        Screen.Profile -> {
+                            currentScreen == Screen.Profile || currentScreen == Screen.SignIn ||
+                                    currentScreen == Screen.SignUp
                         }
+                        Screen.Map -> {
+                            currentScreen == Screen.Map || currentScreen == Screen.Place
+                        }
+                        else -> {
+                            currentScreen == screen
+                        }
+                    }
 
                     val iconPainter = getIconPainter(screen)
-
-                    // Check if the current screen is the Map screen
                     val isMapScreen = screen == Screen.Map
 
-                    // Define sizes of the container and the icon
-                    val containerSize =
-                        if (isMapScreen) navigationBarMapItemContainerSize
-                        else navigationBarItemContainerSize
-
-                    val iconSize =
-                        if (isMapScreen) navigationBarMapItemIconSize
-                        else navigationBarItemIconSize
-
-                    // This makes the buttons have equal spacing between them (except for with the NeuroMap button:
-                    // it's a little bigger and so the second and forth buttons have a little less space from it)
+                    val containerSize = if (isMapScreen) navigationBarMapItemContainerSize else navigationBarItemContainerSize
+                    val iconSize = if (isMapScreen) navigationBarMapItemIconSize else navigationBarItemIconSize
                     val buttonWeight = if (isMapScreen) navigationBarMapItemWeight else navigationBarItemWeight
 
-                    // Button wrapper
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
@@ -132,28 +110,24 @@ fun NavigationBar(
                             )
                     )
                     {
-
-                        // One more wrapper...
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
                         ) {
-
                             // Icon wrapper
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.size(containerSize)
-                                    .requiredSize(containerSize)    // Make sure the size is the one we want
-                                    .aspectRatio(1f)         // Lock the ratio to be a square
+                                    .requiredSize(containerSize)
+                                    .aspectRatio(1f)
                             ) {
-
                                 Box(
                                     modifier = Modifier
                                         .matchParentSize()
                                         .clip(RoundedCornerShape(globalComponentCornerRadius))
                                         .animatedSelectionBackground(
                                             isSelected = isSelected,
-                                            backgroundColor = Surface,
+                                            backgroundColor = MaterialTheme.colorScheme.surface,
                                         )
                                 )
 
@@ -161,24 +135,20 @@ fun NavigationBar(
                                     painter = iconPainter,
                                     contentDescription = screen.label,
                                     modifier = Modifier.size(iconSize),
-                                    tint = Primary
+                                    tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                                 )
-
                             }
 
                             // Icon label
-                            // Show the button label for all buttons except for the Map one
                             if (!isMapScreen) {
                                 Text(
                                     text = screen.label,
                                     style = MaterialTheme.typography.labelSmall,
                                     modifier = Modifier.padding(top = navigationBarItemLabelSpacing),
-                                    color = Primary,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                 )
                             }
-
                         }
-
                     }
                 }
         }

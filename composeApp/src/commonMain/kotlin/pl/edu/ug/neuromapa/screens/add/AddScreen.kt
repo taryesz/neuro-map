@@ -33,7 +33,6 @@ import pl.edu.ug.neuromapa.components.form.FormSection
 import pl.edu.ug.neuromapa.components.form.FormSelection
 import pl.edu.ug.neuromapa.screens.add.settings.widePadding
 import pl.edu.ug.neuromapa.screens.add.settings.mediumSpacing
-import pl.edu.ug.neuromapa.ui.Background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -56,14 +55,22 @@ import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholde
 import neuromapa.composeapp.generated.resources.add_screen_form_field_placeholder_place_website
 import neuromapa.composeapp.generated.resources.add_screen_form_submit_button
 import neuromapa.composeapp.generated.resources.add_screen_header_title
+import pl.edu.ug.neuromapa.data.PlaceViewModel
+import pl.edu.ug.neuromapa.platform.SystemAlertDialog
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import pl.edu.ug.neuromapa.BuildConfig
 
 @Composable
 fun AddScreen(
     userProfileImage: DrawableResource,
     onProfileClick: () -> Unit,
     profilePhotoUrl: String? = null,
-    scrollState: ScrollState = rememberScrollState()
+    scrollState: ScrollState = rememberScrollState(),
+    placeViewModel: PlaceViewModel,
+    currentName: String,
+    currentEmail: String
 ) {
 
     // This is used to hide the keyboard whenever the user clicks somewhere NOT in the form field
@@ -80,6 +87,26 @@ fun AddScreen(
     var selectedCategories by remember { mutableStateOf(setOf<String>()) }
     var selectedProperties by remember { mutableStateOf(setOf<String>()) }
     var selectedExcellences by remember { mutableStateOf(setOf<String>()) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf<String?>(null) }
+
+    fun String.toWpSlug(): String {
+        val polishChars = mapOf(
+            'ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n',
+            'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z'
+        )
+        val slug = this.lowercase()
+            .map { polishChars[it] ?: it }
+            .joinToString("")
+            .replace(" ", "_")
+            .filter { it.isLetterOrDigit() || it == '_' }
+        return when (slug) {
+            "cisza" -> "ciche"
+            "brak_intensywnych_zapachow" -> "brak_zapachow"
+            "jasna_informacja" -> "dostepnosc_informacyjna"
+            else -> slug
+        }
+    }
 
     // Wrapper of the whole screen
     Scaffold(
@@ -96,7 +123,7 @@ fun AddScreen(
                     indication = null                                               // This makes the clicks non-visible
                 ) {
                     focusManager.clearFocus()   // If the user clicked somewhere in the screen but not a form field,
-                                                // the keyboard hides ("focus is lost")
+                    // the keyboard hides ("focus is lost")
                 }
                 .verticalScroll(scrollState)  // Make the screen scrollable
         ) {
@@ -115,7 +142,7 @@ fun AddScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Background)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(widePadding),
                 verticalArrangement = Arrangement.spacedBy(mediumSpacing)
             )
@@ -229,7 +256,54 @@ fun AddScreen(
                         modifier = Modifier
                             .weight(1f)
                             .bounceClick {
-                                // TODO: send the information to the admin panel
+
+                                if (placeViewModel.isSubmitting.value) return@bounceClick
+
+                                focusManager.clearFocus()
+
+                                val hasMedal = selectedExcellences.any { it.contains("medal", true) }
+                                val hasHeart = selectedExcellences.any { it.contains("serduszko", true) }
+                                val wpPropertiesSlugs = selectedProperties.map { it.toWpSlug() }
+                                val category = selectedCategories.firstOrNull()?.toWpSlug() ?: ""
+
+                                val wpUsername = BuildConfig.WP_USERNAME
+                                val wpAppPassword = BuildConfig.WP_APPLICATION_PASSWORD
+
+                                val credentials = "$wpUsername:$wpAppPassword"
+
+                                @OptIn(ExperimentalEncodingApi::class)
+                                val base64Credentials = Base64.encode(credentials.encodeToByteArray())
+
+                                val authHeader = "Basic $base64Credentials"
+
+                                placeViewModel.submitPlace(
+                                    name = name,
+                                    description = description,
+                                    address = address,
+                                    category = category,
+                                    properties = wpPropertiesSlugs,
+                                    hasMedal = hasMedal,
+                                    hasHeart = hasHeart,
+                                    facebook = facebook,
+                                    instagram = instagram,
+                                    website = website,
+                                    authHeader = authHeader,
+                                    submitterName = currentName,
+                                    submitterEmail = currentEmail,
+                                    onSuccess = {
+                                        name = ""; description = ""; address = ""
+                                        instagram = ""; facebook = ""; website = ""
+                                        selectedCategories = emptySet()
+                                        selectedProperties = emptySet()
+                                        selectedExcellences = emptySet()
+
+                                        showSuccessDialog = true
+
+                                    },
+                                    onError = { errorMessage ->
+                                        showErrorDialog = errorMessage
+                                    }
+                                )
                             }
                     ) {
                         FormButton(
@@ -242,6 +316,26 @@ fun AddScreen(
 
             }
 
+        }
+
+        if (showSuccessDialog) {
+            SystemAlertDialog(
+                title = "Powiodło się!",
+                message = "Pomyślnie wysłano formularz zgłoszeniowy.",
+                onDismiss = {
+                    showSuccessDialog = false
+                }
+            )
+        }
+
+        if (showErrorDialog != null) {
+            SystemAlertDialog(
+                title = "Błąd",
+                message = showErrorDialog!!,
+                onDismiss = {
+                    showErrorDialog = null
+                }
+            )
         }
 
     }

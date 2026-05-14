@@ -16,6 +16,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import pl.edu.ug.neuromapa.BuildConfig
+import pl.edu.ug.neuromapa.data.auth.SupabaseAuth.supabaseHttpClient
 
 private const val SUPABASE_URL = "https://mvcxlvcjcvcrjftbcvxp.supabase.co"
 private const val PROFILE_PHOTO_BUCKET = "photo"
@@ -97,6 +98,12 @@ data class UserDataProfile(
     val theme: String
 )
 
+@Serializable
+data class FavoriteRequestResponse(
+    @SerialName("user_id") val userId: String? = null,
+    @SerialName("place_id") val placeId: Int
+)
+
 object SupabaseAuth {
 
     private val SUPABASE_ANON_KEY = BuildConfig.SUPABASE_API_KEY
@@ -141,13 +148,36 @@ object SupabaseAuth {
 
     suspend fun getUser(accessToken: String): AuthUser? {
         return supabaseHttpClient.get("$SUPABASE_URL/auth/v1/user") {
-                header("apikey", SUPABASE_ANON_KEY)
-                header(HttpHeaders.Authorization, "Bearer $accessToken")
-            }.body()
+            header("apikey", SUPABASE_ANON_KEY)
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+        }.body()
+    }
+}
+
+
+object SupabaseDatabase {
+    private val SUPABASE_ANON_KEY = BuildConfig.SUPABASE_API_KEY
+    private const val USER_SCHEMA = "user_information"
+
+    suspend fun addFavoritePlace(userId: String, placeId: Int, accessToken: String): Boolean {
+        val response = SupabaseAuth.supabaseHttpClient.post("$SUPABASE_URL/rest/v1/favorite_places") {
+            header("apikey", SUPABASE_ANON_KEY)
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            header("Content-Type", "application/json")
+
+            header("Content-Profile", USER_SCHEMA)
+            header("Accept-Profile", USER_SCHEMA)
+
+            setBody(FavoriteRequestResponse(userId, placeId))
+        }
+        if (!response.status.isSuccess()) {
+            println("DB ERROR BODY: ${response.bodyAsText()}")
+        }
+        return response.status.isSuccess()
     }
 
     suspend fun getName(accessToken: String, userId: String): String? {
-        val user = getUser(accessToken) ?: return null
+        val user = SupabaseAuth.getUser(accessToken) ?: return null
         val metadata = user.userMetadata ?: return null
 
         val valueFromMetadata = metadata["display_name"]?.jsonPrimitive?.contentOrNull
@@ -158,7 +188,7 @@ object SupabaseAuth {
     }
 
     suspend fun updateName(accessToken: String, userId: String, name: String) {
-        val response = supabaseHttpClient.put("$SUPABASE_URL/auth/v1/user") {
+        val response = SupabaseAuth.supabaseHttpClient.put("$SUPABASE_URL/auth/v1/user") {
             contentType(ContentType.Application.Json)
             header("apikey", SUPABASE_ANON_KEY)
             header(HttpHeaders.Authorization, "Bearer $accessToken")
@@ -179,7 +209,7 @@ object SupabaseAuth {
     }
 
     suspend fun getUserDataProfile(accessToken: String, userId: String): UserDataProfile {
-        val response = supabaseHttpClient.get("$SUPABASE_URL/rest/v1/user_data") {
+        val response = SupabaseAuth.supabaseHttpClient.get("$SUPABASE_URL/rest/v1/user_data") {
             header("apikey", SUPABASE_ANON_KEY)
             header(HttpHeaders.Authorization, "Bearer $accessToken")
             header("Accept-Profile", "user_information")
@@ -224,7 +254,7 @@ object SupabaseAuth {
     }
 
     suspend fun updateBirthDate(accessToken: String, userId: String, birthDate: String) {
-        val patchResponse = supabaseHttpClient.patch("$SUPABASE_URL/rest/v1/user_data") {
+        val patchResponse = SupabaseAuth.supabaseHttpClient.patch("$SUPABASE_URL/rest/v1/user_data") {
             contentType(ContentType.Application.Json)
             header("apikey", SUPABASE_ANON_KEY)
             header(HttpHeaders.Authorization, "Bearer $accessToken")
@@ -243,7 +273,7 @@ object SupabaseAuth {
             return
         }
 
-        val insertResponse = supabaseHttpClient.post("$SUPABASE_URL/rest/v1/user_data") {
+        val insertResponse = SupabaseAuth.supabaseHttpClient.post("$SUPABASE_URL/rest/v1/user_data") {
             contentType(ContentType.Application.Json)
             header("apikey", SUPABASE_ANON_KEY)
             header(HttpHeaders.Authorization, "Bearer $accessToken")
@@ -269,7 +299,7 @@ object SupabaseAuth {
         val timestamp = kotlin.time.Clock.System.now().toEpochMilliseconds()
         val objectPath = "$userId.jpg"
 
-        val uploadResponse = supabaseHttpClient.post("$SUPABASE_URL/storage/v1/object/$PROFILE_PHOTO_BUCKET/$objectPath") {
+        val uploadResponse = SupabaseAuth.supabaseHttpClient.post("$SUPABASE_URL/storage/v1/object/$PROFILE_PHOTO_BUCKET/$objectPath") {
             header("apikey", SUPABASE_ANON_KEY)
             header(HttpHeaders.Authorization, "Bearer $accessToken")
             header("x-upsert", "true")
@@ -283,7 +313,7 @@ object SupabaseAuth {
 
         val publicUrl = "$SUPABASE_URL/storage/v1/object/public/$PROFILE_PHOTO_BUCKET/$objectPath?t=$timestamp"
         
-        val patchResponse = supabaseHttpClient.patch("$SUPABASE_URL/rest/v1/user_data") {
+        val patchResponse = SupabaseAuth.supabaseHttpClient.patch("$SUPABASE_URL/rest/v1/user_data") {
             contentType(ContentType.Application.Json)
             header("apikey", SUPABASE_ANON_KEY)
             header(HttpHeaders.Authorization, "Bearer $accessToken")
@@ -299,7 +329,7 @@ object SupabaseAuth {
 
         val patchedRows = patchResponse.body<List<UserDataResponse>>()
         if (patchedRows.isEmpty()) {
-            val insertResponse = supabaseHttpClient.post("$SUPABASE_URL/rest/v1/user_data") {
+            val insertResponse = SupabaseAuth.supabaseHttpClient.post("$SUPABASE_URL/rest/v1/user_data") {
                 contentType(ContentType.Application.Json)
                 header("apikey", SUPABASE_ANON_KEY)
                 header(HttpHeaders.Authorization, "Bearer $accessToken")
@@ -323,4 +353,38 @@ object SupabaseAuth {
         return publicUrl
     }
 
+    suspend fun removeFavoritePlace(userId: String, placeId: Int, accessToken: String): Boolean {
+        val response = SupabaseAuth.supabaseHttpClient.delete("$SUPABASE_URL/rest/v1/favorite_places") {
+            header("apikey", SUPABASE_ANON_KEY)
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+
+            header("Accept-Profile", USER_SCHEMA)
+            header("Content-Profile", USER_SCHEMA)
+
+            parameter("user_id", "eq.$userId")
+            parameter("place_id", "eq.$placeId")
+        }
+        return response.status.isSuccess()
+    }
+
+    suspend fun fetchFavoritePlaces(userId: String, accessToken: String): List<Int> {
+        val response = SupabaseAuth.supabaseHttpClient.get("$SUPABASE_URL/rest/v1/favorite_places") {
+            header("apikey", SUPABASE_ANON_KEY)
+
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            header("Accept-Profile", "user_information")
+
+            header("Content-Profile", USER_SCHEMA)
+            parameter("select", "place_id")
+            parameter("user_id", "eq.$userId")
+        }
+        println("RAW RESPONSE: ${response.bodyAsText()}")
+
+        return if (response.status.isSuccess()) {
+            val favorites: List<FavoriteRequestResponse> = response.body()
+            favorites.map { it.placeId }
+        } else {
+            emptyList()
+        }
+    }
 }

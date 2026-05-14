@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
+import androidx.compose.ui.unit.Dp
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
 import platform.CoreLocation.CLLocationCoordinate2DMake
@@ -153,6 +154,8 @@ private class MapDelegate(
 actual fun NativeMap(
     points: List<MapPoint>,
     modifier: Modifier,
+    isInteractive: Boolean,
+    bottomPadding: Dp,
     onPointClick: (Long) -> Unit
 ) {
     val mkMapView = remember { MKMapView() }
@@ -174,6 +177,18 @@ actual fun NativeMap(
         },
         modifier = modifier,
         update = { view ->
+            view.scrollEnabled = isInteractive
+            view.zoomEnabled = isInteractive
+            view.pitchEnabled = isInteractive
+            view.rotateEnabled = isInteractive
+
+            view.layoutMargins = UIEdgeInsetsMake(
+                top = 0.0,
+                left = 0.0,
+                bottom = max(0.0, bottomPadding.value.toDouble() - 35.0),
+                right = 0.0
+            )
+
             view.delegate = delegate
             view.removeAnnotations(view.annotations)
 

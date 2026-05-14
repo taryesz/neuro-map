@@ -62,7 +62,7 @@ fun SelectionItem(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = name,
-            style = MaterialTheme.typography.titleSmall.copy(
+            style = MaterialTheme.typography.bodyLarge.copy(
                 hyphens = Hyphens.Auto,         // Automatically add hyphens when a word doesn't fit
                 lineBreak = LineBreak.Heading   // The app will rather move the whole word to a new line than
                                                 // only one letter

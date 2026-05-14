@@ -67,6 +67,8 @@
         <string name="place_screen_place__description_facebook_link_label">Facebook</string>
         <string name="place_screen_place__description_website_link_label">Strona internetowa</string>
 
+        <string name="place_screen_system_alert_dialog_log_in">Aby móc zapisać to miejsce do ulubionych, musisz się zalogować.</string>
+
     <!-- ADD SCREEN -->
 
         <!-- Screen title -->
@@ -105,6 +107,12 @@
 
         <!-- Instruction on how to use gestures on the cards -->
         <string name="favorites_screen_instruction">Stuknij kafelek, żeby zobaczyć szczegóły miejsca. Przesuń kafelek w lewo, żeby usunąć miejsce z listy ulubionych. Przesuń kafelek w prawo, żeby uruchomić tryb nawigacji.</string>
+
+        <string name="favorites_screen_empty_body_title">Tutaj jeszcze nic nie ma.</string>
+
+        <string name="favorites_screen_empty_body_text">Dodaj imponujące miejsca do ulubionych,\naby mieć je zawsze pod ręką!</string>
+
+        <string name="favorites_screen_go_to_map_button_text">Otwórz mapę</string>
 
     <!-- MAP SCREEN -->
 
@@ -152,5 +160,39 @@
         <string name="sign_up_screen_system_alert_dialog_title">Błąd rejestracji</string>
 
         <string name="auth_system_alert_dialog_no_internet">Sprawdź połączenie z internetem i spróbuj jeszcze raz.</string>
+
+    <!-- PROFILE SCREEN -->
+
+        <string name="profile_screen_title">Ustawienia</string>
+
+        <string name="profile_screen_account_setting_title">Konto</string>
+        <string name="profile_screen_account_setting_description">Edytuj profil (imię, data urodzenia).</string>
+
+        <string name="profile_screen_motive_setting_title">Wygląd</string>
+        <string name="profile_screen_motive_setting_description">Zmień motyw (jasny / ciemny).</string>
+
+        <string name="profile_screen_user_profile_picture_content_description">Zdjęcie profilowe.</string>
+
+        <string name="profile_screen_edit_profile_subscreen_title">Edytuj konto</string>
+
+        <string name="profile_screen_name_field_title">Imię</string>
+        <string name="profile_screen_name_placeholder">Jak masz na imię?</string>
+
+        <string name="profile_screen_birthday_field_title">Data urodzenia</string>
+        <string name="profile_screen_birthday_playholder">Kiedy się urodził*ś?</string>
+
+        <string name="profile_screen_save_changes_button_text">Zapisz zmiany</string>
+
+        <string name="profile_screen_edit_motive_subscreen_title">Edytuj wygląd</string>
+
+        <string name="profile_screen_motive_field_title">Tryb ciemny</string>
+
+        <string name="profile_screen_log_out_button_text">Wyloguj się</string>
+
+        <string name="profile_screen_edit_profile_subscreen_edit_pfp_button_description">Zmień zdjęcie.</string>
+
+        <string name="profile_screen_system_alert_dialog_title">Informacja</string>
+
+        <string name="profile_screen_pick_profile_picture_button_text">Wybierz zdjęcie profilowe</string>
 
 </resources>

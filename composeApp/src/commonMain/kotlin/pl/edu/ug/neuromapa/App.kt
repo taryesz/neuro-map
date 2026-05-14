@@ -36,25 +36,26 @@ import pl.edu.ug.neuromapa.data.auth.ProfilePhotoPicker
 import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
 import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
 import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
+import pl.edu.ug.neuromapa.screens.account.dashboard.MotiveSettings
+import pl.edu.ug.neuromapa.screens.account.dashboard.ProfileSettings
+import pl.edu.ug.neuromapa.screens.favorites.FavoritesViewModel
 
 @Composable
 @Preview
 fun App() {
 
-    val authViewModel = viewModel { AuthViewModel() }
-    val authState by authViewModel.authState.collectAsState()
-    val signedInState = authState as? AuthState.SignedIn
-
-    val isDarkTheme = signedInState?.theme == "dark"
+    var isDarkTheme by remember { mutableStateOf(false) }
     var editableName by remember { mutableStateOf("") }
     var editableBirthDate by remember { mutableStateOf("") }
     var saveStatusMessage by remember { mutableStateOf<String?>(null) }
-    var displayNameOverride by remember { mutableStateOf<String?>(null) }
+
+    var confirmedUserName by remember { mutableStateOf<String?>(null) }
 
     NeuroMapTheme(darkTheme = isDarkTheme) {
 
         val placeViewModel = viewModel { PlaceViewModel() }
         val authViewModel = viewModel { AuthViewModel() }
+        val favoritesViewModel = viewModel { FavoritesViewModel() }
 
         LaunchedEffect(Unit) {
             authViewModel.restoreSession()
@@ -71,25 +72,39 @@ fun App() {
         }
 
         LaunchedEffect(authState) {
-            if (authState is AuthState.SignedIn &&
-                (currentScreen == Screen.SignIn || currentScreen == Screen.SignUp)) {
-                currentScreen = Screen.Profile
+            if (authState is AuthState.SignedIn) {
+                favoritesViewModel.loadFavorites(authState)
+
+                if (currentScreen == Screen.SignIn || currentScreen == Screen.SignUp) {
+                    currentScreen = Screen.Profile
+                }
+            } else if (authState is AuthState.SignedOut) {
+                favoritesViewModel.clearFavorites()
             }
         }
 
         val signedInState = authState as? AuthState.SignedIn
 
-        val displayName = when {
-            !displayNameOverride.isNullOrBlank() -> displayNameOverride.orEmpty()
-            !signedInState?.name.isNullOrBlank() -> signedInState?.name.orEmpty()
-            signedInState != null -> signedInState.email.substringBefore("@")
-            else -> "Użytkownik"
+        LaunchedEffect(signedInState) {
+            if (signedInState != null) {
+                if (confirmedUserName == null && !signedInState.name.isNullOrBlank()) {
+                    confirmedUserName = signedInState.name
+                    editableName = signedInState.name
+                }
+                if (editableBirthDate.isBlank() && !signedInState.birthDate.isNullOrBlank()) {
+                    editableBirthDate = signedInState.birthDate
+                }
+            } else {
+                confirmedUserName = null
+                editableName = ""
+                editableBirthDate = ""
+            }
         }
 
-        LaunchedEffect(signedInState?.name, signedInState?.userId) {
-            editableName = signedInState?.name.orEmpty()
-            editableBirthDate = signedInState?.birthDate.orEmpty()
-            displayNameOverride = null
+        val displayName = when {
+            !confirmedUserName.isNullOrBlank() -> confirmedUserName.orEmpty()
+            // signedInState != null -> ""
+            else -> ""
         }
 
         LaunchedEffect(authViewModel) {
@@ -99,7 +114,6 @@ fun App() {
                 } else if (imageBytes == null) {
                     saveStatusMessage = "Nie wybrano zdjęcia."
                 } else {
-                    saveStatusMessage = "Przesyłamy zdjęcie profilowe..."
                     authViewModel.uploadProfilePhoto(
                         imageBytes = imageBytes,
                         onError = { message -> saveStatusMessage = message },
@@ -115,6 +129,8 @@ fun App() {
         val favoritesListState = rememberLazyListState()
         val profileScrollState = rememberScrollState()
         val coroutineScope = rememberCoroutineScope()
+
+        var activeSettingsScreen by remember { mutableStateOf<String?>(null) }
 
         Scaffold(
             bottomBar = {
@@ -133,6 +149,9 @@ fun App() {
                             }
                         } else {
                             currentScreen = newScreen
+                            if (newScreen != Screen.Profile) {
+                                activeSettingsScreen = null
+                            }
                         }
                     }
                 )
@@ -195,26 +214,43 @@ fun App() {
                                             scrollState = homeScrollState
                                         )
 
-                                        Screen.Add -> AddScreen(
-                                            userProfileImage = Res.drawable.user_pfp_example,
-                                            onProfileClick = { currentScreen = Screen.Profile },
-                                            profilePhotoUrl = signedInState?.photoUrl,
-                                            scrollState = addScrollState
-                                        )
+                                        Screen.Add -> {
+
+                                            val currentUserEmail = signedInState?.email ?: "Nieznany e-mail"
+
+                                            AddScreen(
+                                                userProfileImage = Res.drawable.user_pfp_example,
+                                                onProfileClick = { currentScreen = Screen.Profile },
+                                                profilePhotoUrl = signedInState?.photoUrl,
+                                                scrollState = addScrollState,
+                                                placeViewModel = placeViewModel,
+                                                currentEmail = currentUserEmail,
+                                                currentName = editableName
+                                            )
+                                        }
 
                                         Screen.Favorites -> FavoritesScreen(
                                             userProfileImage = Res.drawable.user_pfp_example,
+                                            favoritesViewModel = favoritesViewModel,
+                                            mapPoints = mapPoints,
                                             onPlaceClick = { place ->
-                                                println("Kliknięto w ulubione: ${place.name}")
+                                                selectedMapPoint = place
+                                                currentScreen = Screen.Place
                                             },
                                             onProfileClick = { currentScreen = Screen.Profile },
                                             profilePhotoUrl = signedInState?.photoUrl,
-                                            listState = favoritesListState
+                                            onGoToMap = { currentScreen = Screen.Map },
+                                            listState = favoritesListState,
+                                            authViewModel = authViewModel
                                         )
 
                                         Screen.Place -> {
                                             if (selectedMapPoint != null) {
-                                                PlaceScreen(mapPoint = selectedMapPoint!!)
+                                                PlaceScreen(
+                                                    mapPoint = selectedMapPoint!!,
+                                                    authViewModel = authViewModel,
+                                                    favoritesViewModel = favoritesViewModel
+                                                )
                                             }
                                         }
 
@@ -229,54 +265,58 @@ fun App() {
                                                     }
                                                 }
                                                 is AuthState.SignedIn -> {
+
                                                     val signedIn = authState as AuthState.SignedIn
-                                                    DashboardScreen(
-                                                        headerTitle = "Witaj, $displayName!",
-                                                        userProfileImage = Res.drawable.user_pfp_example,
-                                                        userEmail = signedIn.email,
-                                                        displayName = displayName,
-                                                        onSignOut = { authViewModel.signOut() },
-                                                        currentName = editableName,
-                                                        onNameChange = { editableName = it },
-                                                        onSaveName = {
-                                                            val normalizedName = editableName.trim()
-                                                            if (normalizedName.isNotEmpty()) {
-                                                                displayNameOverride = normalizedName
-                                                                saveStatusMessage = "Zapisujemy imię w Supabase..."
-                                                            }
-                                                            authViewModel.updateName(
-                                                                newName = editableName,
-                                                                onError = { message ->
-                                                                    displayNameOverride = null
-                                                                    saveStatusMessage = message
+
+                                                    when (activeSettingsScreen) {
+                                                        "profile" -> {
+                                                            ProfileSettings(
+                                                                userProfileImage = Res.drawable.user_pfp_example,
+                                                                profilePhotoUrl = signedIn.photoUrl,
+                                                                currentName = editableName,
+                                                                onNameChange = { editableName = it },
+                                                                currentBirthDate = editableBirthDate,
+                                                                onBirthDateChange = { editableBirthDate = it },
+                                                                onSaveProfile = {
+                                                                    authViewModel.updateProfileData(
+                                                                        newName = editableName.trim(),
+                                                                        newBirthDate = editableBirthDate,
+                                                                        onError = { message -> saveStatusMessage = message },
+                                                                        onSuccess = {
+                                                                            confirmedUserName = editableName.trim()
+                                                                            saveStatusMessage = "Dane zostały pomyślnie zapisane."
+                                                                        }
+                                                                    )
                                                                 },
-                                                                onSuccess = {
-                                                                    saveStatusMessage = "Imię zostało pomyślnie zapisane."
-                                                                }
+                                                                onPickProfilePhoto = {
+                                                                    ProfilePhotoPicker.launch?.invoke()
+                                                                        ?: run { saveStatusMessage = "Wybór zdjęcia nie jest dostępny na tej platformie." }
+                                                                },
+                                                                saveStatusMessage = saveStatusMessage,
+                                                                onClearStatusMessage = { saveStatusMessage = null },
                                                             )
-                                                        },
-                                                        currentBirthDate = editableBirthDate,
-                                                        onBirthDateChange = { editableBirthDate = it },
-                                                        onSaveBirthDate = {
-                                                            saveStatusMessage = "Zapisujemy datę urodzenia..."
-                                                            authViewModel.updateBirthDate(
-                                                                newBirthDate = editableBirthDate,
-                                                                onError = { message -> saveStatusMessage = message },
-                                                                onSuccess = { saveStatusMessage = "Data urodzenia została zapisana." }
+                                                        }
+                                                        "motive" -> {
+                                                            MotiveSettings(
+                                                                isDarkTheme = isDarkTheme,
+                                                                onThemeChange = { isDarkTheme = it },
                                                             )
-                                                        },
-                                                        onPickProfilePhoto = {
-                                                            ProfilePhotoPicker.launch?.invoke()
-                                                                ?: run { saveStatusMessage = "Wybór zdjęcia nie jest dostępny na tej platformie." }
-                                                        },
-                                                        profilePhotoUrl = signedIn.photoUrl,
-                                                        saveStatusMessage = saveStatusMessage,
-                                                        isDarkTheme = isDarkTheme,
-                                                        onThemeChange = { isDark ->
-                                                            authViewModel.updateTheme(if (isDark) "dark" else "light")
-                                                        },
-                                                        scrollState = profileScrollState
-                                                    )
+                                                        }
+                                                        else -> {
+                                                            DashboardScreen(
+                                                                userProfileImage = Res.drawable.user_pfp_example,
+                                                                onSignOut = { authViewModel.signOut() },
+                                                                currentName = editableName,
+                                                                profilePhotoUrl = signedIn.photoUrl,
+                                                                saveStatusMessage = saveStatusMessage,
+                                                                onClearStatusMessage = { saveStatusMessage = null },
+                                                                onNavigateToProfileSettings = { activeSettingsScreen = "profile" },
+                                                                onNavigateToMotiveSettings = { activeSettingsScreen = "motive" },
+                                                                scrollState = profileScrollState,
+                                                                currentEmail = signedIn.email,
+                                                            )
+                                                        }
+                                                    }
                                                 }
                                                 else -> {
                                                     SignInScreen(
@@ -284,6 +324,7 @@ fun App() {
                                                         onNavigateToSignUp = { currentScreen = Screen.SignUp }
                                                     )
                                                 }
+
                                             }
                                         }
 

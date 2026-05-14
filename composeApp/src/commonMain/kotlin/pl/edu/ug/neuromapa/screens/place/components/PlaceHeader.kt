@@ -27,20 +27,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
-import neuromapa.composeapp.generated.resources.navigation_bar_add
+import neuromapa.composeapp.generated.resources.favorite_place_red_filled_heart
 import neuromapa.composeapp.generated.resources.navigation_bar_favorites
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import pl.edu.ug.neuromapa.screens.place.settings.cornerRadius
-import pl.edu.ug.neuromapa.ui.getAppTypography
-import pl.edu.ug.neuromapa.screens.place.settings.widePadding
-import pl.edu.ug.neuromapa.screens.place.settings.wideSpacing
+import pl.edu.ug.neuromapa.screens.place.settings.headerCategoryIconSize
 import pl.edu.ug.neuromapa.screens.place.settings.headerHeight
 import pl.edu.ug.neuromapa.screens.place.settings.headerScrimOffset
 import pl.edu.ug.neuromapa.screens.place.settings.headerScrimOpacity
-import pl.edu.ug.neuromapa.screens.place.settings.headerCategoryIconSize
+import pl.edu.ug.neuromapa.screens.place.settings.widePadding
+import pl.edu.ug.neuromapa.screens.place.settings.wideSpacing
+import pl.edu.ug.neuromapa.ui.getAppTypography
 
 @Composable
 fun PlaceHeader(
@@ -52,12 +53,15 @@ fun PlaceHeader(
     isFavorite: Boolean,
     onFavoriteButtonClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    showSaveButton: Boolean = false,
+    height: Dp = headerHeight,
+    onCardClick: (() -> Unit)? = null
 ) {
 
     // Wrapper
     Box(
         modifier = modifier
-            .height(headerHeight)
+            .height(height)
             .fillMaxWidth()
             .clip(RoundedCornerShape(bottomStart = cornerRadius, bottomEnd = cornerRadius))
     )
@@ -68,87 +72,99 @@ fun PlaceHeader(
             latitude = latitude,
             longitude = longitude,
             category = categoryIconDescription,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            isInteractive = (onCardClick == null)
         )
 
-        // Scrim-box (for better readability)
+        // Scrim-box 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = headerScrimOpacity)),
-                        startY = headerScrimOffset
-                    )
+                .then(
+                    if (onCardClick != null) Modifier.clickable { onCardClick() } else Modifier
                 )
-        )
-
-        // Add to favorites / Remove from favorites button
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(top = widePadding, end = widePadding)
-                .clip(CircleShape)
-                .clickable{ onFavoriteButtonClick() },
-            contentAlignment = Alignment.Center,
-        )
-        {
-            Image(
-                modifier = Modifier.size(40.dp),
-                // TODO: replace the icons (or at least an icon for when we want to remove the place)
-                painter = painterResource(if (!isFavorite) Res.drawable.navigation_bar_favorites else Res.drawable.navigation_bar_add),
-                contentDescription = if (isFavorite) "Usuń z ulubionych." else "Dodaj do ulubionych.",
-            )
-        }
-
-        // Main place information (Category icon + dynamic place name)
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(horizontal = widePadding, vertical = widePadding),
-            verticalArrangement = Arrangement.Bottom
         ) {
 
-            // Wrapper
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(wideSpacing),
-                verticalAlignment = Alignment.Top,
+            // Scrim-box (for better readability)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = headerScrimOpacity)),
+                            startY = headerScrimOffset
+                        )
+                    )
+            )
+
+            // Add to favorites / Remove from favorites button
+            if (showSaveButton) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .windowInsetsPadding(WindowInsets.statusBars)
+                        .padding(top = widePadding, end = widePadding)
+                        .clip(CircleShape)
+                        .clickable { onFavoriteButtonClick() },
+                    contentAlignment = Alignment.Center,
+                )
+                {
+                    Image(
+                        modifier = Modifier.size(40.dp),
+                        painter = painterResource(if (!isFavorite) Res.drawable.navigation_bar_favorites else Res.drawable.favorite_place_red_filled_heart),
+                        contentDescription = if (isFavorite) "Usuń z ulubionych." else "Dodaj do ulubionych.",
+                    )
+                }
+            }
+
+            // Main place information (Category icon + dynamic place name)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(horizontal = widePadding, vertical = widePadding),
+                verticalArrangement = Arrangement.Bottom
             ) {
 
-                // Category icon Wrapper
-                Box(
-                    modifier = Modifier.clip(CircleShape),
-                    contentAlignment = Alignment.Center
-                )
-                {
+                // Wrapper
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(wideSpacing),
+                    verticalAlignment = Alignment.Top,
+                ) {
 
-                    Image(
-                        modifier = Modifier.size(headerCategoryIconSize),
-                        painter = painterResource(categoryIcon),
-                        contentDescription = categoryIconDescription,
+                    // Category icon Wrapper
+                    Box(
+                        modifier = Modifier.clip(CircleShape),
+                        contentAlignment = Alignment.Center
                     )
+                    {
 
-                }
+                        Image(
+                            modifier = Modifier.size(headerCategoryIconSize),
+                            painter = painterResource(categoryIcon),
+                            contentDescription = categoryIconDescription,
+                        )
 
-                // Place name Wrapper
-                Box(
-                    modifier = Modifier.weight(1f)
-                )
-                {
+                    }
 
-                    Text(
-                        text = name,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = getAppTypography().titleLarge,
-                        maxLines = 1,
-                        overflow = TextOverflow.Visible,
-                        softWrap = false,
-                        modifier = Modifier.basicMarquee()
+                    // Place name Wrapper
+                    Box(
+                        modifier = Modifier.weight(1f)
                     )
+                    {
 
+                        Text(
+                            text = name,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            style = getAppTypography().titleLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Visible,
+                            softWrap = false,
+                            modifier = Modifier.basicMarquee()
+                        )
+
+                    }
                 }
             }
         }

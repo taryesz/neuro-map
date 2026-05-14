@@ -29,12 +29,12 @@ import pl.edu.ug.neuromapa.components.form.FormSelection
 import pl.edu.ug.neuromapa.screens.map.components.MapHeader
 import pl.edu.ug.neuromapa.screens.map.settings.mediumSpacing
 import pl.edu.ug.neuromapa.screens.map.settings.widePadding
-import pl.edu.ug.neuromapa.ui.Background
 import pl.edu.ug.neuromapa.data.getCategories
 import pl.edu.ug.neuromapa.data.getExcellenceMarks
 import pl.edu.ug.neuromapa.data.getSensoryProperties
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.platform.LocalFocusManager
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.map_screen_filter_overlay_form_erase_button
@@ -158,7 +158,7 @@ fun MapScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Background)
+                    .background(MaterialTheme.colorScheme.background)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
@@ -254,7 +254,9 @@ fun MapScreen(
                 NativeMap(
                     points = filteredPoints,
                     modifier = Modifier.fillMaxSize(),
-                    onPointClick = onPlaceClick
+                    bottomPadding = bottomPadding,
+                    onPointClick = onPlaceClick,
+                    isInteractive = true
                 )
 
                 // Custom Header that has a search bar

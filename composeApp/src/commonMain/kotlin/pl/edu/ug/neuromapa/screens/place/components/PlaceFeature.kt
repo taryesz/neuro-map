@@ -48,7 +48,8 @@ fun PlaceFeature(
         // Property name
         Text(
             text = name,
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary
         )
 
     }

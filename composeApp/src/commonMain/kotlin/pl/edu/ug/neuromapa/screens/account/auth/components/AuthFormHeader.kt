@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -41,6 +42,7 @@ fun AuthFormHeader(
         // Section title ("Sign up" / "Sign in")
         Text(
             text = title,
+            color = MaterialTheme.colorScheme.onBackground,
             style = getAppTypography().titleMedium,
         )
 
