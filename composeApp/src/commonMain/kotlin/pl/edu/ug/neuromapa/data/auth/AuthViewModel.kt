@@ -247,6 +247,13 @@ class AuthViewModel : ViewModel() {
 
                 val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
 
+                val updatedState = validSession.copy(
+                    name = normalizedName,
+                    birthDate = normalizedBirthDate
+                )
+
+                _authState.value = updatedState
+
                 SupabaseDatabase.updateName(
                     accessToken = validSession.accessToken,
                     userId = validSession.userId,
@@ -260,13 +267,6 @@ class AuthViewModel : ViewModel() {
                         birthDate = normalizedBirthDate
                     )
                 }
-
-                val updatedState = validSession.copy(
-                    name = normalizedName,
-                    birthDate = normalizedBirthDate
-                )
-
-                _authState.value = updatedState
 
                 SessionStorage.save?.invoke(
                     updatedState.accessToken,
@@ -331,7 +331,8 @@ class AuthViewModel : ViewModel() {
                 )
                 _authState.value = validSession.copy(photoUrl = photoUrl)
                 onSuccess?.invoke()
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                println("BŁĄD UPLOADU ZDJĘCIA: ${e.message}")
                 onError?.invoke("Nie udało się zapisać zdjęcia profilowego.")
             }
         }

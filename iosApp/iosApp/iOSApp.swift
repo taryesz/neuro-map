@@ -27,10 +27,11 @@ struct iOSApp: App {
                 }
             }
         }
-        
-        let accessToken = params["access_token"] ?? ""
-        let errorDesc = params["error_description"] ?? params["error"] ?? ""
-        
-        OAuthResultHandler.shared.handle?(accessToken, errorDesc)
+
+        let accessToken = params["access_token"]
+        let refreshToken = params["refresh_token"]
+        let errorDesc = params["error_description"] ?? params["error"]
+
+        OAuthResultHandler.shared.handle?(accessToken, refreshToken, errorDesc)
     }
 }

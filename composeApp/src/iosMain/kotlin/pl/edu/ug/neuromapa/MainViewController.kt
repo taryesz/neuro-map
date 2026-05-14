@@ -2,9 +2,8 @@ package pl.edu.ug.neuromapa
 
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.readBytes
-import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.useContents
 import pl.edu.ug.neuromapa.data.auth.OAuthLauncher
 import pl.edu.ug.neuromapa.data.auth.ProfilePhotoPicker
 import pl.edu.ug.neuromapa.data.auth.SessionStorage
@@ -18,7 +17,13 @@ import platform.PhotosUI.PHPickerResult
 import platform.PhotosUI.PHPickerViewController
 import platform.PhotosUI.PHPickerViewControllerDelegateProtocol
 import platform.UIKit.UIApplication
+import platform.UIKit.UIImage
+import platform.UIKit.UIImageJPEGRepresentation
 import platform.darwin.NSObject
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
+
+private var currentPickerDelegate: PHPickerViewControllerDelegateProtocol? = null
 
 @OptIn(ExperimentalForeignApi::class)
 fun MainViewController() = ComposeUIViewController {
@@ -72,6 +77,7 @@ fun MainViewController() = ComposeUIViewController {
             )
         }
     }
+
     ProfilePhotoPicker.launch = launch@{
         val topController = UIApplication.sharedApplication.keyWindow?.rootViewController
             ?: return@launch
@@ -87,6 +93,7 @@ fun MainViewController() = ComposeUIViewController {
                 picker: PHPickerViewController,
                 didFinishPicking: List<*>
             ) {
+                currentPickerDelegate = null
                 picker.dismissViewControllerAnimated(true, null)
 
                 val result = didFinishPicking.firstOrNull() as? PHPickerResult
@@ -95,38 +102,75 @@ fun MainViewController() = ComposeUIViewController {
                     return
                 }
 
-                result.itemProvider.loadDataRepresentationForTypeIdentifier(
-                    typeIdentifier = "public.jpeg"
-                ) { data, _ ->
-                    val imageData = data as? NSData
-                    if (imageData != null) {
-                        val bytes = imageData.toByteArray()
-                        ProfilePhotoPicker.onResult?.invoke(bytes, null)
-                    } else {
-                        result.itemProvider.loadDataRepresentationForTypeIdentifier(
-                            typeIdentifier = "public.heic"
-                        ) { heicData, _ ->
-                            val heicBytes = (heicData as? NSData)?.toByteArray()
-                            ProfilePhotoPicker.onResult?.invoke(
-                                heicBytes,
-                                if (heicBytes == null) "Nie udało się załadować zdjęcia." else null
-                            )
+                val itemProvider = result.itemProvider
+                val registeredTypes = itemProvider.registeredTypeIdentifiers.filterIsInstance<String>()
+                val imageType = registeredTypes.firstOrNull {
+                    it.contains("image") || it.contains("jpeg") || it.contains("png") || it.contains("heic")
+                }
+
+                if (imageType != null) {
+                    itemProvider.loadDataRepresentationForTypeIdentifier(imageType) { data, _ ->
+                        val nsData = data as? NSData
+                        dispatch_async(dispatch_get_main_queue()) {
+                            if (nsData != null) {
+                                val rawImage = UIImage(data = nsData)
+                                val resizedImage = rawImage?.resizeToLimit(1000.0)
+                                val jpegData = resizedImage?.let { UIImageJPEGRepresentation(it, 0.5) }
+                                val jpegBytes = jpegData?.toByteArray()
+
+                                ProfilePhotoPicker.onResult?.invoke(
+                                    jpegBytes,
+                                    if (jpegBytes == null) "Błąd konwersji zdjęcia." else null
+                                )
+                            } else {
+                                ProfilePhotoPicker.onResult?.invoke(null, "Nie udało się załadować danych zdjęcia.")
+                            }
                         }
                     }
+                } else {
+                    ProfilePhotoPicker.onResult?.invoke(null, "Wybrany plik nie jest obsługiwanym obrazem.")
                 }
             }
         }
 
+        currentPickerDelegate = delegate
         picker.delegate = delegate
         topController.presentViewController(picker, animated = true, completion = null)
     }
 
     App()
 }
+
 @OptIn(ExperimentalForeignApi::class)
 private fun NSData.toByteArray(): ByteArray {
     val length = this.length.toInt()
     if (length == 0) return ByteArray(0)
     val bytes = this.bytes ?: return ByteArray(0)
     return bytes.readBytes(length)
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private fun UIImage.resizeToLimit(maxDimension: Double): UIImage {
+    val width = size.useContents { width }
+    val height = size.useContents { height }
+
+    if (width <= maxDimension && height <= maxDimension) return this
+
+    val ratio = width / height
+    val (newWidth, newHeight) = if (width > height) {
+        maxDimension to (maxDimension / ratio)
+    } else {
+        (maxDimension * ratio) to maxDimension
+    }
+
+    platform.UIKit.UIGraphicsBeginImageContextWithOptions(
+        platform.CoreGraphics.CGSizeMake(newWidth, newHeight),
+        false,
+        1.0
+    )
+    drawInRect(platform.CoreGraphics.CGRectMake(0.0, 0.0, newWidth, newHeight))
+    val resizedImage = platform.UIKit.UIGraphicsGetImageFromCurrentImageContext()
+    platform.UIKit.UIGraphicsEndImageContext()
+
+    return resizedImage ?: this
 }

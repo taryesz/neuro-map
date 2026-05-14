@@ -44,7 +44,11 @@ import pl.edu.ug.neuromapa.screens.favorites.FavoritesViewModel
 @Preview
 fun App() {
 
-    var isDarkTheme by remember { mutableStateOf(false) }
+    val authViewModel = viewModel { AuthViewModel() }
+    val authState by authViewModel.authState.collectAsState()
+    val signedInState = authState as? AuthState.SignedIn
+
+    val isDarkTheme = signedInState?.theme == "dark"
     var editableName by remember { mutableStateOf("") }
     var editableBirthDate by remember { mutableStateOf("") }
     var saveStatusMessage by remember { mutableStateOf<String?>(null) }
@@ -54,7 +58,6 @@ fun App() {
     NeuroMapTheme(darkTheme = isDarkTheme) {
 
         val placeViewModel = viewModel { PlaceViewModel() }
-        val authViewModel = viewModel { AuthViewModel() }
         val favoritesViewModel = viewModel { FavoritesViewModel() }
 
         LaunchedEffect(Unit) {
@@ -62,8 +65,6 @@ fun App() {
         }
 
         val dataState by placeViewModel.dataState.collectAsState()
-        val authState by authViewModel.authState.collectAsState()
-
         var currentScreen by remember { mutableStateOf(Screen.Home) }
         var selectedMapPoint by remember { mutableStateOf<MapPoint?>(null) }
 
@@ -71,7 +72,9 @@ fun App() {
             (dataState as? PlaceDataState.Success)?.mapPoints ?: emptyList()
         }
 
-        LaunchedEffect(authState) {
+        val userId = (authState as? AuthState.SignedIn)?.userId
+
+        LaunchedEffect(userId) {
             if (authState is AuthState.SignedIn) {
                 favoritesViewModel.loadFavorites(authState)
 
@@ -82,8 +85,6 @@ fun App() {
                 favoritesViewModel.clearFavorites()
             }
         }
-
-        val signedInState = authState as? AuthState.SignedIn
 
         LaunchedEffect(signedInState) {
             if (signedInState != null) {
@@ -299,7 +300,9 @@ fun App() {
                                                         "motive" -> {
                                                             MotiveSettings(
                                                                 isDarkTheme = isDarkTheme,
-                                                                onThemeChange = { isDarkTheme = it },
+                                                                onThemeChange = { isDark ->
+                                                                    authViewModel.updateTheme(if (isDark) "dark" else "light")
+                                                                },
                                                             )
                                                         }
                                                         else -> {
