@@ -13,6 +13,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import pl.edu.ug.neuromapa.BuildConfig
@@ -35,6 +36,7 @@ data class RefreshTokenRequest(
 data class AuthUser(
     val id: String,
     val email: String? = null,
+    @SerialName("app_metadata") val appMetadata: JsonObject? = null,
     @SerialName("user_metadata") val userMetadata: JsonObject? = null
 )
 
@@ -47,6 +49,7 @@ data class AuthResponse(
     // top-level user fields when email confirmation is required
     val id: String? = null,
     val email: String? = null,
+    @SerialName("app_metadata") val appMetadata: JsonObject? = null,
     @SerialName("user_metadata") val userMetadata: JsonObject? = null,
 
     // error fields
@@ -158,6 +161,41 @@ object SupabaseAuth {
 object SupabaseDatabase {
     private val SUPABASE_ANON_KEY = BuildConfig.SUPABASE_API_KEY
     private const val USER_SCHEMA = "user_information"
+
+    suspend fun isCurrentUserAdmin(accessToken: String): Boolean {
+        return SupabaseAuth.getUser(accessToken)?.appMetadata.hasAdminFlag()
+    }
+
+    private fun JsonObject?.hasAdminFlag(): Boolean {
+        val value = this?.get("is_admin")?.jsonPrimitive ?: return false
+        return value.booleanOrNull ?: value.contentOrNull.equals("true", ignoreCase = true)
+    }
+
+//    suspend fun debugLogCurrentUserDatabase(accessToken: String, userId: String) {
+//        try {
+//            val authUser = SupabaseAuth.getUser(accessToken)
+//
+//            val profileResponse = SupabaseAuth.supabaseHttpClient.get("$SUPABASE_URL/rest/v1/user_data") {
+//                header("apikey", SUPABASE_ANON_KEY)
+//                header(HttpHeaders.Authorization, "Bearer $accessToken")
+//                header("Accept-Profile", USER_SCHEMA)
+//                parameter("select", "id,year,photo,theme")
+//                parameter("id", "eq.$userId")
+//                header("Accept", "application/json")
+//            }
+//
+//            println("===== NEUROMAPA USER DEBUG START =====")
+//            println("auth.users.id = ${authUser?.id ?: userId}")
+//            println("auth.users.email = ${authUser?.email ?: "unknown"}")
+//            println("auth.users.app_metadata = ${authUser?.appMetadata ?: "empty"}")
+//            println("auth.users.user_metadata = ${authUser?.userMetadata ?: "empty"}")
+//            println("user_information.user_data.status = ${profileResponse.status}")
+//            println("user_information.user_data.rows = ${profileResponse.bodyAsText()}")
+//            println("===== NEUROMAPA USER DEBUG END =====")
+//        } catch (e: Exception) {
+//            println("NEUROMAPA USER DEBUG ERROR: ${e.message}")
+//        }
+//    }
 
     suspend fun addFavoritePlace(userId: String, placeId: Int, accessToken: String): Boolean {
         val response = SupabaseAuth.supabaseHttpClient.post("$SUPABASE_URL/rest/v1/favorite_places") {

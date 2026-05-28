@@ -35,6 +35,7 @@ import pl.edu.ug.neuromapa.data.auth.AuthState
 import pl.edu.ug.neuromapa.data.auth.ProfilePhotoPicker
 import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
 import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
+import pl.edu.ug.neuromapa.screens.account.dashboard.AdminPanel
 import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
 import pl.edu.ug.neuromapa.screens.account.dashboard.MotiveSettings
 import pl.edu.ug.neuromapa.screens.account.dashboard.ProfileSettings
@@ -268,8 +269,11 @@ fun App() {
                                                 is AuthState.SignedIn -> {
 
                                                     val signedIn = authState as AuthState.SignedIn
+                                                    val visibleSettingsScreen =
+                                                        if (activeSettingsScreen == "admin" && !signedIn.isAdmin) null
+                                                        else activeSettingsScreen
 
-                                                    when (activeSettingsScreen) {
+                                                    when (visibleSettingsScreen) {
                                                         "profile" -> {
                                                             ProfileSettings(
                                                                 userProfileImage = Res.drawable.user_pfp_example,
@@ -305,6 +309,9 @@ fun App() {
                                                                 },
                                                             )
                                                         }
+                                                        "admin" -> {
+                                                            AdminPanel(placeViewModel = placeViewModel)
+                                                        }
                                                         else -> {
                                                             DashboardScreen(
                                                                 userProfileImage = Res.drawable.user_pfp_example,
@@ -315,6 +322,8 @@ fun App() {
                                                                 onClearStatusMessage = { saveStatusMessage = null },
                                                                 onNavigateToProfileSettings = { activeSettingsScreen = "profile" },
                                                                 onNavigateToMotiveSettings = { activeSettingsScreen = "motive" },
+                                                                onNavigateToAdminPanel = { activeSettingsScreen = "admin" },
+                                                                isAdmin = signedIn.isAdmin,
                                                                 scrollState = profileScrollState,
                                                                 currentEmail = signedIn.email,
                                                             )

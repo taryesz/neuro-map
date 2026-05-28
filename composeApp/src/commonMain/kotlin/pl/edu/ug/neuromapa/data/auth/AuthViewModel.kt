@@ -16,6 +16,7 @@ class AuthViewModel : ViewModel() {
     val authState: StateFlow<AuthState> = _authState
 
     private var lastSelectedProvider: String? = null
+//    private var hasLoggedUserDatabaseDebug = false
 
     init {
         OAuthResultHandler.handle = { accessToken, refreshToken, error ->
@@ -101,6 +102,7 @@ class AuthViewModel : ViewModel() {
                     AuthUser(
                         id = response.id,
                         email = response.email,
+                        appMetadata = response.appMetadata,
                         userMetadata = response.userMetadata
                     )
                 }
@@ -151,6 +153,7 @@ class AuthViewModel : ViewModel() {
 
             // still sign the user out even if Supabase returned an error
             SessionStorage.clear?.invoke()
+//            hasLoggedUserDatabaseDebug = false
 
             // change the state to SignedOut
             _authState.value = AuthState.SignedOut
@@ -352,11 +355,15 @@ class AuthViewModel : ViewModel() {
                     accessToken = validSession.accessToken,
                     userId = validSession.userId
                 )
+                val isAdmin = SupabaseDatabase.isCurrentUserAdmin(
+                    accessToken = validSession.accessToken
+                )
                 _authState.value = validSession.copy(
                     name = name,
                     birthDate = profile.birthDate,
                     photoUrl = profile.photoUrl,
-                    theme = profile.theme
+                    theme = profile.theme,
+                    isAdmin = isAdmin
                 )
                 val updated = _authState.value as? AuthState.SignedIn
                 if (updated != null) {
@@ -369,6 +376,14 @@ class AuthViewModel : ViewModel() {
                         updated.birthDate,
                         updated.photoUrl
                     )
+
+//                    if (!hasLoggedUserDatabaseDebug) {
+//                        hasLoggedUserDatabaseDebug = true
+//                        SupabaseDatabase.debugLogCurrentUserDatabase(
+//                            accessToken = updated.accessToken,
+//                            userId = updated.userId
+//                        )
+//                    }
                 }
             } catch (_: Exception) {
                 // keep user signed in even if profile endpoint fails

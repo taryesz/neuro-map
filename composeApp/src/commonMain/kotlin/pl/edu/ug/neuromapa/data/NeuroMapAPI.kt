@@ -5,17 +5,32 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
+// import io.ktor.client.request.delete
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import io.ktor.client.request.post // DODANE
 import io.ktor.client.request.setBody // DODANE
 import io.ktor.client.request.header // DODANE
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType // DODANE
 import io.ktor.http.contentType // DODANE
 import io.ktor.http.isSuccess // DODANE
+import kotlinx.serialization.Serializable
 import pl.edu.ug.neuromapa.screens.add.data.NominatimResponse
 import pl.edu.ug.neuromapa.screens.add.data.WpPlaceRequest
+
+@Serializable
+private data class WpStatusUpdateRequest(
+    val status: String
+)
+
+data class WordPressActionResult(
+    val isSuccess: Boolean,
+    val errorMessage: String? = null
+)
 
 class NeuroMapApi {
 
@@ -52,6 +67,141 @@ class NeuroMapApi {
         }
     }
 
+//    suspend fun debugLogAllPlacesRaw(authHeader: String) {
+//        val prettyJson = Json {
+//            ignoreUnknownKeys = true
+//            prettyPrint = true
+//            isLenient = true
+//            coerceInputValues = true
+//        }
+//
+//        try {
+//            var page = 1
+//            var loggedPlacesCount = 0
+//
+//            println("===== NEUROMAPA PLACES API DEBUG START =====")
+//            println("NEUROMAPA PLACES API DEBUG AUTH = YES")
+//            println("NEUROMAPA PLACES API DEBUG PARAMS = status=any, context=edit")
+//
+//            while (true) {
+//                val response = client.get("$baseUrl/miejsce") {
+//                    parameter("per_page", 10)
+//                    parameter("page", page)
+//                    parameter("status", "any")
+//                    parameter("context", "edit")
+//                    header("Authorization", authHeader)
+//                }
+//
+//                if (!response.status.isSuccess()) {
+//                    println("NEUROMAPA PLACES API DEBUG ERROR: ${response.status}")
+//                    println(response.bodyAsText())
+//                    break
+//                }
+//
+//                val responseBody = response.bodyAsText()
+//                val jsonElement = prettyJson.parseToJsonElement(responseBody)
+//                val places = jsonElement as? JsonArray
+//
+//                if (places == null) {
+//                    println("NEUROMAPA PLACES API DEBUG: response is not a JSON array")
+//                    printLongLog(responseBody)
+//                    break
+//                }
+//
+//                if (places.isEmpty()) {
+//                    break
+//                }
+//
+//                println("===== NEUROMAPA PLACES API DEBUG PAGE $page, ITEMS ${places.size} =====")
+//
+//                places.forEachIndexed { index, place ->
+//                    loggedPlacesCount += 1
+//                    println("----- PLACE $loggedPlacesCount START -----")
+//                    printLongLog(prettyJson.encodeToString(JsonElement.serializer(), place))
+//                    println("----- PLACE $loggedPlacesCount END -----")
+//                }
+//
+//                val totalPages = response.headers["X-WP-TotalPages"]?.toIntOrNull()
+//                if (totalPages != null && page >= totalPages) {
+//                    break
+//                }
+//
+//                if (totalPages == null && places.size < 100) {
+//                    break
+//                }
+//
+//                page += 1
+//            }
+//
+//            println("===== NEUROMAPA PLACES API DEBUG END. PLACES LOGGED: $loggedPlacesCount =====")
+//        } catch (e: Exception) {
+//            println("NEUROMAPA PLACES API DEBUG ERROR: ${e.message}")
+//            e.printStackTrace()
+//        }
+//    }
+
+    suspend fun getRawPlacesByStatus(authHeader: String, status: String): List<JsonElement> {
+        val json = Json {
+            ignoreUnknownKeys = true
+            prettyPrint = true
+            isLenient = true
+            coerceInputValues = true
+        }
+
+        val allPlaces = mutableListOf<JsonElement>()
+        var page = 1
+
+        while (true) {
+            val response = client.get("$baseUrl/miejsce") {
+                parameter("per_page", 100)
+                parameter("page", page)
+                parameter("status", status)
+                parameter("context", "edit")
+                header("Authorization", authHeader)
+            }
+
+            if (!response.status.isSuccess()) {
+                throw IllegalStateException(
+                    "WordPress API error ${response.status}: ${response.bodyAsText()}"
+                )
+            }
+
+            val responseBody = response.bodyAsText()
+            val places = json.parseToJsonElement(responseBody) as? JsonArray
+                ?: throw IllegalStateException("WordPress API did not return a JSON array: $responseBody")
+
+            if (places.isEmpty()) {
+                break
+            }
+
+            allPlaces.addAll(places)
+
+            val totalPages = response.headers["X-WP-TotalPages"]?.toIntOrNull()
+            if (totalPages != null && page >= totalPages) {
+                break
+            }
+
+            if (totalPages == null && places.size < 100) {
+                break
+            }
+
+            page += 1
+        }
+
+        return allPlaces
+    }
+
+//    private fun printLongLog(text: String) {
+//        val chunkSize = 3000
+//        var startIndex = 0
+//
+//        while (startIndex < text.length) {
+//            val endIndex = minOf(startIndex + chunkSize, text.length)
+//            println(text.substring(startIndex, endIndex))
+//            startIndex = endIndex
+//        }
+//    }
+
     suspend fun postPlace(request: WpPlaceRequest, authHeader: String): Boolean {
         return try {
             val response = client.post("$baseUrl/miejsce") {
@@ -74,6 +224,54 @@ class NeuroMapApi {
             false
         }
     }
+
+    suspend fun publishPlaceDraft(placeId: String, authHeader: String): Boolean {
+        return try {
+            val response = client.post("$baseUrl/miejsce/$placeId") {
+                contentType(ContentType.Application.Json)
+                header("Authorization", authHeader)
+                setBody(WpStatusUpdateRequest(status = "publish"))
+            }
+
+            if (response.status.isSuccess()) {
+                true
+            } else {
+                println("API PUBLISH DRAFT Error Body: ${response.bodyAsText()}")
+                false
+            }
+        } catch (e: Exception) {
+            println("API PUBLISH DRAFT Error: ${e.message}")
+            e.printStackTrace()
+            false
+        }
+    }
+
+//    suspend fun deletePlaceDraft(placeId: String, authHeader: String): WordPressActionResult {
+//        return try {
+//            val response = client.delete("$baseUrl/miejsce/$placeId") {
+//                header("Authorization", authHeader)
+//            }
+//
+//            if (response.status.isSuccess()) {
+//                WordPressActionResult(isSuccess = true)
+//            } else {
+//                val errorBody = response.bodyAsText()
+//                val message = "WordPress API ${response.status}: $errorBody"
+//                println("API DELETE DRAFT Error Body: $message")
+//                WordPressActionResult(
+//                    isSuccess = false,
+//                    errorMessage = message
+//                )
+//            }
+//        } catch (e: Exception) {
+//            println("API DELETE DRAFT Error: ${e.message}")
+//            e.printStackTrace()
+//            WordPressActionResult(
+//                isSuccess = false,
+//                errorMessage = e.message ?: "Nieznany błąd połączenia z WordPress API."
+//            )
+//        }
+//    }
 
     suspend fun getCoordinates(address: String): Pair<Double, Double>? {
         return try {

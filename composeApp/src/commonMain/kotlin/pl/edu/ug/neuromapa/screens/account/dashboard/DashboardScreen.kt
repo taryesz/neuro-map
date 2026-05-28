@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -51,12 +52,14 @@ fun DashboardScreen(
     onClearStatusMessage: () -> Unit,
     onNavigateToProfileSettings: () -> Unit,
     onNavigateToMotiveSettings: () -> Unit,
+    onNavigateToAdminPanel: () -> Unit,
+    isAdmin: Boolean,
     scrollState: ScrollState = rememberScrollState(),
     currentEmail: String,
 ) {
 
     // Available settings list
-    val settingsList = listOf(
+    val settingsList = listOfNotNull(
 
         SettingItemData(
             icon = Icons.Outlined.AccountCircle,
@@ -75,6 +78,15 @@ fun DashboardScreen(
                 onNavigateToMotiveSettings()
             }
         ),
+
+        if (isAdmin) SettingItemData(
+            icon = Icons.Outlined.AdminPanelSettings,
+            title = "Panel admina",
+            subtitle = "Zatwierdzanie nowych miejsc",
+            onClick = {
+                onNavigateToAdminPanel()
+            }
+        ) else null,
 
     )
 
