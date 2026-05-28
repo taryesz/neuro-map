@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.profile_screen_account_setting_description
 import neuromapa.composeapp.generated.resources.profile_screen_account_setting_title
+import neuromapa.composeapp.generated.resources.profile_screen_admin_panel_description
+import neuromapa.composeapp.generated.resources.profile_screen_admin_panel_title
 import neuromapa.composeapp.generated.resources.profile_screen_log_out_button_text
 import neuromapa.composeapp.generated.resources.profile_screen_motive_setting_description
 import neuromapa.composeapp.generated.resources.profile_screen_motive_setting_title
@@ -79,14 +81,16 @@ fun DashboardScreen(
             }
         ),
 
-        if (isAdmin) SettingItemData(
-            icon = Icons.Outlined.AdminPanelSettings,
-            title = "Panel admina",
-            subtitle = "Zatwierdzanie nowych miejsc",
-            onClick = {
-                onNavigateToAdminPanel()
-            }
-        ) else null,
+        if (isAdmin)
+            SettingItemData(
+                icon = Icons.Outlined.AdminPanelSettings,
+                title = stringResource(Res.string.profile_screen_admin_panel_title),
+                subtitle = stringResource(Res.string.profile_screen_admin_panel_description),
+                onClick = {
+                    onNavigateToAdminPanel()
+                }
+            )
+        else null,
 
     )
 

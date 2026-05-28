@@ -310,7 +310,10 @@ fun App() {
                                                             )
                                                         }
                                                         "admin" -> {
-                                                            AdminPanel(placeViewModel = placeViewModel)
+                                                            AdminPanel(
+                                                                userProfileImage = Res.drawable.user_pfp_example,
+                                                                profilePhotoUrl = signedIn.photoUrl,
+                                                                placeViewModel = placeViewModel)
                                                         }
                                                         else -> {
                                                             DashboardScreen(

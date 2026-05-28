@@ -84,7 +84,7 @@ class PlaceViewModel : ViewModel() {
 
     val isSubmitting = mutableStateOf(false)
     val isPublishingDraft = mutableStateOf(false)
-//    val isRejectingDraft = mutableStateOf(false)
+    val isUpdatingDraft = mutableStateOf(false) // Flaga dla zapisywania zmian
 
     init {
         fetchPlaces()
@@ -93,22 +93,13 @@ class PlaceViewModel : ViewModel() {
     private fun fetchPlaces() {
         viewModelScope.launch {
             try {
-
-                // Get all the places data from "https://neuromapa.ug.edu.pl/"
                 val fetchedPlaces = api.getPlaces()
 
-                // Compose a list of places - for each place...
                 val mapPoints = fetchedPlaces.mapNotNull { place ->
-
-                    // ... get its coordinates
                     val lat = place.acfFields?.location?.getLatDouble()
                     val lng = place.acfFields?.location?.getLngDouble()
 
-                    // ... check if the coordinates are valid
-                    // If so, create an object with all the necessary information about the place
                     if (lat != null && lng != null) {
-
-                        // This text will be shown if there is a piece of information missing about the place
                         val noInformation = "Datum not available"
 
                         MapPoint(
@@ -133,28 +124,14 @@ class PlaceViewModel : ViewModel() {
                     }
                 }
 
-                // Update the state to Success (at this point, all the data should be available in mapPoints)
                 _dataState.value = PlaceDataState.Success(mapPoints)
 
             } catch (e: Exception) {
-                // TODO: add a UI response to when there is a problem with data fetching
                 e.printStackTrace()
                 _dataState.value = PlaceDataState.Error("Błąd pobierania danych: ${e.message}")
             }
         }
     }
-
-//    fun debugLogAllApiPlaces() {
-//        viewModelScope.launch {
-//            val authHeader = createWordPressAuthHeader()
-//            if (authHeader == null) {
-//                println("NEUROMAPA PLACES API DEBUG ERROR: missing WP_USERNAME or WP_APPLICATION_PASSWORD")
-//                return@launch
-//            }
-//
-//            api.debugLogAllPlacesRaw(authHeader = authHeader)
-//        }
-//    }
 
     fun loadAdminDraftPlaces() {
         viewModelScope.launch {
@@ -221,44 +198,71 @@ class PlaceViewModel : ViewModel() {
         }
     }
 
-//    fun rejectAdminDraftPlace(
-//        draft: AdminDraftPlace,
-//        onSuccess: () -> Unit,
-//        onError: (String) -> Unit
-//    ) {
-//        if (isRejectingDraft.value) return
-//
-//        viewModelScope.launch {
-//            val authHeader = createWordPressAuthHeader()
-//            if (authHeader == null) {
-//                onError("Brakuje WP_USERNAME albo WP_APPLICATION_PASSWORD w local.properties.")
-//                return@launch
-//            }
-//
-//            isRejectingDraft.value = true
-//
-//            try {
-//                val result = api.deletePlaceDraft(
-//                    placeId = draft.id,
-//                    authHeader = authHeader
-//                )
-//
-//                if (result.isSuccess) {
-//                    onSuccess()
-//                    loadAdminDraftPlaces()
-//                } else {
-//                    onError(
-//                        result.errorMessage
-//                            ?: "Nie udało się odrzucić szkicu. WordPress odrzucił żądanie."
-//                    )
-//                }
-//            } catch (e: Exception) {
-//                onError(e.message ?: "Nie udało się odrzucić szkicu.")
-//            } finally {
-//                isRejectingDraft.value = false
-//            }
-//        }
-//    }
+    // Dodana funkcja odpowiadająca za aktualizację zmian w szkicu
+    fun updateAdminDraftPlace(
+        draft: AdminDraftPlace,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        if (isUpdatingDraft.value) return
+
+        viewModelScope.launch {
+            val authHeader = createWordPressAuthHeader()
+            if (authHeader == null) {
+                onError("Brakuje WP_USERNAME albo WP_APPLICATION_PASSWORD w local.properties.")
+                return@launch
+            }
+
+            isUpdatingDraft.value = true
+
+            try {
+                // Pobierz nowe koordynaty w razie, gdyby adres uległ zmianie
+                val coords = api.getCoordinates(draft.address)
+
+                // Zabezpieczenie przed brakiem koordynatów
+                val wpLocation = if (coords != null) {
+                    WpLocation(lat = coords.first, lng = coords.second)
+                } else {
+                    WpLocation(lat = draft.latitude ?: 0.0, lng = draft.longitude ?: 0.0)
+                }
+
+                val payload = WpPlaceRequest(
+                    title = draft.title,
+                    content = "",
+                    acf = WpPlaceFields(
+                        kategoria_miejsca = draft.category.toWpSlug(),
+                        opis_miejsca = draft.description,
+                        adres_miejsca = draft.address,
+                        lokalizacja = wpLocation,
+                        cechy_sensoryczne = draft.sensoryFeatures.map { it.toWpSlug() },
+                        wyroznienie_medal = draft.hasMedal,
+                        wyroznienie_serduszko = draft.hasHeart,
+                        facebook_url = draft.facebook,
+                        instagram_url = draft.instagram,
+                        www = draft.website
+                    )
+                )
+
+                // Należy upewnić się, że istnieje odpowiednia metoda w API
+                val isSuccess = api.updatePlace(
+                    placeId = draft.id,
+                    payload = payload,
+                    authHeader = authHeader
+                )
+
+                if (isSuccess) {
+                    onSuccess()
+                    loadAdminDraftPlaces() // Przeładuj listę by zastosować zmiany wizualnie
+                } else {
+                    onError("Nie udało się zapisać zmian. WordPress odrzucił żądanie.")
+                }
+            } catch (e: Exception) {
+                onError(e.message ?: "Wystąpił błąd podczas zapisu zmian szkicu.")
+            } finally {
+                isUpdatingDraft.value = false
+            }
+        }
+    }
 
     private fun JsonElement.toAdminDraftPlace(index: Int): AdminDraftPlace {
         val objectValue = this as? JsonObject
@@ -423,6 +427,25 @@ class PlaceViewModel : ViewModel() {
                 onError("Nie udało się wysłać zgłoszenia. Serwer odrzucił żądanie. Upewnij się, że masz połączenie z Internetem i dane są poprawne.")
             }
 
+        }
+    }
+
+    private fun String.toWpSlug(): String {
+        val polishChars = mapOf(
+            'ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n',
+            'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z'
+        )
+        val slug = this.lowercase()
+            .map { polishChars[it] ?: it }
+            .joinToString("")
+            .replace(" ", "_")
+            .filter { it.isLetterOrDigit() || it == '_' }
+
+        return when (slug) {
+            "cisza" -> "ciche"
+            "brak_intensywnych_zapachow" -> "brak_zapachow"
+            "jasna_informacja" -> "dostepnosc_informacyjna"
+            else -> slug
         }
     }
 

@@ -1,34 +1,24 @@
 package pl.edu.ug.neuromapa.screens.account.dashboard
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,38 +29,52 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
+import neuromapa.composeapp.generated.resources.Res
+import neuromapa.composeapp.generated.resources.profile_screen_admin_panel_subscreen_content
+import neuromapa.composeapp.generated.resources.profile_screen_admin_panel_subscreen_title
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.stringResource
 import pl.edu.ug.neuromapa.components.Header
 import pl.edu.ug.neuromapa.components.form.FormButton
 import pl.edu.ug.neuromapa.components.form.FormSection
+import pl.edu.ug.neuromapa.components.form.FormSelection
 import pl.edu.ug.neuromapa.data.AdminDraftPlace
 import pl.edu.ug.neuromapa.data.AdminDraftPlacesState
-import pl.edu.ug.neuromapa.data.AdminPlaceParameter
+import pl.edu.ug.neuromapa.data.MapPoint
 import pl.edu.ug.neuromapa.data.PlaceViewModel
+import pl.edu.ug.neuromapa.data.getCategories
+import pl.edu.ug.neuromapa.data.getExcellenceMarks
+import pl.edu.ug.neuromapa.data.getSensoryProperties
 import pl.edu.ug.neuromapa.platform.SystemAlertDialog
-import pl.edu.ug.neuromapa.screens.place.components.PlaceFeature
-import pl.edu.ug.neuromapa.screens.place.helpers.getCategoryIconHelper
-import pl.edu.ug.neuromapa.screens.place.helpers.getFeatureIconHelper
-import pl.edu.ug.neuromapa.screens.place.helpers.getFeatureNameHelper
+import pl.edu.ug.neuromapa.screens.favorites.components.FavoritePlaceCard
+import pl.edu.ug.neuromapa.screens.home.settings.cornerRadius
+import pl.edu.ug.neuromapa.screens.home.settings.widePadding
+import pl.edu.ug.neuromapa.screens.home.settings.wideSpacing
+import pl.edu.ug.neuromapa.screens.place.settings.mediumPadding
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.getAppTypography
+import pl.edu.ug.neuromapa.ui.settings.globalComponentCornerRadius
 import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumPadding
 import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumSpacing
-import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
+import pl.edu.ug.neuromapa.ui.settings.globalComponentNarrowSpacing
 
 @Composable
-fun AdminPanel(placeViewModel: PlaceViewModel) {
+fun AdminPanel(
+    userProfileImage: DrawableResource,
+    profilePhotoUrl: String? = null,
+    placeViewModel: PlaceViewModel
+)
+{
 
     val draftPlacesState by placeViewModel.adminDraftPlacesState.collectAsState()
     val isPublishingDraft by placeViewModel.isPublishingDraft
-//    val isRejectingDraft by placeViewModel.isRejectingDraft
     var selectedDraft by remember { mutableStateOf<AdminDraftPlace?>(null) }
-    var draftPendingPublish by remember { mutableStateOf<AdminDraftPlace?>(null) }
-//    var draftPendingReject by remember { mutableStateOf<AdminDraftPlace?>(null) }
     var actionStatusMessage by remember { mutableStateOf<String?>(null) }
+
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(placeViewModel) {
         placeViewModel.loadAdminDraftPlaces()
@@ -85,104 +89,124 @@ fun AdminPanel(placeViewModel: PlaceViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .verticalScroll(scrollState)
         ) {
 
             Header(
-                title = "Panel admina",
-                showProfileTopRightCorner = false,
+                title = stringResource(Res.string.profile_screen_admin_panel_subscreen_title),
+                userProfileImage = userProfileImage,
+                profilePhotoUrl = profilePhotoUrl,
+                showProfileTopRightCorner = true,
                 roundBottomCorners = true
             )
 
-            when (val state = draftPlacesState) {
-                AdminDraftPlacesState.Idle,
-                AdminDraftPlacesState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(widePadding),
+                verticalArrangement = Arrangement.spacedBy(wideSpacing)
+            ) {
+
+                when (val state = draftPlacesState) {
+                    is AdminDraftPlacesState.Idle, is AdminDraftPlacesState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
-                }
 
-                is AdminDraftPlacesState.Error -> {
-                    AdminMessage(message = state.message, isError = true)
-                }
+                    is AdminDraftPlacesState.Error -> {
+                        SystemAlertDialog(
+                            title = "Błąd",
+                            message = "Wystąpił błąd: ${state.message}",
+                            onDismiss = { }
+                        )
+                    }
 
-                is AdminDraftPlacesState.Success -> {
-                    val currentDraft = selectedDraft
-                    if (currentDraft == null) {
-                        DraftPlacesList(
-                            drafts = state.drafts,
-                            onDraftSelected = { draft -> selectedDraft = draft }
-                        )
-                    } else {
-                        DraftPlaceDetails(
-                            draft = currentDraft,
-                            isPublishing = isPublishingDraft,
-                            onBack = { selectedDraft = null },
-                            onPublishClick = { draftPendingPublish = currentDraft }
-//                            onRejectClick = { draftPendingReject = currentDraft }
-                        )
+                    is AdminDraftPlacesState.Success -> {
+
+                        if (selectedDraft == null) {
+
+                            Text(
+                                text = stringResource(Res.string.profile_screen_admin_panel_subscreen_content) + "${state.drafts.size}",
+                                style = getAppTypography().bodySmall,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+
+                            state.drafts.forEach { draft ->
+
+                                val mockMapPoint = remember(draft) {
+                                    MapPoint(
+                                        id = draft.id.toIntOrNull() ?: 0,
+                                        name = draft.title,
+                                        category = draft.category,
+                                        latitude = 0.0,
+                                        longitude = 0.0,
+                                        sensoryFeatures = draft.sensoryFeatures,
+                                        hasMedal = draft.hasMedal,
+                                        hasHeart = draft.hasHeart,
+                                        description = draft.description,
+                                        address = draft.address,
+                                        photoUrl = "",
+                                        website = draft.website,
+                                        facebook = draft.facebook,
+                                        instagram = draft.instagram
+                                    )
+                                }
+
+                                FavoritePlaceCard(
+                                    mapPoint = mockMapPoint,
+                                    isFavorite = false,
+                                    onFavoriteClick = { },
+                                    onDelete = { },
+                                    onNavigate = { },
+                                    onClick = { selectedDraft = draft },
+                                    isSwipeable = false
+                                )
+
+                            }
+
+                        } else {
+                            EditDraftForm(
+                                draft = selectedDraft!!,
+                                isPublishing = isPublishingDraft,
+                                onSaveClick = { updatedDraft ->
+                                    placeViewModel.updateAdminDraftPlace(
+                                        draft = updatedDraft,
+                                        onSuccess = {
+                                            selectedDraft = updatedDraft
+                                            actionStatusMessage = "Zmiany zostały pomyślnie zapisane."
+                                        },
+                                        onError = { message ->
+                                            actionStatusMessage = message
+                                        }
+                                    )
+                                },
+                                onPublishClick = { updatedDraft ->
+                                    placeViewModel.publishAdminDraftPlace(
+                                        draft = updatedDraft,
+                                        onSuccess = {
+                                            selectedDraft = null
+                                            actionStatusMessage = "Miejsce zostało pomyślnie opublikowane."
+                                        },
+                                        onError = { message ->
+                                            actionStatusMessage = message
+                                        }
+                                    )
+                                },
+                                onBackClick = { selectedDraft = null }
+                            )
+                        }
                     }
                 }
             }
         }
 
-        val confirmationDraft = draftPendingPublish
-        if (confirmationDraft != null) {
-            PublishConfirmationDialog(
-                draft = confirmationDraft,
-                isPublishing = isPublishingDraft,
-                onConfirm = {
-                    draftPendingPublish = null
-                    placeViewModel.publishAdminDraftPlace(
-                        draft = confirmationDraft,
-                        onSuccess = {
-                            selectedDraft = null
-                            actionStatusMessage = "Miejsce zostało opublikowane."
-                        },
-                        onError = { message ->
-                            actionStatusMessage = message
-                        }
-                    )
-                },
-                onDismiss = {
-                    if (!isPublishingDraft) {
-                        draftPendingPublish = null
-                    }
-                }
-            )
-        }
-
-//        val rejectionDraft = draftPendingReject
-//        if (rejectionDraft != null) {
-//            RejectConfirmationDialog(
-//                draft = rejectionDraft,
-//                isRejecting = isRejectingDraft,
-//                onConfirm = {
-//                    draftPendingReject = null
-//                    placeViewModel.rejectAdminDraftPlace(
-//                        draft = rejectionDraft,
-//                        onSuccess = {
-//                            selectedDraft = null
-//                            actionStatusMessage = "Szkic został odrzucony i usunięty."
-//                        },
-//                        onError = { message ->
-//                            actionStatusMessage = message
-//                        }
-//                    )
-//                },
-//                onDismiss = {
-//                    if (!isRejectingDraft) {
-//                        draftPendingReject = null
-//                    }
-//                }
-//            )
-//        }
-
         if (!actionStatusMessage.isNullOrBlank()) {
             SystemAlertDialog(
-                title = "Panel admina",
+                title = "Sukces",
                 message = actionStatusMessage.orEmpty(),
                 onDismiss = { actionStatusMessage = null }
             )
@@ -191,562 +215,246 @@ fun AdminPanel(placeViewModel: PlaceViewModel) {
 }
 
 @Composable
-private fun AdminMessage(message: String, isError: Boolean = false) {
+private fun EditDraftForm(
+    draft: AdminDraftPlace,
+    isPublishing: Boolean,
+    onSaveClick: (AdminDraftPlace) -> Unit,
+    onPublishClick: (AdminDraftPlace) -> Unit,
+    onBackClick: () -> Unit
+)
+{
+
+    val focusManager = LocalFocusManager.current
+
+    var name by remember { mutableStateOf(draft.title) }
+    var description by remember { mutableStateOf(draft.description) }
+    var address by remember { mutableStateOf(draft.address) }
+    var instagram by remember { mutableStateOf(draft.instagram) }
+    var facebook by remember { mutableStateOf(draft.facebook) }
+    var website by remember { mutableStateOf(draft.website) }
+
+    val allExcellences = getExcellenceMarks()
+    val allCategories = getCategories()
+    val allProperties = getSensoryProperties()
+
+    fun String.toWpSlug(): String {
+        val polishChars = mapOf(
+            'ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n',
+            'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z'
+        )
+        val slug = this.lowercase()
+            .map { polishChars[it] ?: it }
+            .joinToString("")
+            .replace(" ", "_")
+            .filter { it.isLetterOrDigit() || it == '_' }
+        return when (slug) {
+            "cisza" -> "ciche"
+            "brak_intensywnych_zapachow" -> "brak_zapachow"
+            "jasna_informacja" -> "dostepnosc_informacyjna"
+            else -> slug
+        }
+    }
+
+    var selectedCategories by remember {
+        mutableStateOf<Set<String>>(
+            if (draft.category.isNotBlank()) {
+                allCategories
+                    .filter { it.name.toWpSlug() == draft.category || it.name.contains(draft.category, ignoreCase = true) }
+                    .map { it.name }
+                    .toSet()
+            } else emptySet()
+        )
+    }
+
+    var selectedProperties by remember {
+        mutableStateOf<Set<String>>(
+            allProperties
+                .filter { prop ->
+                    // Zamieniamy nazwę wyświetlaną (UI) na sluga i dopiero wtedy porównujemy z cechą (slugiem) z bazy
+                    draft.sensoryFeatures.any { feature -> prop.name.toWpSlug() == feature || prop.name.contains(feature, ignoreCase = true) }
+                }
+                .map { it.name }
+                .toSet()
+        )
+    }
+
+    var selectedExcellences by remember(draft, allExcellences) {
+        mutableStateOf<Set<String>>(
+            allExcellences
+                .filter { item ->
+                    (draft.hasMedal && item.name.contains("medal", ignoreCase = true)) ||
+                            (draft.hasHeart && item.name.contains("serduszko", ignoreCase = true))
+                }
+                .map { it.name }
+                .toSet()
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(globalComponentWidePadding),
-        verticalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { focusManager.clearFocus() },
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
         FormSection(
-            title = "Szkice miejsc",
-            customContent = {
-                Text(
-                    text = message,
-                    style = getAppTypography().bodySmall,
-                    color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground
-                )
-            }
+            title = "Nazwa miejsca",
+            placeholder = "Wpisz nazwę",
+            value = name,
+            onValueChange = { name = it }
         )
-    }
-}
 
-@Composable
-private fun DraftPlacesList(
-    drafts: List<AdminDraftPlace>,
-    onDraftSelected: (AdminDraftPlace) -> Unit
-) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(globalComponentWidePadding),
-        verticalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
-    ) {
-        item {
-            FormSection(
-                title = "Szkice miejsc",
-                customContent = {
-                    Text(
-                        text = "Znaleziono szkicow: ${drafts.size}",
-                        style = getAppTypography().bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-            )
-        }
-
-        if (drafts.isEmpty()) {
-            item {
-                Text(
-                    text = "Brak szkicow do wyswietlenia.",
-                    style = getAppTypography().bodySmall,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-        }
-
-        itemsIndexed(drafts) { index, draft ->
-            DraftPlaceCard(
-                index = index,
-                draft = draft,
-                onClick = { onDraftSelected(draft) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun DraftPlaceCard(
-    index: Int,
-    draft: AdminDraftPlace,
-    onClick: () -> Unit
-) {
-    val features = buildList {
-        addAll(draft.sensoryFeatures)
-        if (draft.hasMedal) add("hasMedal")
-        if (draft.hasHeart) add("hasHeart")
-    }
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .bounceClick(isAnimated = false) { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surface
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            DraftPlaceCardHeader(index = index, draft = draft)
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(globalComponentWidePadding),
-                verticalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
-            ) {
-                if (features.isNotEmpty()) {
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
-                    ) {
-                        items(features) { feature ->
-                            PlaceFeature(
-                                icon = getFeatureIconHelper(feature),
-                                iconContentDescription = getFeatureNameHelper(feature),
-                                name = getFeatureNameHelper(feature)
-                            )
-                        }
-                    }
-                }
-
-                DraftInfoSection(
-                    title = "Opis",
-                    value = draft.description.ifBlank { "Brak opisu" }
-                )
-
-                DraftInfoSection(
-                    title = "Adres",
-                    value = draft.address.ifBlank { "Brak adresu" }
-                )
-
-                DraftLinksSection(draft = draft)
-            }
-        }
-    }
-}
-
-@Composable
-private fun DraftPlaceDetails(
-    draft: AdminDraftPlace,
-    isPublishing: Boolean,
-    onBack: () -> Unit,
-    onPublishClick: () -> Unit,
-//    onRejectClick: () -> Unit
-) {
-    val features = buildList {
-        addAll(draft.sensoryFeatures)
-        if (draft.hasMedal) add("hasMedal")
-        if (draft.hasHeart) add("hasHeart")
-    }
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(globalComponentWidePadding),
-        verticalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
-    ) {
-        item {
-            DraftDetailsActions(
-                isPublishing = isPublishing,
-                onBack = onBack,
-                onPublishClick = onPublishClick
-//                onRejectClick = onRejectClick
-            )
-        }
-
-        item {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
-                color = MaterialTheme.colorScheme.surface
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    DraftPlaceCardHeader(index = 0, draft = draft, showIndex = false)
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(globalComponentWidePadding),
-                        verticalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
-                    ) {
-                        if (features.isNotEmpty()) {
-                            LazyRow(
-                                horizontalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
-                            ) {
-                                items(features) { feature ->
-                                    PlaceFeature(
-                                        icon = getFeatureIconHelper(feature),
-                                        iconContentDescription = getFeatureNameHelper(feature),
-                                        name = getFeatureNameHelper(feature)
-                                    )
-                                }
-                            }
-                        }
-
-                        DraftInfoSection(
-                            title = "Opis",
-                            value = draft.description.ifBlank { "Brak opisu" }
-                        )
-
-                        DraftInfoSection(
-                            title = "Adres",
-                            value = draft.address.ifBlank { "Brak adresu" }
-                        )
-
-                        DraftLinksSection(draft = draft)
-
-                        DraftParametersSection(parameters = draft.parameters)
-                    }
-                }
-            }
-        }
-
-        item {
-            PublishDraftButton(
-                isPublishing = isPublishing,
-                onPublishClick = onPublishClick
-//                onRejectClick = onRejectClick
-            )
-        }
-    }
-}
-
-@Composable
-private fun DraftDetailsActions(
-    isPublishing: Boolean,
-    onBack: () -> Unit,
-    onPublishClick: () -> Unit,
-//    onRejectClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
-    ) {
-        Box(
-            modifier = Modifier.bounceClick { onBack() }
-        ) {
-            FormButton(
-                text = "Wroc do listy",
-                isPrimary = false
-            )
-        }
-
-        PublishDraftButton(
-            isPublishing = isPublishing,
-            onPublishClick = onPublishClick
+        FormSelection(
+            title = "Kategoria",
+            items = getCategories(),
+            selectedItems = selectedCategories,
+            onSelectionChange = { selectedCategories = it },
+            isSingleSelection = true
         )
-//        DraftDecisionButtons(
-//            isPublishing = isPublishing,
-//            isRejecting = isRejecting,
-//            onPublishClick = onPublishClick,
-//            onRejectClick = onRejectClick
-//        )
-    }
-}
 
-//@Composable
-//private fun DraftDecisionButtons(
-//    isPublishing: Boolean,
-//    isRejecting: Boolean,
-//    onPublishClick: () -> Unit,
-//    onRejectClick: () -> Unit
-//) {
-//    Column(
-//        modifier = Modifier.fillMaxWidth(),
-//        verticalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
-//    ) {
-//        PublishDraftButton(
-//            isPublishing = isPublishing,
-//            isRejecting = isRejecting,
-//            onPublishClick = onPublishClick
-//        )
-//
-//        RejectDraftButton(
-//            isPublishing = isPublishing,
-//            isRejecting = isRejecting,
-//            onRejectClick = onRejectClick
-//        )
-//    }
-//}
-
-@Composable
-private fun PublishDraftButton(
-    isPublishing: Boolean,
-    onPublishClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier.bounceClick {
-            if (!isPublishing) {
-                onPublishClick()
-            }
-        }
-    ) {
-        FormButton(
-            text = if (isPublishing) "Publikowanie..." else "Opublikuj miejsce",
-            isPrimary = true,
-            containerColor = if (isPublishing) MaterialTheme.colorScheme.surfaceBright else MaterialTheme.colorScheme.surfaceVariant
+        FormSection(
+            title = "Opis",
+            placeholder = "Opis miejsca",
+            value = description,
+            onValueChange = { description = it }
         )
-    }
-}
 
-//@Composable
-//private fun RejectDraftButton(
-//    isPublishing: Boolean,
-//    isRejecting: Boolean,
-//    onRejectClick: () -> Unit
-//) {
-//    Box(
-//        modifier = Modifier.bounceClick {
-//            if (!isPublishing && !isRejecting) {
-//                onRejectClick()
-//            }
-//        }
-//    ) {
-//        FormButton(
-//            text = if (isRejecting) "Odrzucanie..." else "Odrzuć szkic",
-//            isPrimary = true,
-//            containerColor = if (isRejecting) MaterialTheme.colorScheme.surfaceBright else MaterialTheme.colorScheme.surfaceTint
-//        )
-//    }
-//}
+        FormSection(
+            title = "Adres",
+            placeholder = "Adres miejsca",
+            value = address,
+            onValueChange = { address = it }
+        )
 
-@Composable
-private fun PublishConfirmationDialog(
-    draft: AdminDraftPlace,
-    isPublishing: Boolean,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = "Opublikować miejsce?")
-        },
-        text = {
-            Text(
-                text = "Czy na pewno chcesz dodać \"${draft.title}\" ze szkiców do opublikowanych?"
-            )
-        },
-        confirmButton = {
-            TextButton(
-                enabled = !isPublishing,
-                onClick = onConfirm
-            ) {
-                Text(text = if (isPublishing) "Publikowanie..." else "Opublikuj")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                enabled = !isPublishing,
-                onClick = onDismiss
-            ) {
-                Text(text = "Anuluj")
-            }
-        }
-    )
-}
+        FormSelection(
+            title = "Cechy sensoryczne",
+            items = getSensoryProperties(),
+            selectedItems = selectedProperties,
+            onSelectionChange = { selectedProperties = it }
+        )
 
-//@Composable
-//private fun RejectConfirmationDialog(
-//    draft: AdminDraftPlace,
-//    isRejecting: Boolean,
-//    onConfirm: () -> Unit,
-//    onDismiss: () -> Unit
-//) {
-//    AlertDialog(
-//        onDismissRequest = onDismiss,
-//        title = {
-//            Text(text = "Odrzucić szkic?")
-//        },
-//        text = {
-//            Text(
-//                text = "Czy na pewno chcesz odrzucić i usunąć \"${draft.title}\"? Tej operacji nie da się cofnąć."
-//            )
-//        },
-//        confirmButton = {
-//            TextButton(
-//                enabled = !isRejecting,
-//                onClick = onConfirm
-//            ) {
-//                Text(text = if (isRejecting) "Odrzucanie..." else "Odrzuć")
-//            }
-//        },
-//        dismissButton = {
-//            TextButton(
-//                enabled = !isRejecting,
-//                onClick = onDismiss
-//            ) {
-//                Text(text = "Anuluj")
-//            }
-//        }
-//    )
-//}
+        FormSelection(
+            title = "Wyróżnienia",
+            items = getExcellenceMarks(),
+            selectedItems = selectedExcellences,
+            onSelectionChange = { selectedExcellences = it }
+        )
 
-@Composable
-private fun DraftPlaceCardHeader(
-    index: Int,
-    draft: AdminDraftPlace,
-    showIndex: Boolean = true
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primary)
-            .padding(globalComponentWidePadding)
-    ) {
+        FormSection(
+            title = "Instagram",
+            placeholder = "Link do profilu na Instagramie",
+            value = instagram,
+            onValueChange = { instagram = it }
+        )
+
+        FormSection(
+            title = "Facebook",
+            placeholder = "Link do profilu na Facebooku",
+            value = facebook,
+            onValueChange = { facebook = it }
+        )
+
+        FormSection(
+            title = "Strona WWW",
+            placeholder = "Link do strony",
+            value = website,
+            onValueChange = { website = it }
+        )
+
+        // Buttons
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing),
-            verticalAlignment = Alignment.Top
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = globalComponentMediumPadding),
+            horizontalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
         ) {
+
+            // Go back
             Box(
                 modifier = Modifier
-                    .size(52.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.onPrimary),
-                contentAlignment = Alignment.Center
+                    .weight(1f)
+                    .bounceClick { onBackClick() }
             ) {
-                Image(
-                    painter = painterResource(getCategoryIconHelper(draft.category)),
-                    contentDescription = draft.category.ifBlank { "Kategoria" },
-                    modifier = Modifier.size(42.dp)
+                FormButton(
+                    text = "Wróć",
+                    isPrimary = false
                 )
             }
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+            // Save
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .bounceClick {
+                        if (!isPublishing) {
+                            focusManager.clearFocus()
+
+                            val updatedDraft = draft.copy(
+                                title = name,
+                                description = description,
+                                address = address,
+                                category = selectedCategories.firstOrNull() ?: "",
+                                sensoryFeatures = selectedProperties.toList(),
+                                hasMedal = selectedExcellences.any { it.contains("medal", ignoreCase = true) },
+                                hasHeart = selectedExcellences.any { it.contains("serduszko", ignoreCase = true) },
+                                instagram = instagram,
+                                facebook = facebook,
+                                website = website
+                            )
+                            onSaveClick(updatedDraft)
+                        }
+                    }
             ) {
-                Text(
-                    text = if (showIndex) "${index + 1}. ${draft.title}" else draft.title,
-                    style = getAppTypography().titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    text = draft.category.ifBlank { "Brak kategorii" },
-                    style = getAppTypography().bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Row {
-                    DraftStatusPill(text = "ID ${draft.id}")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    DraftStatusPill(text = draft.status)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DraftStatusPill(text: String) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.16f))
-            .padding(horizontal = 10.dp, vertical = 5.dp)
-    ) {
-        Text(
-            text = text,
-            style = getAppTypography().bodySmall,
-            color = MaterialTheme.colorScheme.onPrimary
-        )
-    }
-}
-
-@Composable
-private fun DraftInfoSection(title: String, value: String) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = title,
-            style = getAppTypography().titleSmall,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        SelectionContainer {
-            Text(
-                text = value,
-                style = getAppTypography().bodySmall,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        }
-    }
-}
-
-@Composable
-private fun DraftLinksSection(draft: AdminDraftPlace) {
-    val links = listOf(
-        "WWW" to draft.website,
-        "Facebook" to draft.facebook,
-        "Instagram" to draft.instagram
-    ).filter { (_, value) -> value.isNotBlank() }
-
-    if (links.isEmpty()) return
-
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = "Linki",
-            style = getAppTypography().titleSmall,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        links.forEach { (label, value) ->
-            ParameterRow(
-                parameter = AdminPlaceParameter(label, value),
-                compact = true
-            )
-        }
-    }
-}
-
-@Composable
-private fun DraftParametersSection(parameters: List<AdminPlaceParameter>) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Text(
-            text = "Parametry wpisu",
-            style = getAppTypography().titleSmall,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        parameters.forEachIndexed { index, parameter ->
-            ParameterRow(parameter = parameter)
-            if (index != parameters.lastIndex) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f)
+                FormButton(
+                    text = "Zapisz",
+                    isPrimary = false
                 )
             }
-        }
-    }
-}
 
-@Composable
-private fun ParameterRow(
-    parameter: AdminPlaceParameter,
-    compact: Boolean = false
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = if (compact) 2.dp else globalComponentMediumPadding / 2)
-    ) {
-        Text(
-            text = parameter.name,
-            style = getAppTypography().bodySmall.copy(fontWeight = FontWeight.SemiBold),
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        SelectionContainer {
+        }
+
+        // Publish
+        Column(
+            modifier = Modifier
+                .padding(top = mediumPadding)
+                .bounceClick(
+                    onClick = {
+                        if (!isPublishing) {
+                            focusManager.clearFocus()
+
+                            val updatedDraft = draft.copy(
+                                title = name,
+                                description = description,
+                                address = address,
+                                category = selectedCategories.firstOrNull() ?: "",
+                                sensoryFeatures = selectedProperties.toList(),
+                                hasMedal = selectedExcellences.any { it.contains("medal", ignoreCase = true) },
+                                hasHeart = selectedExcellences.any { it.contains("serduszko", ignoreCase = true) },
+                                instagram = instagram,
+                                facebook = facebook,
+                                website = website
+                            )
+                            onPublishClick(updatedDraft)
+                        }
+                    },
+                    hapticType = HapticFeedbackType.LongPress
+                )
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(cornerRadius))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(horizontal = pl.edu.ug.neuromapa.screens.place.settings.widePadding, vertical = mediumPadding),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Text(
-                text = parameter.value.ifBlank { "-" },
-                style = getAppTypography().bodySmall,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.82f)
+                text = "Opublikuj miejsce",
+                color = MaterialTheme.colorScheme.onPrimary,
+                style = getAppTypography().bodyLarge,
             )
         }
+
     }
 }

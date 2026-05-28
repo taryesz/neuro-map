@@ -171,7 +171,14 @@
         <string name="profile_screen_motive_setting_title">Wygląd</string>
         <string name="profile_screen_motive_setting_description">Zmień motyw (jasny / ciemny).</string>
 
+        <string name="profile_screen_admin_panel_title">Panel admina</string>
+        <string name="profile_screen_admin_panel_description">Zatwierdź nowe miejsca.</string>
+
         <string name="profile_screen_user_profile_picture_content_description">Zdjęcie profilowe.</string>
+
+        <string name="profile_screen_admin_panel_subscreen_title">Zarządzaj</string>
+
+        <string name="profile_screen_admin_panel_subscreen_content">Znaleziono szkiców / zgłoszeń: </string>
 
         <string name="profile_screen_edit_profile_subscreen_title">Edytuj konto</string>
 
