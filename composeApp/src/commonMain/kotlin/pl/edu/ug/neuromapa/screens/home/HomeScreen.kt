@@ -158,13 +158,13 @@ fun HomeScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
-    ) {
+    ) { paddingValues ->
 
         // One more wrapper...
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState)  // Make the screen scrollable
+                .padding(paddingValues)
         ) {
 
             // Header (turquoise panel at the very top) - CUSTOM VERSION
@@ -185,7 +185,9 @@ fun HomeScreen(
             // Body (main content)
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(scrollState)
                     .padding(widePadding),
                 verticalArrangement = Arrangement.spacedBy(wideSpacing)
             ) {
