@@ -112,12 +112,13 @@ fun AddScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0.dp)
-    ) {
+    ) { paddingValues ->
 
         // One more wrapper...
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(paddingValues)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },    // This allows tracking the clicks
                     indication = null                                               // This makes the clicks non-visible
@@ -125,7 +126,6 @@ fun AddScreen(
                     focusManager.clearFocus()   // If the user clicked somewhere in the screen but not a form field,
                     // the keyboard hides ("focus is lost")
                 }
-                .verticalScroll(scrollState)  // Make the screen scrollable
         ) {
 
             // Header (turquoise panel at the very top)
@@ -142,6 +142,8 @@ fun AddScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(1f)
+                    .verticalScroll(scrollState)
                     .background(MaterialTheme.colorScheme.background)
                     .padding(widePadding),
                 verticalArrangement = Arrangement.spacedBy(mediumSpacing)

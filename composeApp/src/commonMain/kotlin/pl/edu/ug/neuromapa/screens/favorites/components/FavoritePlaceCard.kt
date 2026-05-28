@@ -33,7 +33,8 @@ fun FavoritePlaceCard(
     onFavoriteClick: () -> Unit,
     onClick: () -> Unit = {},
     onDelete: () -> Unit,
-    onNavigate: () -> Unit
+    onNavigate: () -> Unit,
+    isSwipeable: Boolean = true
 ) {
 
     val dismissState = rememberSwipeToDismissBoxState(
@@ -52,31 +53,38 @@ fun FavoritePlaceCard(
         }
     )
 
+    val cardContent = @Composable {
+        PlaceHeader(
+            modifier = Modifier.bounceClick(isAnimated = false) { onClick() },
+            name = mapPoint.name,
+            categoryIcon = getCategoryIconHelper(mapPoint.category),
+            categoryIconDescription = mapPoint.category,
+            isFavorite = isFavorite,
+            onFavoriteButtonClick = onFavoriteClick,
+            latitude = mapPoint.latitude,
+            longitude = mapPoint.longitude,
+            height = cardHeight,
+            onCardClick = onClick
+        )
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(globalComponentCornerRadius))
     ) {
-        SwipeToDismissBox(
-            state = dismissState,
-            backgroundContent = {
-                DismissBackground(dismissState)
-            },
-            content = {
-                PlaceHeader(
-                    modifier = Modifier.bounceClick(isAnimated = false) { onClick() },
-                    name = mapPoint.name,
-                    categoryIcon = getCategoryIconHelper(mapPoint.category),
-                    categoryIconDescription = mapPoint.category,
-                    isFavorite = isFavorite,
-                    onFavoriteButtonClick = onFavoriteClick,
-                    latitude = mapPoint.latitude,
-                    longitude = mapPoint.longitude,
-                    height = cardHeight,
-                    onCardClick = onClick
-                )
-            }
-        )
+        if (isSwipeable) {
+            SwipeToDismissBox(
+                state = dismissState,
+                backgroundContent = {
+                    DismissBackground(dismissState)
+                },
+                content = { cardContent() }
+            )
+        }
+        else {
+            cardContent()
+        }
     }
 }
 

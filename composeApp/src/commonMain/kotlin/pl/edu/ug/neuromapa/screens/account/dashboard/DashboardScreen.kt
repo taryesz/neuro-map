@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.profile_screen_account_setting_description
 import neuromapa.composeapp.generated.resources.profile_screen_account_setting_title
+import neuromapa.composeapp.generated.resources.profile_screen_admin_panel_description
+import neuromapa.composeapp.generated.resources.profile_screen_admin_panel_title
 import neuromapa.composeapp.generated.resources.profile_screen_log_out_button_text
 import neuromapa.composeapp.generated.resources.profile_screen_motive_setting_description
 import neuromapa.composeapp.generated.resources.profile_screen_motive_setting_title
@@ -51,12 +54,14 @@ fun DashboardScreen(
     onClearStatusMessage: () -> Unit,
     onNavigateToProfileSettings: () -> Unit,
     onNavigateToMotiveSettings: () -> Unit,
+    onNavigateToAdminPanel: () -> Unit,
+    isAdmin: Boolean,
     scrollState: ScrollState = rememberScrollState(),
     currentEmail: String,
 ) {
 
     // Available settings list
-    val settingsList = listOf(
+    val settingsList = listOfNotNull(
 
         SettingItemData(
             icon = Icons.Outlined.AccountCircle,
@@ -75,6 +80,17 @@ fun DashboardScreen(
                 onNavigateToMotiveSettings()
             }
         ),
+
+        if (isAdmin)
+            SettingItemData(
+                icon = Icons.Outlined.AdminPanelSettings,
+                title = stringResource(Res.string.profile_screen_admin_panel_title),
+                subtitle = stringResource(Res.string.profile_screen_admin_panel_description),
+                onClick = {
+                    onNavigateToAdminPanel()
+                }
+            )
+        else null,
 
     )
 

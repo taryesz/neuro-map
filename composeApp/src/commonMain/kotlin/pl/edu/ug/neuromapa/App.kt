@@ -18,27 +18,28 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.user_pfp_example
-import pl.edu.ug.neuromapa.enums.Screen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import pl.edu.ug.neuromapa.components.navigation_bar.NavigationBar
+import pl.edu.ug.neuromapa.data.MapPoint
+import pl.edu.ug.neuromapa.data.PlaceDataState
+import pl.edu.ug.neuromapa.data.PlaceViewModel
+import pl.edu.ug.neuromapa.data.auth.AuthState
+import pl.edu.ug.neuromapa.data.auth.AuthViewModel
+import pl.edu.ug.neuromapa.data.auth.ProfilePhotoPicker
+import pl.edu.ug.neuromapa.enums.Screen
+import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
+import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
+import pl.edu.ug.neuromapa.screens.account.dashboard.AdminPanel
+import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
+import pl.edu.ug.neuromapa.screens.account.dashboard.MotiveSettings
+import pl.edu.ug.neuromapa.screens.account.dashboard.ProfileSettings
 import pl.edu.ug.neuromapa.screens.add.AddScreen
 import pl.edu.ug.neuromapa.screens.favorites.FavoritesScreen
+import pl.edu.ug.neuromapa.screens.favorites.FavoritesViewModel
 import pl.edu.ug.neuromapa.screens.home.HomeScreen
 import pl.edu.ug.neuromapa.screens.map.MapScreen
 import pl.edu.ug.neuromapa.screens.place.PlaceScreen
 import pl.edu.ug.neuromapa.ui.NeuroMapTheme
-import pl.edu.ug.neuromapa.data.MapPoint
-import pl.edu.ug.neuromapa.data.PlaceDataState
-import pl.edu.ug.neuromapa.data.PlaceViewModel
-import pl.edu.ug.neuromapa.data.auth.AuthViewModel
-import pl.edu.ug.neuromapa.data.auth.AuthState
-import pl.edu.ug.neuromapa.data.auth.ProfilePhotoPicker
-import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
-import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
-import pl.edu.ug.neuromapa.screens.account.dashboard.DashboardScreen
-import pl.edu.ug.neuromapa.screens.account.dashboard.MotiveSettings
-import pl.edu.ug.neuromapa.screens.account.dashboard.ProfileSettings
-import pl.edu.ug.neuromapa.screens.favorites.FavoritesViewModel
 
 @Composable
 @Preview
@@ -139,12 +140,18 @@ fun App() {
                     currentScreen = currentScreen,
                     onScreenSelected = { newScreen ->
                         if (currentScreen == newScreen) {
+
+                            if (newScreen == Screen.Profile) {
+                                activeSettingsScreen = null
+                            }
+
                             coroutineScope.launch {
                                 when (newScreen) {
                                     Screen.Home -> homeScrollState.animateScrollTo(0)
                                     Screen.Add -> addScrollState.animateScrollTo(0)
                                     Screen.Map -> mapFilterScrollState.animateScrollTo(0)
                                     Screen.Favorites -> favoritesListState.animateScrollToItem(0)
+                                    Screen.Profile -> profileScrollState.animateScrollTo(0)
                                     else -> {}
                                 }
                             }
@@ -268,8 +275,11 @@ fun App() {
                                                 is AuthState.SignedIn -> {
 
                                                     val signedIn = authState as AuthState.SignedIn
+                                                    val visibleSettingsScreen =
+                                                        if (activeSettingsScreen == "admin" && !signedIn.isAdmin) null
+                                                        else activeSettingsScreen
 
-                                                    when (activeSettingsScreen) {
+                                                    when (visibleSettingsScreen) {
                                                         "profile" -> {
                                                             ProfileSettings(
                                                                 userProfileImage = Res.drawable.user_pfp_example,
@@ -305,6 +315,12 @@ fun App() {
                                                                 },
                                                             )
                                                         }
+                                                        "admin" -> {
+                                                            AdminPanel(
+                                                                userProfileImage = Res.drawable.user_pfp_example,
+                                                                profilePhotoUrl = signedIn.photoUrl,
+                                                                placeViewModel = placeViewModel)
+                                                        }
                                                         else -> {
                                                             DashboardScreen(
                                                                 userProfileImage = Res.drawable.user_pfp_example,
@@ -315,6 +331,8 @@ fun App() {
                                                                 onClearStatusMessage = { saveStatusMessage = null },
                                                                 onNavigateToProfileSettings = { activeSettingsScreen = "profile" },
                                                                 onNavigateToMotiveSettings = { activeSettingsScreen = "motive" },
+                                                                onNavigateToAdminPanel = { activeSettingsScreen = "admin" },
+                                                                isAdmin = signedIn.isAdmin,
                                                                 scrollState = profileScrollState,
                                                                 currentEmail = signedIn.email,
                                                             )
