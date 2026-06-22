@@ -425,4 +425,16 @@ object SupabaseDatabase {
             emptyList()
         }
     }
+
+    suspend fun deleteUserAccount(accessToken: String) {
+        val response = SupabaseAuth.supabaseHttpClient.post("$SUPABASE_URL/rest/v1/rpc/delete_user") {
+            header("apikey", SUPABASE_ANON_KEY)
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+        }
+
+        if (!response.status.isSuccess()) {
+            throw IllegalStateException("Failed to delete user account: ${response.status} ${response.bodyAsText()}")
+        }
+    }
+
 }

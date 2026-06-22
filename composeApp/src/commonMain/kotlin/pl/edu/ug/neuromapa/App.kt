@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -17,7 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import neuromapa.composeapp.generated.resources.Res
+import neuromapa.composeapp.generated.resources.profile_screen_delete_account_alert_dialog_text
+import neuromapa.composeapp.generated.resources.profile_screen_delete_account_button_text
 import neuromapa.composeapp.generated.resources.user_pfp_example
+import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import pl.edu.ug.neuromapa.components.navigation_bar.NavigationBar
 import pl.edu.ug.neuromapa.data.MapPoint
@@ -27,6 +32,7 @@ import pl.edu.ug.neuromapa.data.auth.AuthState
 import pl.edu.ug.neuromapa.data.auth.AuthViewModel
 import pl.edu.ug.neuromapa.data.auth.ProfilePhotoPicker
 import pl.edu.ug.neuromapa.enums.Screen
+import pl.edu.ug.neuromapa.platform.SystemConfirmDialog
 import pl.edu.ug.neuromapa.screens.account.auth.SignInScreen
 import pl.edu.ug.neuromapa.screens.account.auth.SignUpScreen
 import pl.edu.ug.neuromapa.screens.account.dashboard.AdminPanel
@@ -279,6 +285,8 @@ fun App() {
                                                         if (activeSettingsScreen == "admin" && !signedIn.isAdmin) null
                                                         else activeSettingsScreen
 
+                                                    var showDeleteConfirmation by remember { mutableStateOf(false) }
+
                                                     when (visibleSettingsScreen) {
                                                         "profile" -> {
                                                             ProfileSettings(
@@ -299,6 +307,10 @@ fun App() {
                                                                         }
                                                                     )
                                                                 },
+                                                                onRemoveProfile = {
+                                                                    // TODO
+                                                                    showDeleteConfirmation = true
+                                                                },
                                                                 onPickProfilePhoto = {
                                                                     ProfilePhotoPicker.launch?.invoke()
                                                                         ?: run { saveStatusMessage = "Wybór zdjęcia nie jest dostępny na tej platformie." }
@@ -306,6 +318,27 @@ fun App() {
                                                                 saveStatusMessage = saveStatusMessage,
                                                                 onClearStatusMessage = { saveStatusMessage = null },
                                                             )
+
+                                                            if (showDeleteConfirmation) {
+                                                                SystemConfirmDialog(
+                                                                    title = stringResource(Res.string.profile_screen_delete_account_button_text),
+                                                                    message = stringResource(Res.string.profile_screen_delete_account_alert_dialog_text),
+                                                                    confirmButtonText = "Usuń trwale",
+                                                                    cancelButtonText = "Anuluj",
+                                                                    isDestructive = true,
+                                                                    onConfirm = {
+                                                                        showDeleteConfirmation = false
+                                                                        authViewModel.deleteAccount(
+                                                                            onError = { message -> saveStatusMessage = message },
+                                                                            onSuccess = { saveStatusMessage = "Konto zostało usunięte." }
+                                                                        )
+                                                                    },
+                                                                    onDismiss = {
+                                                                        showDeleteConfirmation = false
+                                                                    }
+                                                                )
+                                                            }
+
                                                         }
                                                         "motive" -> {
                                                             MotiveSettings(

@@ -58,17 +58,17 @@ fun AlternativeAuthForm(
                 )
             }
 
-            // Sign in with Apple
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .bounceClick { onAppleClick() }
-            ) {
-                FormButton(
-                    icon = Res.drawable.sign_in_apple,
-                    isPrimary = false,
-                )
-            }
+//            // Sign in with Apple
+//            Box(
+//                modifier = Modifier
+//                    .weight(1f)
+//                    .bounceClick { onAppleClick() }
+//            ) {
+//                FormButton(
+//                    icon = Res.drawable.sign_in_apple,
+//                    isPrimary = false,
+//                )
+//            }
 
         }
 

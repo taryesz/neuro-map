@@ -224,6 +224,30 @@ class AuthViewModel : ViewModel() {
         _authState.value = AuthState.SignedOut
     }
 
+    fun deleteAccount(
+        onError: ((String) -> Unit)? = null,
+        onSuccess: (() -> Unit)? = null
+    ) {
+        val current = _authState.value as? AuthState.SignedIn ?: return
+
+        viewModelScope.launch {
+            try {
+                val validSession = getValidSession(current) ?: throw IllegalStateException("Sesja wygasła. Zaloguj się ponownie.")
+                SupabaseDatabase.deleteUserAccount(
+                    accessToken = validSession.accessToken
+                )
+                signOut()
+                onSuccess?.invoke()
+            } catch (e: Exception) {
+                val details = e.message?.take(220).orEmpty()
+                onError?.invoke(
+                    if (details.isNotBlank()) "Nie udało się usunąć konta: $details"
+                    else "Wystąpił błąd podczas usuwania konta. Spróbuj ponownie później."
+                )
+            }
+        }
+    }
+
     fun updateProfileData(
         newName: String,
         newBirthDate: String,

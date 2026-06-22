@@ -189,6 +189,8 @@
         <string name="profile_screen_birthday_playholder">Kiedy się urodził*ś?</string>
 
         <string name="profile_screen_save_changes_button_text">Zapisz zmiany</string>
+        <string name="profile_screen_delete_account_button_text">Usuń konto</string>
+        <string name="profile_screen_delete_account_alert_dialog_text">Czy na pewno chcesz trwale usunąć swoje konto? Tej operacji nie można cofnąć, a wszystkie Twoje dane (w tym zapisane miejsca) przepadną.</string>
 
         <string name="profile_screen_edit_motive_subscreen_title">Edytuj wygląd</string>
 

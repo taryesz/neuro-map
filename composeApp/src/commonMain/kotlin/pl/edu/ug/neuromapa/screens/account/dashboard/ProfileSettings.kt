@@ -3,7 +3,9 @@ package pl.edu.ug.neuromapa.screens.account.dashboard
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
@@ -19,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import neuromapa.composeapp.generated.resources.Res
 import neuromapa.composeapp.generated.resources.profile_screen_birthday_field_title
 import neuromapa.composeapp.generated.resources.profile_screen_birthday_playholder
+import neuromapa.composeapp.generated.resources.profile_screen_delete_account_button_text
 import neuromapa.composeapp.generated.resources.profile_screen_edit_profile_subscreen_edit_pfp_button_description
 import neuromapa.composeapp.generated.resources.profile_screen_edit_profile_subscreen_title
 import neuromapa.composeapp.generated.resources.profile_screen_name_field_title
@@ -38,6 +41,7 @@ import pl.edu.ug.neuromapa.screens.account.settings.iconSmallSizeSettingRepresen
 import pl.edu.ug.neuromapa.screens.account.settings.imageBigSizeProfilePicture
 import pl.edu.ug.neuromapa.ui.animations.bounceClick
 import pl.edu.ug.neuromapa.ui.settings.globalComponentMediumSpacing
+import pl.edu.ug.neuromapa.ui.settings.globalComponentNarrowSpacing
 import pl.edu.ug.neuromapa.ui.settings.globalComponentWidePadding
 import pl.edu.ug.neuromapa.ui.settings.globalComponentWideSpacing
 
@@ -50,6 +54,7 @@ fun ProfileSettings(
     currentBirthDate: String,
     onBirthDateChange: (String) -> Unit,
     onSaveProfile: () -> Unit,
+    onRemoveProfile: () -> Unit,
     onPickProfilePhoto: () -> Unit,
     saveStatusMessage: String?,
     onClearStatusMessage: () -> Unit,
@@ -131,6 +136,7 @@ fun ProfileSettings(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
+                    .verticalScroll(rememberScrollState())
                     .padding(globalComponentWidePadding),
                 verticalArrangement = Arrangement.spacedBy(globalComponentMediumSpacing)
             )
@@ -152,7 +158,7 @@ fun ProfileSettings(
                     onValueChange = onBirthDateChange
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
+                // Spacer(modifier = Modifier.height(globalComponentNarrowSpacing))
 
                 // Save button
                 Box(
@@ -166,6 +172,21 @@ fun ProfileSettings(
                         text = stringResource(Res.string.profile_screen_save_changes_button_text),
                         isPrimary = true,
                         containerColor = MaterialTheme.colorScheme.primary,
+                    )
+                }
+
+                // Remove account and delete all user data button
+                Box(
+                    modifier = Modifier
+                        .padding(top = globalComponentWidePadding)
+                        .bounceClick {
+                            onRemoveProfile()
+                        }
+                ) {
+                    FormButton(
+                        text = stringResource(Res.string.profile_screen_delete_account_button_text),
+                        isPrimary = true,
+                        containerColor = MaterialTheme.colorScheme.surfaceTint,
                     )
                 }
 
